@@ -1,53 +1,64 @@
 import React from 'react';
+import './css/Login.css';
 
 const Login: React.FC = () => {
   return (
-    <div style={loginContainerStyle}>
-      <h2>Iniciar Sesión</h2>
-      <form style={formStyle}>
-        <div>
-          <label htmlFor="email">Correo Electrónico:</label>
-          <input type="email" id="email" name="email" style={inputStyle} required />
+    <div className="container-fluid mt-5">
+      <div className="row mt-5">
+        <div className="form-signin w-50 mx-auto mt-5">
+          <form>
+            <div className="form-header p-4">
+              <h1 className="h3 pt-3 mt-4 mb-3 fw-normal text-center">
+                ¡Bienvenido!
+              </h1>
+            </div>
+            <div className="form-body p-3">
+              <div className="form-floating">
+                <input
+                  type="email"
+                  className="form-control shadow"
+                  id="loginEmail"
+                  placeholder="Correo electrónico"
+                  name="loginEmail"
+                />
+                <label htmlFor="loginEmail">Correo electrónico</label>
+              </div>
+
+              <div className="form-floating mt-4">
+                <input
+                  type="password"
+                  className="form-control shadow"
+                  id="loginPassword"
+                  placeholder="Contraseña"
+                  name="loginPassword"
+                />
+                <label htmlFor="loginPassword">Contraseña</label>
+              </div>
+
+              <p className="text-center mt-4 pt-4">
+                <a href="/recuperar-contrasena">¿Olvidaste tu contraseña?</a>
+              </p>
+
+              <div className="container-fluid mt-4">
+                <div className="row">
+                  <div className="col text-center btn-azul">
+                    <input
+                      className="w-50 btn btn-lg "
+                      type="submit"
+                      value="Iniciar sesión"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
         </div>
-        <div>
-          <label htmlFor="password">Contraseña:</label>
-          <input type="password" id="password" name="password" style={inputStyle} required />
-        </div>
-        <button type="submit" style={buttonStyle}>Entrar</button>
-      </form>
+      </div>
+      <div className="text-center text-register mt-4 pt-4 ">
+            ¿No tienes una cuenta? <a href="/sign-in">Regístrate</a>
+      </div>
     </div>
   );
-};
-
-const loginContainerStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: '100vh',
-  backgroundColor: '#f4f4f9',
-};
-
-const formStyle: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  width: '300px',
-};
-
-const inputStyle: React.CSSProperties = {
-  padding: '0.5rem',
-  margin: '0.5rem 0',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-};
-
-const buttonStyle: React.CSSProperties = {
-  padding: '0.75rem',
-  backgroundColor: '#282c34',
-  color: 'white',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
 };
 
 export default Login;

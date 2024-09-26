@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400&display=swap');
+
+* {
+  font-family: 'Poppins', 'Roboto Condensed', 'Arial', sans-serif;
+  font-style: normal;
+}
+
+body {
+  background-color: #fefefe;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-image: url('../../assets/si-bg.png');
+  background-size: cover; 
+  background-repeat: no-repeat; 
+  background-attachment: fixed; 
+}
+
+
+a {
+  color: rgb(0, 0, 0);
+}
+
+a:hover {
+  color: #F2541B;
+}
+
+.form-centrar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 100px); 
+  padding: 20px; 
+}
+
+.form-signin {
+  width: 100%;
+  max-width: 700px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-60 {
+  width: 60% !important;
+}
+
+.btn-gris {
+  background-color: #fbfbfb;
+  border-radius: 53px;
+  color: white;
+}
+
+.form-control:focus {
+  color: #212529;
+  background-color: #fff;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(33 46 70 / 25%);
+}
+
+.text-register{
+  color:white
+}
+.text-register a {
+  color: white;
+}
+.text-register a:hover{
+  color: #1B70A6;
+}
+
+.btn-azul {
+  background-color: #1B70A6;
+  border-color: #1B70A6;
+  border-radius: 32px;
+  color: white;
+  transition-timing-function: ease-out;
+  transition-duration: .5s;
+  transition-property: all;
+}
+
+.btn-azul:hover {
+  background-color: rgba(20, 82, 121, 0.1); /* Fondo semitransparente */
+  border-color: #1B70A6;
+  color: #1B70A6;
+  transition-duration: 1s;
+}
+
+.btn-naranja {
+  background-color: #F2541B;
+  border-color: #F2541B;
+  border-radius: 8px;
+  color: white;
+  transition-timing-function: ease-out;
+  transition-duration: .5s;
+  transition-property: all;
+}
+
+.btn-naranja:hover {
+  background-color: rgba(242, 84, 27, 0.1); /* Fondo semitransparente */
+  border-color: var(--botonNrj);
+  color: black;
+  transition-duration: 1s;
+}
+
+.input-field-error {
+  border: 2px solid #ff0000 !important;
+}
+
+.input-field-ok {
+  border: 2px solid #1B70A6 !important;
+}
+
+.error {
+  color: #ff0000;
+}
+
+.centrar {
+  text-align: center;
+}
+
+.react-autosuggest__input {
+  width: 500px;
+  font-size: (1.275rem + 0.3vw) !important;
+}
+
+.react-autosuggest__suggestions-container {
+  display: block;
+  position: absolute;
+  top: 31px;
+  width: 500px;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  font-weight: 300;
+  z-index: 2;
+  max-height: 300px;
+  overflow: auto;
+  margin-top: 16px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}

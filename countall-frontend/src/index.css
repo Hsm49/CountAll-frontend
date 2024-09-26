@@ -1,3 +1,9 @@
+:root {
+  --botonAzul: #1B70A6;
+  --botonNrj: #F2541B;
+}
+
+
 * {
   margin: 0;
   padding: 0;

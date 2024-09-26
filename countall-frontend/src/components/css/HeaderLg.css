@@ -1,0 +1,68 @@
+/* Estilos generales del header */
+.header {
+    background-color: #ffffff;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+  }
+  
+  /* Contenedor del logo y los botones */
+  .container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
+  
+  /* Estilos del logo */
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo-img {
+    max-height: 50px; /* Ajusta el tamaño del logo */
+    height: auto;
+    width: auto;
+  }
+  
+  /* Botones de autenticación */
+  .auth-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Botón de iniciar sesión */
+  .btn-li {
+    background-color: white;
+    color: #f2541b;
+    border: 2px solid #f2541b;
+    border-radius: 32px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn-li:hover {
+    background-color: rgba(242, 84, 27, 0.1);
+    color: #f2541b;
+  }
+  
+  /* Botón de registrarse */
+  .btn-su {
+    background-color: #1b70a6;
+    color: white;
+    border: 2px solid #1b70a6;
+    border-radius: 32px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn-su:hover {
+    background-color: rgba(27, 112, 166, 0.8);
+    border-color: #1b70a6;
+  }
+  

@@ -1,11 +1,11 @@
 import React from 'react';
-import Header from './components/Header';
+import HeaderLg from './components/HeaderLg';
 import Login from './components/Login';
 
 const App: React.FC = () => {
   return (
     <div>
-      <Header />
+      <HeaderLg />
       <Login />
     </div>
   );
