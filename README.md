@@ -12,4 +12,4 @@ Este es el frontend del proyecto CountAll creado con Vite, React y TypeScript.
 1. Clona el repositorio:
 
 ```bash
-git clone https://github.com/TU-USUARIO/countall-frontend.git
+git clone https://github.com/Hsm49/countall-frontend.git
