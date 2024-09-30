@@ -9,6 +9,7 @@ import RecoverPassword from '../components/RecoverPassword';
 import RecoverSent from '../components/RecoverSent';
 import NewPassword from '../components/NewPassword';
 import PasswordSaved from '../components/PasswordSaved';
+import LandingPage from '../components/LandingPage';
 
 const AppRouter: React.FC = () => {
   return (
@@ -41,8 +42,8 @@ const AppRouter: React.FC = () => {
          {/* Ruta de correo de recuperación enviado */}
          <Route path="/recover-sent" element={<RecoverSent />} /> 
 
-        {/* Ruta raíz que redirige a login */}
-        <Route path="/" element={<Login />} />
+        {/* Ruta raíz que redirige a la página principal*/}
+        <Route path="/" element={<LandingPage />} />
 
       </Routes>
     </Router>
