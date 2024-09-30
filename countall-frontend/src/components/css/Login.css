@@ -5,25 +5,26 @@
   font-style: normal;
 }
 
-body {
+.login-container {
   background-color: #fefefe;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
+  min-height: calc(100vh - 82px);
   background-image: url('../../assets/si-bg.png');
   background-size: cover; 
   background-repeat: no-repeat; 
-  background-attachment: fixed; 
+  background-attachment: fixed;
 }
 
 
-a {
+.login-container a {
   color: rgb(0, 0, 0);
 }
 
-a:hover {
+.login-container a:hover {
   color: #F2541B;
 }
 
@@ -32,14 +33,15 @@ a:hover {
   justify-content: center;
   align-items: center;
   min-height: calc(100vh - 100px); 
-  padding: 20px; 
+  padding: 30px; 
 }
 
 .form-signin {
+  align-items: center;
   width: 100%;
   max-width: 700px;
   background-color: #f8f9fa;
-  padding: 15px;
+  padding: 40px;
   border-radius: 10px;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 }
@@ -83,7 +85,7 @@ a:hover {
 
 .btn-azul:hover {
   background-color: rgba(20, 82, 121, 0.1); /* Fondo semitransparente */
-  border-color: #1B70A6;
+  border: 2px solid #1b70a6;
   color: #1B70A6;
   transition-duration: 1s;
 }

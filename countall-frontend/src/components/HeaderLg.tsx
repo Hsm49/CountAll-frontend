@@ -1,19 +1,30 @@
 import React from 'react';
-import './css/HeaderLg.css'; // Asegúrate de que este archivo esté presente y contenga los estilos
+import './css/HeaderLg.css';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
+  const navigate = useNavigate(); 
+
   return (
     <header className="header">
       <div className="container">
-        {/* Logo en la izquierda */}
         <div className="logo">
-          <img src="../assets/CA4.png" alt="Logo" className="logo-img" />
+          <img
+            src="src/assets/CA2.png"
+            alt="Logo"
+            className="logo-img"
+            onClick={() => navigate('/')} 
+            style={{ cursor: 'pointer' }}
+          />
         </div>
 
-        {/* Botones en la derecha */}
         <div className="auth-buttons">
-          <button className="btn-li">Iniciar sesión</button>
-          <button className="btn-su">Registrarse</button>
+          <button className="btn-li" onClick={() => navigate('/login')}>
+            Iniciar sesión
+          </button>
+          <button className="btn-su" onClick={() => navigate('/sign-up')}>
+            Registrarse
+          </button>
         </div>
       </div>
     </header>

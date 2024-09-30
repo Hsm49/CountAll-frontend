@@ -1,13 +1,9 @@
 import React from 'react';
-import HeaderLg from './components/HeaderLg';
-import Login from './components/Login';
+import AppRouter from './routes/AppRouter';
 
 const App: React.FC = () => {
   return (
-    <div>
-      <HeaderLg />
-      <Login />
-    </div>
+      <AppRouter />
   );
 };
 
