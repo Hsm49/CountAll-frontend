@@ -1,0 +1,138 @@
+/* Landing Page Container */
+.landing-page {
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    height: 100vh;
+  }
+  
+  .section {
+    scroll-snap-align: start;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+  
+  /* Sección 1: Intro */
+  .intro {
+    background-image: url('src/assets/img/intro-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+  }
+  
+  .intro .logo {
+    display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+    width: 50%;
+    margin-bottom: 20px;
+  }
+  
+  .intro h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+  }
+  
+  .intro p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+  }
+  
+  .btn-azul {
+    background-color: #1b70a6;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-azul:hover {
+    background-color: rgba(27, 112, 166, 0.8);
+  }
+  
+  /* Sección 2: Beneficios */
+  .beneficios {
+    text-align: center;
+  }
+  
+  .benefits-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+  
+  .benefit {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    width: 30%;
+    text-align: center;
+  }
+  
+  .benefit img {
+    max-width: 100px;
+    margin-bottom: 20px;
+  }
+  
+  .benefit h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Secciones de funciones */
+  .funcion1, .funcion2, .funcion3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .funcion1 .content, .funcion2 .content, .funcion3 .content {
+    display: flex;
+    align-items: center;
+    width: 80%;
+    justify-content: space-between;
+  }
+  
+  .text {
+    flex: 1;
+    margin-right: 20px;
+    text-align: justify;
+  }
+  
+  .image {
+    flex: 1;
+  }
+  
+  .image img {
+    max-width: 100%;
+  }
+  
+  /* Sección 6: Call to Action */
+  .cta {
+    background-image: url('src/assets/img/cta-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    text-align: center;
+  }
+  
+  .cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+  }
+  
+  /* Footer */
+  .footer {
+    background-color: #1b70a6;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .footer-logo {
+    max-width: 150px;
+  }
+  

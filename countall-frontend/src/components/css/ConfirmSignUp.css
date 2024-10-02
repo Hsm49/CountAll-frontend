@@ -1,0 +1,60 @@
+.confirm-container {
+    height: 100%;
+    min-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fefefe;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .email-img {
+    width: 45%;
+    margin-bottom: 20px;
+  }
+
+  .secure-img {
+    width: 60%;
+    margin-bottom: 20px;
+  }
+  
+  .buttons-container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .btn-naranja {
+    background-color: #f57c00;
+    color: white;
+    border: 2px solid #f57c00;
+    border-radius: 32px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn-naranja:hover {
+    background-color: rgba(245, 124, 0, 0.8);
+    color: white;
+    border-color: #f57c00;
+  }
+  
+  .btn-azul {
+    background-color: #1b70a6;
+    color: white;
+    border: 2px solid #1b70a6;
+    border-radius: 32px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .btn-azul:hover {
+    background-color: rgba(27, 112, 166, 0.8);
+    border-color: #1b70a6;
+  }
+  
