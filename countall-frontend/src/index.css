@@ -3,6 +3,16 @@
   --botonNrj: #F2541B;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Evitar scroll horizontal si hay algún overflow */
+}
+
+main {
+  margin-top: 80px; /* Ajusta este valor según la altura del header */
+}
 
 * {
   margin: 0;
