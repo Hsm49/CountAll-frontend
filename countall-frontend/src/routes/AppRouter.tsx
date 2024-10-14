@@ -10,6 +10,8 @@ import RecoverSent from '../components/RecoverSent';
 import NewPassword from '../components/NewPassword';
 import PasswordSaved from '../components/PasswordSaved';
 import LandingPage from '../components/LandingPage';
+import Leaderboard from '../components/Leaderboard'
+import Tracking from '../components/Tracking';
 
 const AppRouter: React.FC = () => {
   return (
@@ -41,6 +43,14 @@ const AppRouter: React.FC = () => {
 
          {/* Ruta de correo de recuperación enviado */}
          <Route path="/recover-sent" element={<RecoverSent />} /> 
+
+         {/* Ruta de pantalla de inicio (seguimiento) */}
+         <Route path="/tracking" element={<Tracking />} /> 
+
+         {/* Ruta de correo de recuperación enviado */}
+         <Route path="/leaderboard" element={<Leaderboard />} /> 
+
+
 
         {/* Ruta raíz que redirige a la página principal*/}
         <Route path="/" element={<LandingPage />} />
