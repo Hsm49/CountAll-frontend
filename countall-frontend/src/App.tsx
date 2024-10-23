@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import LoadingScreen from './components/LoadingScreen';
 import AppRouter from './routes/AppRouter';
+import HeaderLoggedIn from './components/HeaderLoggedIn';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -17,6 +18,7 @@ const App: React.FC = () => {
   return (
     <>
       {loading ? <LoadingScreen /> : <AppRouter />}
+      <HeaderLoggedIn></HeaderLoggedIn>
     </>
   );
 };
