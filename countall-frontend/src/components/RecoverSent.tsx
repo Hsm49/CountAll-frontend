@@ -18,21 +18,23 @@ const RecoverSent: React.FC = () => {
   return (
     <>
     <Header />
-    <div className="confirm-container">
-      <h1 className="text-center mb-4">Correo de recuperación enviado</h1>
-      <p className="text-center mb-4">
-        Por favor revisa tu email para continuar con el proceso de recuperación de contraseña.
-      </p>
-      <div className="text-center mb-4">
-        <img src="src/assets/svg/email.svg" alt="Correo enviado" className="email-img" />
-      </div>
-      <div className="buttons-container">
-        <button className="btn-naranja" onClick={handleResendEmail}>
-          Reenviar correo
-        </button>
-        <button className="btn-azul" onClick={handleBackToHome}>
-          Volver al inicio
-        </button>
+    <div className="main-content">
+      <div className="confirm-container">
+        <h1 className="text-center mb-4">Correo de recuperación enviado</h1>
+        <p className="text-center mb-4">
+          Por favor revisa tu email para continuar con el proceso de recuperación de contraseña.
+        </p>
+        <div className="text-center mb-4">
+          <img src="src/assets/svg/email.svg" alt="Correo enviado" className="email-img" />
+        </div>
+        <div className="buttons-container">
+          <button className="btn-naranja" onClick={handleResendEmail}>
+            Reenviar correo
+          </button>
+          <button className="btn-azul" onClick={handleBackToHome}>
+            Volver al inicio
+          </button>
+        </div>
       </div>
     </div>
     </>

@@ -7,11 +7,11 @@ body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  overflow-x: hidden; /* Evitar scroll horizontal si hay algún overflow */
+  overflow-x: hidden;
 }
 
 main {
-  margin-top: 80px; /* Ajusta este valor según la altura del header */
+  margin-top: 80px;
 }
 
 * {
@@ -28,4 +28,8 @@ body {
 
 button:hover {
   opacity: 0.9;
+}
+
+.main-content {
+  padding-top: 5.1rem; 
 }

@@ -32,42 +32,44 @@ const NewPassword: React.FC = () => {
   return (
     <>
     <Header/>
-    <div className="recover-container">
-      <div className="pass-container">
-        <img src="src/assets/svg/password2.svg" alt="Nueva contraseña" className="img-fluid" />
-      </div>
-      <div className="form-container">
-        <h2>Crea una nueva contraseña</h2>
-        <p>Introduce y confirma tu nueva contraseña.</p>
-        <form onSubmit={formik.handleSubmit}>
-          <input
-            type="password"
-            id="newPassword"
-            name="newPassword"
-            placeholder="Nueva contraseña"
-            onChange={formik.handleChange}
-            value={formik.values.newPassword}
-            className={`form-control ${formik.touched.newPassword && formik.errors.newPassword ? 'is-invalid' : ''}`}
-          />
-          {formik.errors.newPassword && formik.touched.newPassword ? (
-            <div className="invalid-feedback">{formik.errors.newPassword}</div>
-          ) : null}
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Confirmar contraseña"
-            onChange={formik.handleChange}
-            value={formik.values.confirmPassword}
-            className={`form-control ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'is-invalid' : ''}`}
-          />
-          {formik.errors.confirmPassword && formik.touched.confirmPassword ? (
-            <div className="invalid-feedback">{formik.errors.confirmPassword}</div>
-          ) : null}
-          <button type="submit" className="btn-azul">
-            Guardar nueva contraseña
-          </button>
-        </form>
+    <div className="main-content">
+      <div className="recover-container">
+        <div className="pass-container">
+          <img src="src/assets/svg/password2.svg" alt="Nueva contraseña" className="img-fluid" />
+        </div>
+        <div className="form-container">
+          <h2>Crea una nueva contraseña</h2>
+          <p>Introduce y confirma tu nueva contraseña.</p>
+          <form onSubmit={formik.handleSubmit}>
+            <input
+              type="password"
+              id="newPassword"
+              name="newPassword"
+              placeholder="Nueva contraseña"
+              onChange={formik.handleChange}
+              value={formik.values.newPassword}
+              className={`form-control ${formik.touched.newPassword && formik.errors.newPassword ? 'is-invalid' : ''}`}
+            />
+            {formik.errors.newPassword && formik.touched.newPassword ? (
+              <div className="invalid-feedback">{formik.errors.newPassword}</div>
+            ) : null}
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirmar contraseña"
+              onChange={formik.handleChange}
+              value={formik.values.confirmPassword}
+              className={`form-control ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'is-invalid' : ''}`}
+            />
+            {formik.errors.confirmPassword && formik.touched.confirmPassword ? (
+              <div className="invalid-feedback">{formik.errors.confirmPassword}</div>
+            ) : null}
+            <button type="submit" className="btn-azul">
+              Guardar nueva contraseña
+            </button>
+          </form>
+        </div>
       </div>
     </div>
     </>
