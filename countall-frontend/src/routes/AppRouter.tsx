@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import LoadingScreen from '../components/LoadingScreen';
 import Login from '../components/Login';
 import HeaderLg from '../components/HeaderLg';
 import SignUp from '../components/SignUp';
@@ -49,8 +50,6 @@ const AppRouter: React.FC = () => {
 
          {/* Ruta de correo de recuperación enviado */}
          <Route path="/leaderboard" element={<Leaderboard />} /> 
-
-
 
         {/* Ruta raíz que redirige a la página principal*/}
         <Route path="/" element={<LandingPage />} />

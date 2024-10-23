@@ -13,7 +13,7 @@ const LandingPage: React.FC = () => {
         {/* Sección 1: Introductoria */}
         <section className="section intro">
           <div className="content">
-            <img src="src/assets/CA2.png" alt="CountAll Logo" className="logo mx-auto" />
+            <img src="src/assets/img/logos/CA2.png" alt="CountAll Logo" className="logo mx-auto" />
             <h1>Gestión de Proyectos de Software con Gamificación</h1>
             <p>Gestiona tus proyectos de software de manera divertida y eficaz.</p>
             <button className="btn-azul" onClick={() => navigate('/sign-up')}>
