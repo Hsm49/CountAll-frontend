@@ -30,6 +30,7 @@ const RecoverPassword: React.FC = () => {
   return (
     <>
         <Header/>
+        <div className="main-content">
         <div className="recover-container">
             <div className="pass-container">
                 <img src="src/assets/svg/password1.svg" alt="Correo enviado" className="pass1-img" />
@@ -59,6 +60,7 @@ const RecoverPassword: React.FC = () => {
             </form>
         </div>
         </div>
+      </div>
     </>
   );
 };

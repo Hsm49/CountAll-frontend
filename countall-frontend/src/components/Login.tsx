@@ -6,6 +6,7 @@ const Login: React.FC = () => {
   return (
     <>
     <Header />
+    <div className="main-content">
       <div className="login-container container-fluid">
         <div className="row mt-5">
           <div className="form-signin w-50 mx-auto mt-5">
@@ -60,6 +61,7 @@ const Login: React.FC = () => {
         <div className="text-center text-register mt-4 pt-4 ">
               ¿No tienes una cuenta? <a href="/sign-up">Regístrate</a>
         </div>
+      </div>
       </div>
     </>
   );

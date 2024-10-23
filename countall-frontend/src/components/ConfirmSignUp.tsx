@@ -18,6 +18,7 @@ const ConfirmSignUp: React.FC = () => {
   return (
     <>
     <Header />
+    <div className="main-content">
     <div className="confirm-container">
       <h1 className="text-center mb-4">Registro exitoso</h1>
       <p className="text-center mb-4">
@@ -34,6 +35,7 @@ const ConfirmSignUp: React.FC = () => {
           Volver al inicio
         </button>
       </div>
+    </div>
     </div>
     </>
   );
