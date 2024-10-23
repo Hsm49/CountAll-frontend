@@ -1,0 +1,113 @@
+.tracking-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #fefefe;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Recuadros de información */
+.info-cards {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.time-frame-select {
+  margin-left: auto;
+  padding: 5px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Contenedor de tablas */
+.tables-container {
+  display: flex;
+  width: 100%;
+  gap: 2rem;
+  padding: 20px;
+}
+
+/* Tabla Resumen del Proyecto y Tareas para Hoy */
+.project-summary {
+  flex: 1;
+}
+
+.task-filter {
+  margin: 10px 0;
+}
+
+.task-filter button {
+  margin-right: 5px;
+  background-color: #1b70a6;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.task-filter button:hover {
+  background-color: rgba(27, 112, 166, 0.8);
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  border-color: #1b70a6;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+th {
+  background-color: #f8f9fa;
+  color: #1b70a6;
+}
+
+td {
+  background-color: white;
+}
+
+/* Icono de urgencia */
+.urgency-icon {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.urgency-icon.red {
+  background-color: red;
+}
+
+.urgency-icon.yellow {
+  background-color: yellow;
+}
+
+.urgency-icon.green {
+  background-color: green;
+}
+
+/* Tabla de Clasificatorias */
+.leaderboard {
+  flex: 1;
+}
+
+.user-photo-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #f2541b;
+  border-radius: 50%;
+  margin: 0 auto;
+}

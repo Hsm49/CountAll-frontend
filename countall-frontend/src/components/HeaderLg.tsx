@@ -10,7 +10,7 @@ const Header: React.FC = () => {
       <div className="container">
         <div className="logo">
           <img
-            src="src/assets/CA2.png"
+            src="src/assets/img/logos/CA2.png"
             alt="Logo"
             className="logo-img"
             onClick={() => navigate('/')} 
