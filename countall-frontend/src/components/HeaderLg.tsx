@@ -2,7 +2,7 @@ import React from 'react';
 import './css/HeaderLg.css';
 import { useNavigate } from 'react-router-dom';
 
-const Header: React.FC = () => {
+const HeaderLg: React.FC = () => {
   const navigate = useNavigate(); 
 
   return (
@@ -31,4 +31,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default HeaderLg;

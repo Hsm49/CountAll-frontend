@@ -10,10 +10,6 @@ body {
   overflow-x: hidden;
 }
 
-main {
-  margin-top: 80px;
-}
-
 * {
   margin: 0;
   padding: 0;
@@ -31,5 +27,5 @@ button:hover {
 }
 
 .main-content {
-  padding-top: 5.1rem; 
+  padding-top: 2.55rem; 
 }

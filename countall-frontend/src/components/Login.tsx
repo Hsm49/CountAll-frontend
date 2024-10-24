@@ -5,7 +5,6 @@ import Header from './HeaderLg';
 const Login: React.FC = () => {
   return (
     <>
-    <Header />
     <div className="main-content">
       <div className="login-container container-fluid">
         <div className="row mt-5">

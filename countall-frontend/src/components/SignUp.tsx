@@ -37,7 +37,6 @@ const SignUp: React.FC = () => {
   
     return (
       <>
-        <Header />
         <div className="main-content">
           <div className="container-fluid signup-container">
             <div className="row">
