@@ -2,7 +2,7 @@
 .content-wrapper {
   padding: 24px;
   background-color: #f8f9fa;
-  height: calc(100vh - 60px); /* Adjust based on your header height */
+  height: calc(100vh - 70px); /* Adjust based on your header height */
   overflow-y: auto;
 }
 

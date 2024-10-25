@@ -2,34 +2,65 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background-color: #fefefe;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  padding: 24px;
+  background-color: #f8f9fa;
+  height: calc(100vh - 70px); /* Adjust based on your header height */
+  overflow-y: auto;
 }
 
 /* Recuadros de información */
 .info-cards {
   display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
 }
 
-.time-frame-select {
-  margin-left: auto;
-  padding: 5px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+.score-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.score-icon {
+  background: #e8f4ff;
+  color: #0098e5;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.score-content {
+  flex: 1;
+}
+
+.score-content h3 {
+  color: #607489;
+  font-size: 14px;
+  margin: 0 0 8px 0;
+}
+
+.score-content .score {
+  color: #44596e;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
 }
 
 /* Contenedor de tablas */
 .tables-container {
   display: flex;
   width: 100%;
-  gap: 2rem;
-  padding: 20px;
+  gap: 24px;
+  padding: 24px;
 }
 
 /* Tabla Resumen del Proyecto y Tareas para Hoy */
@@ -43,7 +74,7 @@
 
 .task-filter button {
   margin-right: 5px;
-  background-color: #1b70a6;
+  background-color: #f2541b;
   color: white;
   border: none;
   border-radius: 5px;
@@ -52,31 +83,35 @@
 }
 
 .task-filter button:hover {
-  background-color: rgba(27, 112, 166, 0.8);
+  background-color: rgba(224, 126, 13, 0.8);
 }
 
 /* Tabla */
 table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   margin-top: 1rem;
-  border-color: #1b70a6;
+  border: 2px solid #1b70a6; /* Visible border for all tables */
+  background-color: #ffffff; /* White background for better contrast */
+  text-align: center;
 }
 
 th,
 td {
   padding: 10px;
   text-align: center;
-  border: 1px solid #ddd;
+  border: 1px solid #6e6e6e;
 }
 
 th {
-  background-color: #f8f9fa;
-  color: #1b70a6;
+  background-color: #1b70a6; /* Darker header background */
+  color: #ffffff; /* White text for header */
 }
 
 td {
-  background-color: white;
+  background-color: #ffffff; /* Light gray for table rows */
+  color: #44596e; /* Dark text for better readability */
 }
 
 /* Icono de urgencia */
@@ -88,20 +123,34 @@ td {
 }
 
 .urgency-icon.red {
-  background-color: red;
+  color: red;
 }
 
 .urgency-icon.yellow {
-  background-color: yellow;
+  color: rgb(255, 231, 15);
 }
 
 .urgency-icon.green {
-  background-color: green;
+  color: green;
 }
 
 /* Tabla de Clasificatorias */
 .leaderboard {
   flex: 1;
+}
+
+.leaderboard table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1rem;
+  border: 2px solid #1b70a6; /* Visible border for all tables */
+  background-color: #ffffff
+}
+
+.leaderboard table th {
+    background-color: #1b70a6; /* Darker header background */
+    color: #ffffff; /* White text for header */
 }
 
 .user-photo-circle {
@@ -110,4 +159,20 @@ td {
   background-color: #f2541b;
   border-radius: 50%;
   margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tracking-container {
+    padding: 16px;
+  }
+
+  .info-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .tables-container {
+    flex-direction: column;
+    gap: 16px;
+  }
 }
