@@ -21,36 +21,43 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     '/recover-password',
     '/recover-sent',
     '/login',
-    '/sign-up',
+    '/sign-up'
   ];
 
   const showHeaderLg = publicPaths.includes(location.pathname);
 
   // Define titles for different routes
   const titles: { [key: string]: string } = {
-    '/inicio': 'Inicio',
+    '/tracking': 'Inicio',
     '/gestionar-equipo': 'Gestionar equipo',
     '/tareas': 'Tareas',
     '/avatar': 'Avatar',
     '/configurar-sitios': 'Configurar sitios',
-    '/clasificatorias': 'Clasificatorias',
+    '/leaderboard': 'Clasificatorias',
     '/usuario': 'Usuario',
-    '/leaderboard': 'Estadísticas',
+    '/statistics': 'Estadísticas',
     '/notificaciones': 'Notificaciones',
   };
 
   const currentTitle = titles[location.pathname] || 'Default Title';
 
   return (
-    <div className="layout-container">
+    <>
       {showHeaderLg || !isLoggedIn ? (
-        <HeaderLg />
+        <>
+          <HeaderLg />
+          <div className={`main-content public-path`}>
+            {children}
+          </div>
+        </>
       ) : (
         <HeaderLoggedIn title={currentTitle}>
-          {children}
+          <div className={`main-content private-path`}>
+            {children}
+          </div>
         </HeaderLoggedIn>
       )}
-    </div>
+    </>
   );
 };
 

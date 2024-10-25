@@ -95,12 +95,12 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
           />
         </div>
         <Menu menuItemStyles={menuItemStyles}>
-          <MenuItem icon={<FaHome />} onClick={() => navigate('/inicio')}>Inicio</MenuItem>
+          <MenuItem icon={<FaHome />} onClick={() => navigate('/tracking')}>Inicio</MenuItem>
           <MenuItem icon={<FaUsers />} onClick={() => navigate('/gestionar-equipo')}>Gestionar equipo</MenuItem>
           <MenuItem icon={<FaTasks />} onClick={() => navigate('/tareas')}>Tareas</MenuItem>
           <MenuItem icon={<FaUser />} onClick={() => navigate('/avatar')}>Avatar</MenuItem>
           <MenuItem icon={<FaCogs />} onClick={() => navigate('/configurar-sitios')}>Configurar sitios</MenuItem>
-          <MenuItem icon={<FaTrophy />} onClick={() => navigate('/clasificatorias')}>Clasificatorias</MenuItem>
+          <MenuItem icon={<FaTrophy />} onClick={() => navigate('/leaderboard')}>Clasificatorias</MenuItem>
           <MenuItem icon={<FaUserCircle />} onClick={() => navigate('/usuario')}>Usuario</MenuItem>
           <MenuItem icon={<FaChartBar />} onClick={() => navigate('/estadisticas')}>Estadísticas</MenuItem>
           <MenuItem icon={<FaBellSlash />} onClick={() => navigate('/notificaciones')}>Notificaciones</MenuItem>

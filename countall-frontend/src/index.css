@@ -3,17 +3,12 @@
   --botonNrj: #F2541B;
 }
 
-body {
+html, body, #root {
+  height: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   overflow-x: hidden;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 body {
@@ -26,6 +21,15 @@ button:hover {
   opacity: 0.9;
 }
 
-.main-content {
-  padding-top: 2.55rem; 
+.main-content.public-path {
+  padding-top: 4.1rem;
+  min-height: calc(100vh - 4.1rem);
+  display: flex;
+  flex-direction: column;
+}
+.main-content.private-path {
+  padding-top: 4.1rem;
+  min-height: calc(100vh - 4.1rem);
+  display: flex;
+  flex-direction: column;
 }
