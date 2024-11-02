@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import './css/SignUp.css';
 import Header from './HeaderLg';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const SignUp: React.FC = () => {
     const navigate = useNavigate(); 
@@ -28,10 +29,33 @@ const SignUp: React.FC = () => {
           .oneOf([Yup.ref('password'), undefined], 'Las contraseñas deben coincidir')
           .required('Debes confirmar la contraseña'),
       }),
-      onSubmit: (values) => {
-        // Lógica para registrar al usuario
-        console.log(values);
-        navigate('/confirm-sign-up');
+      onSubmit: async (values) => {
+        try {
+          // Enviar datos al backend con Axios
+          const response = await axios.post('http://localhost:4444/api/usuario/registrarUsuario', {
+            nombre_usuario: values.username,
+            email_usuario: values.email,
+            password_usuario: values.password,
+          });
+
+          // Mostrar alerta de éxito
+          Swal.fire({
+            icon: 'success',
+            title: 'Usuario registrado',
+            text: 'Te has registrado exitosamente',
+          });
+
+          // Lógica para registrar al usuario
+          console.log(values);
+          navigate('/confirm-sign-up');
+        } catch (error) {
+          // Mostrar errores
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al registrar el usuario',
+          });
+        }
       },
     });
   
