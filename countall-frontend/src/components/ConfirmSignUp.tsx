@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/ConfirmSignUp.css';
-import Header from './HeaderLg';
 
 const ConfirmSignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +16,6 @@ const ConfirmSignUp: React.FC = () => {
 
   return (
     <>
-    <Header />
     <div className="main-content">
     <div className="confirm-container">
       <h1 className="text-center mb-4">Registro exitoso</h1>

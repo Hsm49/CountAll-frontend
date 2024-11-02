@@ -1,80 +1,120 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { FaTrophy, FaCheck, FaArrowUp } from 'react-icons/fa';
 import './css/Leaderboard.css';
+import LeaderboardTable from './LeaderboardTable';
+
+interface Clasificacion {
+  id: number;
+  puntuacion: number;
+  usuario: {
+    nombre_usuario: string;
+    rol: {
+      rol: string;
+    } | null;
+  };
+}
 
 const Leaderboard: React.FC = () => {
+  const [clasificaciones, setClasificaciones] = useState<Clasificacion[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchClasificaciones = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Obtén el token de autenticación del almacenamiento local
+        const response = await fetch('http://localhost:4444/api/clasificaciones', {
+          headers: {
+            'Authorization': `Bearer ${token}` // Incluye el token en los encabezados de la solicitud
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          throw new Error(`Received non-JSON response: ${text}`);
+        }
+        const data = await response.json();
+        setClasificaciones(data);
+      } catch (error) {
+        console.error('Error fetching clasificaciones:', error);
+      }
+    };
+
+    fetchClasificaciones();
+  }, []);
+
   return (
-    <>
-        <div className="ranking-container">
-            {/* Sección de puntajes del usuario */}
-            <div className="user-scores">
-                <div className="score-card">
-                <h3>Puntos totales</h3>
-                <p>1250</p>
+    <div className="content-wrapper">
+      <div className="ranking-container">
+        {/* User Scores Section */}
+        <div className="user-scores">
+          <div className="score-card">
+            <div className="score-icon">
+              <FaTrophy />
+            </div>
+            <div className="score-content">
+              <h3>Puntos totales</h3>
+              <p className="score">1250</p>
+              <div className="score-trend positive">
+                <FaArrowUp />
                 <small>Aumento del 5% desde el último mes</small>
-                </div>
-                <div className="score-card">
-                <h3>Tareas completadas</h3>
-                <p>10 / 15</p>
-                </div>
+              </div>
             </div>
-
-            {/* Sección del podio */}
-            <div className="podium-and-table">
-                <div className="podium">
-                <div className="podium-member first">
-                    <h4>1° Miembro A</h4>
-                    <p>Puntaje: 1500</p>
-                </div>
-                <div className="podium-member second">
-                    <h4>2° Miembro B</h4>
-                    <p>Puntaje: 1400</p>
-                </div>
-                <div className="podium-member third">
-                    <h4>3° Miembro C</h4>
-                    <p>Puntaje: 1300</p>
-                </div>
-                </div>
-
-                {/* Tabla de clasificatorias */}
-                <div className="leaderboard">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Posición</th>
-                        <th>Foto</th>
-                        <th>Nombre</th>
-                        <th>Rol</th>
-                        <th>Puntaje</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro A</td>
-                        <td>Líder</td>
-                        <td>1500</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro B</td>
-                        <td>Miembro</td>
-                        <td>1400</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro C</td>
-                        <td>Miembro</td>
-                        <td>1300</td>
-                    </tr>
-                    </tbody>
-                </table>
-                </div>
+          </div>
+          
+          <div className="score-card">
+            <div className="score-icon">
+              <FaCheck />
             </div>
+            <div className="score-content">
+              <h3>Tareas completadas</h3>
+              <p className="score">10 / 15</p>
+              <div className="completion-bar">
+                <div className="completion-progress" style={{ width: '66.67%' }}></div>
+              </div>
+            </div>
+          </div>
         </div>
-    </>
+
+        {/* Podium and Table Section */}
+        <div className="podium-and-table">
+          <div className="podium">
+            {clasificaciones.length >= 3 && (
+              <>
+                <div key={`second-${clasificaciones[1].id}`} className="podium-member second">
+                  <div className="avatar">
+                    <img src="/api/placeholder/50/50" alt="2nd Place" />
+                  </div>
+                  <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
+                  <p>{`${clasificaciones[1].puntuacion} pts`}</p>
+                </div>
+                <div key={`first-${clasificaciones[0].id}`} className="podium-member first">
+                  <div className="avatar">
+                    <img src="/api/placeholder/50/50" alt="1st Place" />
+                  </div>
+                  <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
+                  <p>{`${clasificaciones[0].puntuacion} pts`}</p>
+                </div>
+                <div key={`third-${clasificaciones[2].id}`} className="podium-member third">
+                  <div className="avatar">
+                    <img src="/api/placeholder/50/50" alt="3rd Place" />
+                  </div>
+                  <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
+                  <p>{`${clasificaciones[2].puntuacion} pts`}</p>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Leaderboard Table */}
+          <div className="leaderboard">
+          <LeaderboardTable />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

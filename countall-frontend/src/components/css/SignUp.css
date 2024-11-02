@@ -1,11 +1,20 @@
 /* signup.css */
 .signup-container {
-  min-height: calc(100vh - 100px); 
+  min-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   background-color: #fefefe;
   margin: 0;
+  padding-left: 0;
+}
+
+.signup-container .row {
+  --bs-gutter-x: 0rem;
+}
+
+.signup-container .form-container .row {
+  --bs-gutter-x: 1.5rem;
 }
 
 .image-container {
@@ -17,7 +26,7 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-  object-position: -300px top; 
+  object-position: -150px top; 
 }
 
 .form-container {

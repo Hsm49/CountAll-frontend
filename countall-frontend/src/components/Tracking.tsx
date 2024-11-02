@@ -1,5 +1,8 @@
+// Tracking.tsx
 import React, { useState } from 'react';
+import { FaTrophy, FaCheck, FaClock, FaGlobe, FaFlag, FaArrowUp } from 'react-icons/fa';
 import './css/Tracking.css';
+import LeaderboardTable from './LeaderboardTable';
 
 const Tracking: React.FC = () => {
   const [timeFrame, setTimeFrame] = useState('semana');
@@ -12,7 +15,7 @@ const Tracking: React.FC = () => {
             <div>
                 {/* Selector para el periodo de tiempo */}
                 <select 
-                    className="time-frame-select"
+                    className="time-frame-select mb-3"
                     value={timeFrame}
                     onChange={(e) => setTimeFrame(e.target.value)}
                     >
@@ -23,20 +26,40 @@ const Tracking: React.FC = () => {
 
                 <div className="info-cards">
                     <div className="score-card">
-                    <h3>Puntos Totales</h3>
-                    <p>1250</p>
+                        <div className="score-icon">
+                            <FaTrophy />
+                        </div>
+                        <div className="score-content">
+                            <h3>Puntos Totales</h3>
+                            <p className="score">1250</p>
+                        </div>
                     </div>
                     <div className="score-card">
-                    <h3>Tareas Completadas</h3>
-                    <p>10 / 15</p>
+                        <div className="score-icon">
+                            <FaCheck />
+                        </div>
+                        <div className="score-content">
+                            <h3>Tareas Completadas</h3>
+                            <p className="score">10 / 15</p>
+                        </div>
                     </div>
                     <div className="score-card">
-                    <h3>Tiempo Trabajado</h3>
-                    <p>5 horas</p>
+                        <div className="score-icon">
+                            <FaClock />
+                        </div>
+                        <div className="score-content">
+                            <h3>Tiempo Trabajado</h3>
+                            <p className="score">5 horas</p>
+                        </div>
                     </div>
                     <div className="score-card">
-                    <h3>Tiempo en la Web</h3>
-                    <p>3 horas</p>
+                        <div className="score-icon">
+                            <FaGlobe />
+                        </div>
+                        <div className="score-content">
+                            <h3>Tiempo en la Web</h3>
+                            <p className="score">3 horas</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -71,21 +94,21 @@ const Tracking: React.FC = () => {
                         <td>Miembro A</td>
                         <td>01/10/2024</td>
                         <td>Completada</td>
-                        <td><span className="urgency-icon red" /></td>
+                        <td><FaFlag className="urgency-icon red" /></td>
                     </tr>
                     <tr>
                         <td>Tarea 2</td>
                         <td>Miembro B</td>
                         <td>02/10/2024</td>
                         <td>En progreso</td>
-                        <td><span className="urgency-icon yellow" /></td>
+                        <td><FaFlag className="urgency-icon yellow" /></td>
                     </tr>
                     <tr>
                         <td>Tarea 3</td>
                         <td>Miembro C</td>
                         <td>03/10/2024</td>
                         <td>Por hacer</td>
-                        <td><span className="urgency-icon green" /></td>
+                        <td><FaFlag className="urgency-icon green" /></td>
                     </tr>
                     </tbody>
                 </table>
@@ -108,15 +131,15 @@ const Tracking: React.FC = () => {
                     <tbody>
                     <tr>
                         <td>Tarea A</td>
-                        <td><span className="urgency-icon red" /></td>
+                        <td><FaFlag className="urgency-icon red" /></td>
                     </tr>
                     <tr>
                         <td>Tarea B</td>
-                        <td><span className="urgency-icon yellow" /></td>
+                        <td><FaFlag className="urgency-icon yellow" /></td>
                     </tr>
                     <tr>
                         <td>Tarea C</td>
-                        <td><span className="urgency-icon green" /></td>
+                        <td><FaFlag className="urgency-icon green" /></td>
                     </tr>
                     </tbody>
                 </table>
@@ -125,40 +148,7 @@ const Tracking: React.FC = () => {
                 {/* Tabla de Clasificatorias (del lado derecho) */}
                 <div className="leaderboard">
                 <h4>Clasificatorias</h4>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Posición</th>
-                        <th>Foto</th>
-                        <th>Nombre</th>
-                        <th>Rol</th>
-                        <th>Puntaje</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro A</td>
-                        <td>Desarrollador</td>
-                        <td>1500</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro B</td>
-                        <td>Tester</td>
-                        <td>1400</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro C</td>
-                        <td>Diseñador</td>
-                        <td>1300</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <LeaderboardTable />
                 </div>
             </div>
         </div>

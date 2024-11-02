@@ -37,9 +37,8 @@ const SignUp: React.FC = () => {
   
     return (
       <>
-        <Header />
         <div className="main-content">
-          <div className="container-fluid signup-container">
+          <div className="signup-container">
             <div className="row">
               <div className="col-md-5 image-container d-none d-md-block">
                 <img src="src/assets/img/signup-image.jpg" alt="Imagen lateral" className="img-fluid" />
