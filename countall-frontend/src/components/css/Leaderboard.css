@@ -224,4 +224,8 @@
     width: 100%;
     max-width: 300px;
   }
+
+  .highlight {
+  background-color: #63a3db;
+}
 }

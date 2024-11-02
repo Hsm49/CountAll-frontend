@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import LoadingScreen from './components/LoadingScreen';
 import AppRouter from './routes/AppRouter';
 import DefaultLayout from './components/DefaultLayout';
+import { AuthProvider } from './context/AuthContext';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -16,13 +17,13 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <AuthProvider>
       {loading ? <LoadingScreen /> : (
         <DefaultLayout>
           <AppRouter />
         </DefaultLayout>
       )}
-    </>
+    </AuthProvider>
   );
 };
 

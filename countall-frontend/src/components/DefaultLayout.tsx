@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router-dom';
 import HeaderLoggedIn from './HeaderLoggedIn';
 import HeaderLg from './HeaderLg';
 import './css/DefaultLayout.css';
+import { useAuth } from '../context/AuthContext';
 
 interface DefaultLayoutProps {
   children: React.ReactNode;
 }
 
 const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Replace with actual login check
+  const { isLoggedIn } = useAuth();
   const location = useLocation();
 
   // Paths that should always show HeaderLg
@@ -43,19 +44,19 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
 
   return (
     <>
-      {showHeaderLg || !isLoggedIn ? (
+      {isLoggedIn ? (
+        <HeaderLoggedIn title={currentTitle}>
+          <div className={`main-content private-path`}>
+            {children}
+          </div>
+        </HeaderLoggedIn>
+      ) : (
         <>
           <HeaderLg />
           <div className={`main-content public-path`}>
             {children}
           </div>
         </>
-      ) : (
-        <HeaderLoggedIn title={currentTitle}>
-          <div className={`main-content private-path`}>
-            {children}
-          </div>
-        </HeaderLoggedIn>
       )}
     </>
   );

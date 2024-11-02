@@ -1,6 +1,8 @@
+// Tracking.tsx
 import React, { useState } from 'react';
 import { FaTrophy, FaCheck, FaClock, FaGlobe, FaFlag, FaArrowUp } from 'react-icons/fa';
 import './css/Tracking.css';
+import LeaderboardTable from './LeaderboardTable';
 
 const Tracking: React.FC = () => {
   const [timeFrame, setTimeFrame] = useState('semana');
@@ -146,40 +148,7 @@ const Tracking: React.FC = () => {
                 {/* Tabla de Clasificatorias (del lado derecho) */}
                 <div className="leaderboard">
                 <h4>Clasificatorias</h4>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Posición</th>
-                        <th>Foto</th>
-                        <th>Nombre</th>
-                        <th>Rol</th>
-                        <th>Puntaje</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro A</td>
-                        <td>Desarrollador</td>
-                        <td>1500</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro B</td>
-                        <td>Tester</td>
-                        <td>1400</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><div className="user-photo-circle"></div></td>
-                        <td>Miembro C</td>
-                        <td>Diseñador</td>
-                        <td>1300</td>
-                    </tr>
-                    </tbody>
-                </table>
+                <LeaderboardTable />
                 </div>
             </div>
         </div>

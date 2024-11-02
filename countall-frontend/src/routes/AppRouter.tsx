@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import LoadingScreen from '../components/LoadingScreen';
 import Login from '../components/Login';
 import HeaderLg from '../components/HeaderLg';
 import SignUp from '../components/SignUp';
@@ -13,45 +12,41 @@ import PasswordSaved from '../components/PasswordSaved';
 import LandingPage from '../components/LandingPage';
 import Leaderboard from '../components/Leaderboard';
 import Tracking from '../components/Tracking';
+import PrivateRoute from '../components/PrivateRoute';
 
 const AppRouter: React.FC = () => {
   return (
     <Routes>
-      {/* Ruta para el login */}
+      {/* Public Routes */}
       <Route path="/login" element={<Login />} />
-      
-      {/* Ruta para el header */}
       <Route path="/header" element={<HeaderLg />} />
-
-      {/* Ruta para registrarse */}
-      <Route path="/sign-up" element={<SignUp />} /> 
-
-      {/* Ruta para confirmar correo */}
-      <Route path="/confirm-sign-up" element={<ConfirmSignUp />} /> 
-
-      {/* Ruta para recuperar contraseña */}
-      <Route path="/recover-password" element={<RecoverPassword />} /> 
-
-      {/* Ruta para crear nueva contraseña */}
+      <Route path="/sign-up" element={<SignUp />} />
+      <Route path="/confirm-sign-up" element={<ConfirmSignUp />} />
+      <Route path="/recover-password" element={<RecoverPassword />} />
       <Route path="/new-password" element={<NewPassword />} />
-
-      {/* Ruta de contraseña guardada*/}
       <Route path="/password-saved" element={<PasswordSaved />} />
-
-      {/* Ruta de verificación de cuenta */}
-      <Route path="/verify-account" element={<AccountVerified />} /> 
-
-       {/* Ruta de correo de recuperación enviado */}
-       <Route path="/recover-sent" element={<RecoverSent />} /> 
-
-       {/* Ruta de pantalla de inicio (seguimiento) */}
-       <Route path="/tracking" element={<Tracking />} /> 
-
-       {/* Ruta de correo de recuperación enviado */}
-       <Route path="/leaderboard" element={<Leaderboard />} /> 
-
-      {/* Ruta raíz que redirige a la página principal*/}
+      <Route path="/verify-account" element={<AccountVerified />} />
+      <Route path="/recover-sent" element={<RecoverSent />} />
       <Route path="/" element={<LandingPage />} />
+
+      {/* Private Routes */}
+      <Route
+        path="/tracking"
+        element={
+          <PrivateRoute>
+            <Tracking />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/leaderboard"
+        element={
+          <PrivateRoute>
+            <Leaderboard />
+          </PrivateRoute>
+        }
+      />
+      {/* Add other private routes here */}
     </Routes>
   );
 };
