@@ -36,7 +36,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     '/configurar-sitios': 'Configurar sitios',
     '/leaderboard': 'Clasificatorias',
     '/usuario': 'Usuario',
-    '/statistics': 'Estadísticas',
+    '/estadisticas': 'Estadísticas y tablas',
     '/notificaciones': 'Notificaciones',
   };
 

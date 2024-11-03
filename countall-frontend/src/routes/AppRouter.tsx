@@ -13,6 +13,7 @@ import LandingPage from '../components/LandingPage';
 import Leaderboard from '../components/Leaderboard';
 import Tracking from '../components/Tracking';
 import PrivateRoute from '../components/PrivateRoute';
+import Estadisticas from '../components/Statistics'
 
 const AppRouter: React.FC = () => {
   return (
@@ -46,7 +47,13 @@ const AppRouter: React.FC = () => {
           </PrivateRoute>
         }
       />
-      {/* Add other private routes here */}
+      
+      <Route path="/estadisticas" element={
+        <PrivateRoute>
+          <Estadisticas />
+        </PrivateRoute>
+        } 
+        />
     </Routes>
   );
 };
