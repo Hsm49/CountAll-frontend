@@ -14,6 +14,8 @@ import Leaderboard from '../components/Leaderboard';
 import Tracking from '../components/Tracking';
 import PrivateRoute from '../components/PrivateRoute';
 import Estadisticas from '../components/Statistics'
+import ManageSites from '../components/ManageSites';
+import Notifications from '../components/Notifications';
 
 const AppRouter: React.FC = () => {
   return (
@@ -54,6 +56,24 @@ const AppRouter: React.FC = () => {
         </PrivateRoute>
         } 
         />
+
+      <Route
+        path="/configurar-sitios"
+        element={
+          <PrivateRoute>
+            <ManageSites />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/notificaciones"
+        element={
+          <PrivateRoute>
+            <Notifications />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   );
 };
