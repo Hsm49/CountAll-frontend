@@ -29,7 +29,7 @@ const AppRouter: React.FC = () => {
       <Route path="/recover-password" element={<RecoverPassword />} />
       <Route path="/new-password" element={<NewPassword />} />
       <Route path="/password-saved" element={<PasswordSaved />} />
-      <Route path="/verify-account" element={<AccountVerified />} />
+      <Route path="/account-verified" element={<AccountVerified />} />
       <Route path="/recover-sent" element={<RecoverSent />} />
       <Route path="/" element={<LandingPage />} />
 

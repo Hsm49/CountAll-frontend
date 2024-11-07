@@ -216,18 +216,21 @@ const ManageTeam: React.FC = () => {
           onChange={(e) => setNewEmails(e.target.value)}
           variant="outlined"
           size="small"
+          className="text-field"
           sx={{ mr: 2 }}
         />
         <Button
           variant="contained"
-          color="primary"
+          className="btn-azul"
           startIcon={<Add />}
           onClick={handleAddEmails}
         >
           Invitar miembros
         </Button>
       </Box>
-      <MaterialReactTable table={table} />
+      <div className="table-card">
+        <MaterialReactTable table={table} />
+      </div>
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
         <DialogTitle>Invitar miembros</DialogTitle>
         <DialogContent>
