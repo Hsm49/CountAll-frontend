@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { ENDPOINTS, API_BASE_URL } from '../config/api.config';
 import {
   Box,
   Button,
@@ -25,6 +26,7 @@ import {
 } from 'material-react-table';
 import { AccountCircle, Send, Add, MoreVert } from '@mui/icons-material';
 import './css/ManageTeam.css';
+import Swal from 'sweetalert2';
 
 type TeamMember = {
   id: string;
@@ -43,27 +45,96 @@ const ManageTeam: React.FC = () => {
     { id: '2', name: 'Jane Smith', email: 'jane@example.com', lastActivity: '2023-10-02', role: 'Miembro' },
   ]);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [emailError, setEmailError] = useState('');
+
+  const validateEmails = (emailString: string) => {
+    const emailArray = emailString.split(',').map(email => email.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    for (const email of emailArray) {
+      if (!emailRegex.test(email)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleEmailsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const emailString = event.target.value;
+    setNewEmails(emailString);
+    if (validateEmails(emailString)) {
+      setEmailError('');
+    } else {
+      setEmailError('Por favor agrega direcciones de correo válidas separadas por comas.');
+    }
+  };
 
   const handleAddEmails = () => {
+    if (!validateEmails(newEmails)) {
+      setEmailError('Por favor agrega direcciones de correo válidas separadas por comas.');
+      return;
+    }
+
     const emails = newEmails.split(',').map(email => email.trim()).filter(email => email);
     const newEmailList = emails.map(email => ({ email, role: 'Miembro' as 'Lider' | 'Miembro' | 'Invitado' }));
     setEmailList(newEmailList);
     setDialogOpen(true);
   };
 
-  const handleRemoveEmail = (email: string) => {
-    setEmailList(emailList.filter(e => e.email !== email));
+  const handleRemoveEmail = (emailToRemove: string) => {
+      const updatedEmailList = emailList.filter(({ email }) => email !== emailToRemove);
+      setEmailList(updatedEmailList);
+      if (updatedEmailList.length === 0) {
+          setDialogOpen(false);
+      }
   };
 
-  const handleRoleChange = (email: string, role: 'Lider' | 'Miembro' | 'Invitado') => {
-    setEmailList(emailList.map(e => (e.email === email ? { ...e, role } : e)));
-  };
+  const handleSendInvitations = async () => {
+    if (!validateEmails(newEmails)) {
+      setEmailError('Por favor agrega direcciones de correo válidas separadas por comas.');
+      return;
+    }
 
-  const handleSendInvitations = () => {
-    // Agregar la lógica para enviar las invitaciones al backend
-    alert('Invitaciones enviadas');
-    setDialogOpen(false);
-  };
+    const emailArray = newEmails.split(',').map(email => email.trim());
+
+    try {
+      const response = await fetch('/api/equipos/agregarMiembro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ emails: emailArray }),
+      });
+
+      if (response.ok) {
+        Swal.fire({
+            title: 'Success',
+            text: 'Invitations sent successfully!',
+            icon: 'success',
+            customClass: {
+                popup: 'swal2-popup-custom'
+            }
+        });
+      } else {
+          Swal.fire({
+              title: 'Error',
+              text: 'Failed to send invitations.',
+              icon: 'error',
+              customClass: {
+                  popup: 'swal2-popup-custom'
+              }
+          });
+      }
+  } catch (error) {
+      Swal.fire({
+          title: 'Error',
+          text: 'An error occurred while sending invitations.',
+          icon: 'error',
+          customClass: {
+              popup: 'swal2-popup-custom'
+          }
+      });
+  }
+};
 
   const columns = useMemo<MRT_ColumnDef<TeamMember>[]>(
     () => [
@@ -213,17 +284,21 @@ const ManageTeam: React.FC = () => {
         <TextField
           label="Agregar por correo (válido múltiples correos)"
           value={newEmails}
-          onChange={(e) => setNewEmails(e.target.value)}
+          onChange={handleEmailsChange}
+          error={!!emailError}
+          helperText={emailError}
           variant="outlined"
           size="small"
           className="text-field"
-          sx={{ mr: 2 }}
+          sx={{ mr: 3, width: '400px' }}
         />
         <Button
           variant="contained"
           className="btn-azul"
           startIcon={<Add />}
           onClick={handleAddEmails}
+          sx={{ mr: 3, width: '200px' }}
+          disabled={!!emailError}
         >
           Invitar miembros
         </Button>
@@ -231,24 +306,12 @@ const ManageTeam: React.FC = () => {
       <div className="table-card">
         <MaterialReactTable table={table} />
       </div>
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} sx={{ zIndex: 1000 }}>
         <DialogTitle>Invitar miembros</DialogTitle>
         <DialogContent>
-          {emailList.map(({ email, role }) => (
+          {emailList.map(({ email}) => (
             <Box key={email} className="email-item">
-              <Typography>{email}</Typography>
-              <FormControl variant="outlined" size="small" sx={{ minWidth: 120 }}>
-                <InputLabel>Rol</InputLabel>
-                <Select
-                  value={role}
-                  onChange={(e) => handleRoleChange(email, e.target.value as 'Lider' | 'Miembro' | 'Invitado')}
-                  label="Rol"
-                >
-                  <MenuItem value="Lider">Lider</MenuItem>
-                  <MenuItem value="Miembro">Miembro</MenuItem>
-                  <MenuItem value="Invitado">Invitado</MenuItem>
-                </Select>
-              </FormControl>
+              <Typography sx={{ mr: 3}}>{email}</Typography>
               <Button
                 color="error"
                 onClick={() => handleRemoveEmail(email)}
@@ -259,7 +322,7 @@ const ManageTeam: React.FC = () => {
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={() => setDialogOpen(false)} sx={{ color: 'gray' }}>Cancelar</Button>
           <Button onClick={handleSendInvitations} color="primary" variant="contained">
             Enviar invitación
           </Button>
