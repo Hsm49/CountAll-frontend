@@ -13,6 +13,10 @@ import LandingPage from '../components/LandingPage';
 import Leaderboard from '../components/Leaderboard';
 import Tracking from '../components/Tracking';
 import PrivateRoute from '../components/PrivateRoute';
+import Estadisticas from '../components/Statistics'
+import ManageSites from '../components/ManageSites';
+import Notifications from '../components/Notifications';
+import ManageTeam from '../components/ManageTeam';
 
 const AppRouter: React.FC = () => {
   return (
@@ -25,7 +29,7 @@ const AppRouter: React.FC = () => {
       <Route path="/recover-password" element={<RecoverPassword />} />
       <Route path="/new-password" element={<NewPassword />} />
       <Route path="/password-saved" element={<PasswordSaved />} />
-      <Route path="/verify-account" element={<AccountVerified />} />
+      <Route path="/account-verified" element={<AccountVerified />} />
       <Route path="/recover-sent" element={<RecoverSent />} />
       <Route path="/" element={<LandingPage />} />
 
@@ -46,7 +50,40 @@ const AppRouter: React.FC = () => {
           </PrivateRoute>
         }
       />
-      {/* Add other private routes here */}
+      
+      <Route path="/estadisticas" element={
+        <PrivateRoute>
+          <Estadisticas />
+        </PrivateRoute>
+        } 
+        />
+
+      <Route
+        path="/configurar-sitios"
+        element={
+          <PrivateRoute>
+            <ManageSites />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/notificaciones"
+        element={
+          <PrivateRoute>
+            <Notifications />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/gestionar-equipo"
+        element={
+          <PrivateRoute>
+            <ManageTeam />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   );
 };

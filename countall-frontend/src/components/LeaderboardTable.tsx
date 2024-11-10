@@ -1,17 +1,14 @@
-// LeaderboardTable.tsx
 import React, { useEffect, useState } from 'react';
 import './css/Leaderboard.css';
 
 interface Clasificacion {
   id: number;
-  puntuacion: number;
+  puntuacion_local: number;
   usuario: {
     id_usuario: number;
     nombre_usuario: string;
-    rol: {
-      rol: string;
-    } | null;
   };
+  rol: string;
 }
 
 const LeaderboardTable: React.FC = () => {
@@ -22,10 +19,10 @@ const LeaderboardTable: React.FC = () => {
   useEffect(() => {
     const fetchClasificaciones = async () => {
       try {
-        const token = localStorage.getItem('token'); // Obtén el token de autenticación del almacenamiento local
+        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:4444/api/clasificaciones', {
           headers: {
-            'Authorization': `Bearer ${token}` // Incluye el token en los encabezados de la solicitud
+            'Authorization': `Bearer ${token}`
           }
         });
         if (!response.ok) {
@@ -39,7 +36,6 @@ const LeaderboardTable: React.FC = () => {
         const data = await response.json();
         setClasificaciones(data);
 
-        // Obtener el ID del usuario autenticado
         const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
         setUsuarioId(usuario.id_usuario);
       } catch (error) {
@@ -53,7 +49,6 @@ const LeaderboardTable: React.FC = () => {
 
   return (
     <div className="leaderboard">
-      {error && <p className="error">{error}</p>}
       <table>
         <thead>
           <tr>
@@ -67,7 +62,6 @@ const LeaderboardTable: React.FC = () => {
         <tbody>
           {clasificaciones.map((clasificacion, index) => {
             const isCurrentUser = clasificacion.usuario.id_usuario === usuarioId;
-            console.log('Comparing:', clasificacion.usuario.id_usuario, 'with', usuarioId, 'Result:', isCurrentUser);
             return (
               <tr key={clasificacion.id} className={isCurrentUser ? 'highlight' : ''}>
                 <td>{index + 1}</td>
@@ -77,8 +71,8 @@ const LeaderboardTable: React.FC = () => {
                   </div>
                 </td>
                 <td>{clasificacion.usuario.nombre_usuario}</td>
-                <td>{clasificacion.usuario.rol ? clasificacion.usuario.rol.rol : 'Sin rol'}</td>
-                <td>{clasificacion.puntuacion}</td>
+                <td>{clasificacion.rol}</td>
+                <td>{clasificacion.puntuacion_local}</td>
               </tr>
             );
           })}

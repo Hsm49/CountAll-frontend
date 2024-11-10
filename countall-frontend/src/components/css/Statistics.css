@@ -1,0 +1,129 @@
+.statistics-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    background-color: #f8f9fa;
+    height: calc(100vh - 70px); /* Adjust based on your header height */
+    overflow-y: auto;
+  }
+  
+  .info-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  
+  .score-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    flex: 1 1 calc(50% - 24px);
+  }
+  
+  .statistics-container .score-icon {
+    background: #fff3e8;
+    color: #F2541B;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  
+  .score-content {
+    flex: 1;
+  }
+  
+  .score-content h3 {
+    color: #607489;
+    font-size: 14px;
+    margin: 0 0 8px 0;
+  }
+  
+  .score-content .score {
+    color: #44596e;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+  }
+  
+  .chart-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    flex: 1 1 calc(50% - 24px);
+  }
+  
+  .chart-card h4 {
+    color: #1b70a6;
+    margin-bottom: 16px;
+  }
+  
+  .tables-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    width: 100%;
+  }
+  
+  .table-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+    width: 100%;
+  }
+  
+  .table-card h4 {
+    color: #1b70a6;
+    margin-bottom: 16px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
+    border: 2px solid #1b70a6;
+    background-color: #ffffff;
+    text-align: center;
+  }
+  
+  th,
+  td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #6e6e6e;
+  }
+  
+  th {
+    background-color: #1b70a6;
+    color: #ffffff;
+  }
+  
+  td {
+    background-color: #ffffff;
+    color: #44596e;
+  }
+  
+  @media (max-width: 768px) {
+    .info-cards {
+      flex-direction: column;
+    }
+  
+    .chart-card,
+    .table-card {
+      flex: 1 1 100%;
+    }
+  }
