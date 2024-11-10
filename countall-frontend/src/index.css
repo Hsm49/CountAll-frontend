@@ -22,14 +22,10 @@ button:hover {
 }
 
 .main-content.public-path {
-  padding-top: 4.1rem;
-  min-height: calc(100vh - 4.1rem);
   display: flex;
   flex-direction: column;
 }
 .main-content.private-path {
-  padding-top: 4.1rem;
-  min-height: calc(100vh - 4.1rem);
   display: flex;
   flex-direction: column;
 }

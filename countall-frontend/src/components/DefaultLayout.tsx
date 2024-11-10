@@ -13,19 +13,16 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   const { isLoggedIn } = useAuth();
   const location = useLocation();
 
-  // Paths that should always show HeaderLg
-  const publicPaths = [
-    '/',
+  // Paths that should always show HeaderLg even when logged in
+  const publicOnlyPaths = [
+    '/login',
+    '/sign-up',
     '/confirm-sign-up',
     '/new-password',
     '/password-saved',
     '/recover-password',
     '/recover-sent',
-    '/login',
-    '/sign-up'
   ];
-
-  const showHeaderLg = publicPaths.includes(location.pathname);
 
   // Define titles for different routes
   const titles: { [key: string]: string } = {
@@ -42,18 +39,22 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
 
   const currentTitle = titles[location.pathname] || 'Default Title';
 
+  // Determine which header to show based on auth state and current path
+  const showPublicHeader = !isLoggedIn || publicOnlyPaths.includes(location.pathname);
+  const showPrivateHeader = isLoggedIn && !publicOnlyPaths.includes(location.pathname);
+
   return (
     <>
-      {isLoggedIn ? (
+      {showPrivateHeader ? (
         <HeaderLoggedIn title={currentTitle}>
-          <div className={`main-content private-path`}>
+          <div className="main-content private-path">
             {children}
           </div>
         </HeaderLoggedIn>
       ) : (
         <>
-          <HeaderLg />
-          <div className={`main-content public-path`}>
+          {showPublicHeader && <HeaderLg />}
+          <div className="main-content public-path">
             {children}
           </div>
         </>

@@ -4,6 +4,7 @@ interface AuthContextProps {
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   checkLoginStatus: () => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -31,11 +32,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoggedIn(true);
       } else {
         setIsLoggedIn(false);
+        localStorage.removeItem('token');
       }
     } catch (error) {
       console.error('Error checking login status:', error);
       setIsLoggedIn(false);
+      localStorage.removeItem('token');
     }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
   };
 
   useEffect(() => {
@@ -43,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkLoginStatus }}>
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkLoginStatus, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -140,13 +140,9 @@ const Login: React.FC = () => {
 
                   <div className="container-fluid mt-4">
                     <div className="row">
-                      <div className="col text-center btn-azul">
-                        <input
-                          className="w-50 btn"
-                          type="submit"
-                          value="Iniciar sesión"
-                        />
-                      </div>
+                        <button className="col text-center btn-azul" type="submit">
+                          Iniciar sesión
+                        </button>
                     </div>
                   </div>
                 </div>

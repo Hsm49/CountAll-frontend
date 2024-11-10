@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaBell, FaCog, FaHome, FaUsers, FaTasks, FaUser, FaCogs, 
          FaTrophy, FaUserCircle, FaChartBar, FaBellSlash } from 'react-icons/fa';
 import './css/HeaderLoggedIn.css';
+import { useAuth } from '../context/AuthContext';
 
 type Theme = 'light' | 'dark';
 
@@ -53,6 +54,16 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [theme] = useState<Theme>('light');
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    try {
+      logout();  // Use the context's logout method
+      navigate('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
 
   const menuItemStyles = {
     root: {
@@ -118,33 +129,38 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
             </button>
             <h1 className="title">{title}</h1>
           </div>
-          <div className="right-side">
-            <button 
-              className="icon-button notification-button"
-              onClick={() => navigate('/notifications')}
-            >
-              <FaBell />
-            </button>
-            <button 
-              className="icon-button config-button"
-              onClick={() => navigate('/config')}
-            >
-              <FaCog />
-            </button>
-            <div className="profile-button">
-              <div className="user-info">
-                <strong>John Doe</strong>
-                <span>User Role</span>
-              </div>
-              <div className="avatar-circle">
-                <img src="/api/placeholder/40/40" alt="User Avatar" />
-              </div>
-              <div className="profile-menu">
-                <button onClick={() => navigate('/profile')}>Profile</button>
-                <button onClick={() => navigate('/logout')}>Log Out</button>
+
+            <div className="right-side">
+              <button 
+                className="icon-button notification-button"
+                onClick={() => navigate('/notifications')}
+              >
+                <FaBell />
+              </button>
+              <button 
+                className="icon-button config-button"
+                onClick={() => navigate('/config')}
+              >
+                <FaCog />
+              </button>
+              <div className="profile-button-container">
+                <div className="profile-button">
+                  <div className="user-info">
+                    <strong>John Doe</strong>
+                    <span>User Role</span>
+                  </div>
+                  <div className="avatar-circle">
+                    <img src="/api/placeholder/40/40" alt="User Avatar" />
+                  </div>
+                </div>
+                <div className="profile-menu">
+                  <button onClick={() => navigate('/profile')}>Perfil</button>
+                  <button onClick={() => navigate('/profile')}>Mis proyectos</button>
+                  <button onClick={() => navigate('/profile')}>Mis equipos</button>
+                  <button onClick={handleLogout}>Cerrar sesión</button>
+                </div>
               </div>
             </div>
-          </div>
         </header>
         <main className="main-content">
           {children}

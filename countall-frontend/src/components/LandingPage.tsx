@@ -1,14 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './css/LandingPage.css';
-import Header from './HeaderLg';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
     <>
-      <Header />
       <div className="main-content">
         <div className="landing-page">
           {/* Sección 1: Introductoria */}

@@ -3,7 +3,6 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import './css/RecoverPassword.css';
-import Header from './HeaderLg';
 
 const RecoverPassword: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +28,6 @@ const RecoverPassword: React.FC = () => {
 
   return (
     <>
-        <Header/>
         <div className="main-content">
         <div className="recover-container">
             <div className="pass-container">
