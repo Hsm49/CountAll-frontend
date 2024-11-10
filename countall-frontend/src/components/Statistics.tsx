@@ -138,7 +138,7 @@ const timeSpentData = {
         <div className="score-card">
           <FormControl fullWidth>
             <InputLabel>Filtro</InputLabel>
-            <Select value={filter} onChange={handleFilterChange}>
+            <Select className="mt-2" value={filter} onChange={handleFilterChange}>
               <MenuItem value="etapa">Etapa del Proyecto</MenuItem>
               <MenuItem value="tarea">Tipo de Tarea</MenuItem>
               <MenuItem value="miembro">Miembro del Equipo</MenuItem>

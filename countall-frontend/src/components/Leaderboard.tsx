@@ -4,27 +4,27 @@ import './css/Leaderboard.css';
 import LeaderboardTable from './LeaderboardTable';
 
 interface Clasificacion {
-  id: number;
-  puntuacion: number;
+  id_usuario_fk_UE: number;
+  puntuacion_local: number;
   usuario: {
+    id_usuario: number;
     nombre_usuario: string;
-    rol: {
-      rol: string;
-    } | null;
   };
+  rol: string;
 }
 
 const Leaderboard: React.FC = () => {
   const [clasificaciones, setClasificaciones] = useState<Clasificacion[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [usuarioId, setUsuarioId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchClasificaciones = async () => {
       try {
-        const token = localStorage.getItem('token'); // Obtén el token de autenticación del almacenamiento local
+        const token = localStorage.getItem('token');
         const response = await fetch('http://localhost:4444/api/clasificaciones', {
           headers: {
-            'Authorization': `Bearer ${token}` // Incluye el token en los encabezados de la solicitud
+            'Authorization': `Bearer ${token}`
           }
         });
         if (!response.ok) {
@@ -37,8 +37,12 @@ const Leaderboard: React.FC = () => {
         }
         const data = await response.json();
         setClasificaciones(data);
+
+        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
+        setUsuarioId(usuario.id_usuario);
       } catch (error) {
         console.error('Error fetching clasificaciones:', error);
+        setError('Error fetching clasificaciones');
       }
     };
 
@@ -78,40 +82,40 @@ const Leaderboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Podium and Table Section */}
-        <div className="podium-and-table">
-          <div className="podium">
-            {clasificaciones.length >= 3 && (
-              <>
-                <div key={`second-${clasificaciones[1].id}`} className="podium-member second">
-                  <div className="avatar">
-                    <img src="/api/placeholder/50/50" alt="2nd Place" />
-                  </div>
-                  <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
-                  <p>{`${clasificaciones[1].puntuacion} pts`}</p>
-                </div>
-                <div key={`first-${clasificaciones[0].id}`} className="podium-member first">
-                  <div className="avatar">
-                    <img src="/api/placeholder/50/50" alt="1st Place" />
-                  </div>
-                  <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
-                  <p>{`${clasificaciones[0].puntuacion} pts`}</p>
-                </div>
-                <div key={`third-${clasificaciones[2].id}`} className="podium-member third">
-                  <div className="avatar">
-                    <img src="/api/placeholder/50/50" alt="3rd Place" />
-                  </div>
-                  <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
-                  <p>{`${clasificaciones[2].puntuacion} pts`}</p>
-                </div>
-              </>
-            )}
-          </div>
+          {/* Podium and Table Section */}
+          <div className="podium-and-table">
+              <div className="podium">
+                {clasificaciones.length >= 3 && (
+                  <>
+                    <div key={`second-${clasificaciones[1].id_usuario_fk_UE}`} className="podium-member second">
+                      <div className="avatar">
+                        <img src="/api/placeholder/50/50" alt="2nd Place" />
+                      </div>
+                      <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
+                      <p>{`${clasificaciones[1].puntuacion_local} pts`}</p>
+                    </div>
+                    <div key={`first-${clasificaciones[0].id_usuario_fk_UE}`} className="podium-member first">
+                      <div className="avatar">
+                        <img src="/api/placeholder/50/50" alt="1st Place" />
+                      </div>
+                      <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
+                      <p>{`${clasificaciones[0].puntuacion_local} pts`}</p>
+                    </div>
+                    <div key={`third-${clasificaciones[2].id_usuario_fk_UE}`} className="podium-member third">
+                      <div className="avatar">
+                        <img src="/api/placeholder/50/50" alt="3rd Place" />
+                      </div>
+                      <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
+                      <p>{`${clasificaciones[2].puntuacion_local} pts`}</p>
+                    </div>
+                  </>
+                )}
+              </div>
 
-          {/* Leaderboard Table */}
-          <div className="leaderboard">
-          <LeaderboardTable />
-          </div>
+            {/* Leaderboard Table */}
+            <div className="leaderboard">
+            <LeaderboardTable />
+            </div>
         </div>
       </div>
     </div>
