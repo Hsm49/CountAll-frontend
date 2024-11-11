@@ -5,12 +5,17 @@ interface AuthContextProps {
   setIsLoggedIn: (isLoggedIn: boolean) => void;
   checkLoginStatus: () => void;
   logout: () => void;
+  user?: {
+    id_usuario: string;
+    url_avatar: string;
+  };
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<AuthContextProps['user']>();
 
   const checkLoginStatus = async () => {
     const token = localStorage.getItem('token');
@@ -51,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkLoginStatus, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, checkLoginStatus, logout, user }}>
       {children}
     </AuthContext.Provider>
   );

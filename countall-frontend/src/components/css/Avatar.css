@@ -1,0 +1,34 @@
+.avatar-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+  text-align: center;
+  justify-content: center;
+  }
+  
+  .avatars {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .avatar {
+    width: 100px;
+    height: 100px;
+    margin: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .avatar.selected {
+    border: 3px solid #1b70a6;
+    transform: scale(1.1);
+  }
+  
+  .avatar:hover {
+    transform: scale(1.05);
+  }

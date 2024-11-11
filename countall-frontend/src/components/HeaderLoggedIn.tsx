@@ -45,12 +45,20 @@ const themes = {
   },
 };
 
+interface Usuario {
+  url_avatar: string;
+  name_usuario: string;
+  surname_usuario: string;
+  rol: string;
+}
+
 interface HeaderLoggedInProps {
   title: string;
   children: React.ReactNode;
+  usuario: Usuario | null;
 }
 
-const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
+const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children, usuario }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [theme] = useState<Theme>('light');
   const navigate = useNavigate();
@@ -146,11 +154,14 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
               <div className="profile-button-container">
                 <div className="profile-button">
                   <div className="user-info">
-                    <strong>John Doe</strong>
-                    <span>User Role</span>
+                  <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>
+                  <span>{usuario ? usuario.rol : 'User Role'}</span>
                   </div>
                   <div className="avatar-circle">
-                    <img src="/api/placeholder/40/40" alt="User Avatar" />
+                      <img 
+                          src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
+                          alt="User Avatar" 
+                      />
                   </div>
                 </div>
                 <div className="profile-menu">
