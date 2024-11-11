@@ -17,7 +17,6 @@ const RecoverSent: React.FC = () => {
 
   return (
     <>
-    <Header />
     <div className="main-content">
       <div className="confirm-container">
         <h1 className="text-center mb-4">Correo de recuperación enviado</h1>
