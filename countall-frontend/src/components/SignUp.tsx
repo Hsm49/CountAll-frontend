@@ -8,169 +8,196 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const SignUp: React.FC = () => {
-    const navigate = useNavigate(); 
+  const navigate = useNavigate(); 
 
-    const formik = useFormik({
-      initialValues: {
-        nombre: '',
-        apellidos: '',
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-      },
-      validationSchema: Yup.object({
-        nombre: Yup.string().required('El nombre es requerido'),
-        apellidos: Yup.string().required('Los apellidos son requeridos'),
-        username: Yup.string().required('El nombre de usuario es requerido'),
-        email: Yup.string().email('Correo inválido').required('El correo es requerido'),
-        password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es requerida'),
-        confirmPassword: Yup.string()
-          .oneOf([Yup.ref('password'), undefined], 'Las contraseñas deben coincidir')
-          .required('Debes confirmar la contraseña'),
-      }),
-      onSubmit: async (values) => {
-        try {
-          // Enviar datos al backend con Axios
-          const response = await axios.post('http://localhost:4444/api/usuario/registrarUsuario', {
-            nombre_usuario: values.username,
-            email_usuario: values.email,
-            password_usuario: values.password,
-          });
+  const formik = useFormik({
+    initialValues: {
+    nombre: '',
+    apellidos: '',
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    },
+    validationSchema: Yup.object({
+    nombre: Yup.string().required('El nombre es requerido'),
+    apellidos: Yup.string().required('Los apellidos son requeridos'),
+    username: Yup.string().matches(/^[a-zA-Z0-9]+$/, 'El nombre de usuario solo puede contener letras y números').required('El nombre de usuario es requerido'),
+    email: Yup.string().email('Correo inválido').required('El correo es requerido'),
+    password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es requerida'),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref('password'), undefined], 'Las contraseñas deben coincidir')
+      .required('Debes confirmar la contraseña'),
+    }),
+    onSubmit: async (values) => {
+    try {
+      // Enviar datos al backend con Axios
+      const response = await axios.post('http://localhost:4444/api/usuario/registrarUsuario', {
+      name_usuario: values.nombre,
+      surname_usuario: values.apellidos,
+      nombre_usuario: values.username,
+      email_usuario: values.email,
+      password_usuario: values.password,
+      });
 
-          // Mostrar alerta de éxito
-          Swal.fire({
-            icon: 'success',
-            title: 'Usuario registrado',
-            text: 'Te has registrado exitosamente',
-          });
+      // Mostrar alerta de éxito
+      Swal.fire({
+      icon: 'success',
+      title: 'Usuario registrado',
+      text: 'Te has registrado exitosamente',
+      });
 
-          // Lógica para registrar al usuario
-          console.log(values);
-          navigate('/confirm-sign-up');
-        } catch (error) {
-          // Mostrar errores
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Error al registrar el usuario',
-          });
-        }
-      },
-    });
+      // Lógica para registrar al usuario
+      console.log(values);
+      navigate('/confirm-sign-up', { state: { email: values.email } });
+      localStorage.setItem('signupEmail', values.email);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response && error.response.data.errors) {
+      const emailError = error.response.data.errors.find((err: { msg: string }) => err.msg === 'El correo electrónico ya está en uso');
+      const usernameError = error.response.data.errors.find((err: { msg: string }) => err.msg === 'Este username ya está en uso');
+      if (emailError) {
+        Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El email ya está en uso',
+        });
+      } else if (usernameError) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'El nombre de usuario ya está en uso',
+        });
+      } else {
+        Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al registrar el usuario',
+        });
+      }
+      }
+       else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al registrar el usuario',
+      });
+      }
+    }
+    },
+  });
   
-    return (
-      <>
-        <div className="main-content">
-          <div className="signup-container">
-            <div className="row">
-              <div className="col-md-5 image-container d-none d-md-block">
-                <img src="src/assets/img/signup-image.jpg" alt="Imagen lateral" className="img-fluid" />
-              </div>
-    
-              {/* Formulario a la derecha */}
-              <div className="col-md-7 d-flex align-items-center justify-content-center form-container">
-                <div className="w-75">
-                  <h2 className="text-center mb-4">Crea tu cuenta</h2>
-    
-                  <form onSubmit={formik.handleSubmit}>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <label htmlFor="nombre">Nombre</label>
-                        <input
-                          type="text"
-                          id="nombre"
-                          className={`form-control ${formik.touched.nombre && formik.errors.nombre ? 'is-invalid' : ''}`}
-                          placeholder="Nombre(s)"
-                          {...formik.getFieldProps('nombre')}
-                        />
-                        {formik.touched.nombre && formik.errors.nombre ? (
-                          <div className="invalid-feedback">{formik.errors.nombre}</div>
-                        ) : null}
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="apellidos">Apellidos</label>
-                        <input
-                          type="text"
-                          id="apellidos"
-                          className={`form-control ${formik.touched.apellidos && formik.errors.apellidos ? 'is-invalid' : ''}`}
-                          placeholder="Tus apellidos"
-                          {...formik.getFieldProps('apellidos')}
-                        />
-                        {formik.touched.apellidos && formik.errors.apellidos ? (
-                          <div className="invalid-feedback">{formik.errors.apellidos}</div>
-                        ) : null}
-                      </div>
-                    </div>
-    
-                    <div className="mt-3">
-                      <label htmlFor="username">Nombre de usuario</label>
-                      <input
-                        type="text"
-                        id="username"
-                        className={`form-control ${formik.touched.username && formik.errors.username ? 'is-invalid' : ''}`}
-                        placeholder="Nombre de usuario"
-                        {...formik.getFieldProps('username')}
-                      />
-                      {formik.touched.username && formik.errors.username ? (
-                        <div className="invalid-feedback">{formik.errors.username}</div>
-                      ) : null}
-                    </div>
-    
-                    <div className="mt-3">
-                      <label htmlFor="email">Correo electrónico</label>
-                      <input
-                        type="email"
-                        id="email"
-                        className={`form-control ${formik.touched.email && formik.errors.email ? 'is-invalid' : ''}`}
-                        placeholder="Correo electrónico"
-                        {...formik.getFieldProps('email')}
-                      />
-                      {formik.touched.email && formik.errors.email ? (
-                        <div className="invalid-feedback">{formik.errors.email}</div>
-                      ) : null}
-                    </div>
-    
-                    <div className="row mt-3">
-                      <div className="col-md-6">
-                        <label htmlFor="password">Contraseña</label>
-                        <input
-                          type="password"
-                          id="password"
-                          className={`form-control ${formik.touched.password && formik.errors.password ? 'is-invalid' : ''}`}
-                          placeholder="Contraseña"
-                          {...formik.getFieldProps('password')}
-                        />
-                        {formik.touched.password && formik.errors.password ? (
-                          <div className="invalid-feedback">{formik.errors.password}</div>
-                        ) : null}
-                      </div>
-                      <div className="col-md-6">
-                        <label htmlFor="confirmPassword">Confirmar contraseña</label>
-                        <input
-                          type="password"
-                          id="confirmPassword"
-                          className={`form-control ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'is-invalid' : ''}`}
-                          placeholder="Confirmar contraseña"
-                          {...formik.getFieldProps('confirmPassword')}
-                        />
-                        {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
-                          <div className="invalid-feedback">{formik.errors.confirmPassword}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                      
-                      <button className="btn-azul mt-5" type="submit">
-                          Crear cuenta
-                      </button>
-                  </form>
-                </div>
-              </div>
+  return (
+    <>
+    <div className="main-content">
+      <div className="signup-container">
+      <div className="row">
+        <div className="col-md-5 image-container d-none d-md-block">
+        <img src="src/assets/img/signup-image.jpg" alt="Imagen lateral" className="img-fluid" />
+        </div>
+  
+        {/* Formulario a la derecha */}
+        <div className="col-md-7 d-flex align-items-center justify-content-center form-container">
+        <div className="w-75">
+          <h2 className="text-center mb-4">Crea tu cuenta</h2>
+  
+          <form onSubmit={formik.handleSubmit}>
+          <div className="row">
+            <div className="col-md-6">
+            <label htmlFor="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              className={`form-control ${formik.touched.nombre && formik.errors.nombre ? 'is-invalid' : ''}`}
+              placeholder="Nombre(s)"
+              {...formik.getFieldProps('nombre')}
+            />
+            {formik.touched.nombre && formik.errors.nombre ? (
+              <div className="invalid-feedback">{formik.errors.nombre}</div>
+            ) : null}
+            </div>
+            <div className="col-md-6">
+            <label htmlFor="apellidos">Apellidos</label>
+            <input
+              type="text"
+              id="apellidos"
+              className={`form-control ${formik.touched.apellidos && formik.errors.apellidos ? 'is-invalid' : ''}`}
+              placeholder="Tus apellidos"
+              {...formik.getFieldProps('apellidos')}
+            />
+            {formik.touched.apellidos && formik.errors.apellidos ? (
+              <div className="invalid-feedback">{formik.errors.apellidos}</div>
+            ) : null}
             </div>
           </div>
+  
+          <div className="mt-3">
+            <label htmlFor="username">Nombre de usuario</label>
+            <input
+            type="text"
+            id="username"
+            className={`form-control ${formik.touched.username && formik.errors.username ? 'is-invalid' : ''}`}
+            placeholder="Nombre de usuario"
+            {...formik.getFieldProps('username')}
+            />
+            {formik.touched.username && formik.errors.username ? (
+            <div className="invalid-feedback">{formik.errors.username}</div>
+            ) : null}
+          </div>
+  
+          <div className="mt-3">
+            <label htmlFor="email">Correo electrónico</label>
+            <input
+            type="email"
+            id="email"
+            className={`form-control ${formik.touched.email && formik.errors.email ? 'is-invalid' : ''}`}
+            placeholder="Correo electrónico"
+            {...formik.getFieldProps('email')}
+            />
+            {formik.touched.email && formik.errors.email ? (
+            <div className="invalid-feedback">{formik.errors.email}</div>
+            ) : null}
+          </div>
+  
+          <div className="row mt-3">
+            <div className="col-md-6">
+            <label htmlFor="password">Contraseña</label>
+            <input
+              type="password"
+              id="password"
+              className={`form-control ${formik.touched.password && formik.errors.password ? 'is-invalid' : ''}`}
+              placeholder="Contraseña"
+              {...formik.getFieldProps('password')}
+            />
+            {formik.touched.password && formik.errors.password ? (
+              <div className="invalid-feedback">{formik.errors.password}</div>
+            ) : null}
+            </div>
+            <div className="col-md-6">
+            <label htmlFor="confirmPassword">Confirmar contraseña</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              className={`form-control ${formik.touched.confirmPassword && formik.errors.confirmPassword ? 'is-invalid' : ''}`}
+              placeholder="Confirmar contraseña"
+              {...formik.getFieldProps('confirmPassword')}
+            />
+            {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+              <div className="invalid-feedback">{formik.errors.confirmPassword}</div>
+            ) : null}
+            </div>
+          </div>
+            
+            <button className="btn-azul mt-5" type="submit">
+              Crear cuenta
+            </button>
+          </form>
         </div>
-      </>
-    );
+        </div>
+      </div>
+      </div>
+    </div>
+    </>
+  );
   };
 
 export default SignUp;

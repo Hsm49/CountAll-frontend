@@ -26,6 +26,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
 
   // Define titles for different routes
   const titles: { [key: string]: string } = {
+    '/': 'CountAll',
     '/tracking': 'Inicio',
     '/gestionar-equipo': 'Gestionar equipo',
     '/tareas': 'Tareas',
