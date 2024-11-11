@@ -18,6 +18,7 @@ import ManageSites from '../components/ManageSites';
 import Notifications from '../components/Notifications';
 import ManageTeam from '../components/ManageTeam';
 import Avatar from '../components/Avatar';
+import Tarea from '../components/Tareas';
 
 const AppRouter: React.FC = () => {
   return (
@@ -91,6 +92,15 @@ const AppRouter: React.FC = () => {
         element={
           <PrivateRoute>
             <Avatar />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/tareas"
+        element={
+          <PrivateRoute>
+            <Tarea />
           </PrivateRoute>
         }
       />
