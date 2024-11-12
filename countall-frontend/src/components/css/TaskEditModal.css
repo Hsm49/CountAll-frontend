@@ -1,0 +1,33 @@
+.task-edit-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin: -16px;
+  }
+  
+  .edit-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .comments-section {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 24px;
+  }
+  
+  .MuiDialog-paper {
+    min-height: 60vh !important;
+  }
+  
+  /* Estilos para asegurar que Swal esté por encima del Dialog */
+  .swal-over-dialog {
+    z-index: 1400 !important;
+  }
+  
+  .swal-over-dialog-container {
+    z-index: 1400 !important;
+  }

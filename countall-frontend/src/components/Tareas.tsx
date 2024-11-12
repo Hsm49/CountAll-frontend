@@ -3,13 +3,27 @@ import { FaPlus, FaComment, FaEllipsisH, FaCheck, FaEdit } from 'react-icons/fa'
 import { Avatar, Button, Card, CardContent, Typography, Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import Swal from 'sweetalert2';
 import './css/Tareas.css';
+import TaskEditModal from './TaskEditModal';
+
+interface Task {
+  id: number;
+  title: string;
+  description: string;
+  priority: string;
+  assignees: string[];
+  comments: number;
+  status: string;
+}
 
 const Tarea: React.FC = () => {
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
+
   const [tasks, setTasks] = useState([
     {
       id: 1,
       title: 'Lluvia de ideas',
-      description: 'Prioridad: Baja',
+      description: 'Hacer lluvia de ideas',
       priority: 'low',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 12,
@@ -18,8 +32,8 @@ const Tarea: React.FC = () => {
     {
       id: 2,
       title: 'Investigación',
-      description: 'Prioridad: Alta',
-      priority: 'high',
+      description: 'Investigar sobre el proyecto',
+      priority: 'medium',
       assignees: ['avatar1.jpg', 'avatar2.jpg'],
       comments: 10,
       status: 'todo'
@@ -27,7 +41,7 @@ const Tarea: React.FC = () => {
     {
       id: 3,
       title: 'Estimaciones',
-      description: 'Prioridad: Alta',
+      description: 'Realizar estimaciones',
       priority: 'high',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 9,
@@ -36,7 +50,7 @@ const Tarea: React.FC = () => {
     {
       id: 4,
       title: 'Recolectar imágenes',
-      description: 'Prioridad: Baja',
+      description: 'Descargar imágenes de stock',
       priority: 'low',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 14,
@@ -45,7 +59,7 @@ const Tarea: React.FC = () => {
     {
       id: 5,
       title: 'Página de inicio',
-      description: 'Prioridad: Baja',
+      description: 'Programar la página de inicio',
       priority: 'low',
       assignees: ['avatar1.jpg'],
       comments: 9,
@@ -54,7 +68,7 @@ const Tarea: React.FC = () => {
     {
       id: 6,
       title: 'Diseño móvil del sistema',
-      description: 'Completada',
+      description: 'Diseñar la versión móvil del sistema',
       priority: 'complete',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 12,
@@ -63,7 +77,7 @@ const Tarea: React.FC = () => {
     {
       id: 7,
       title: 'Diseñar el sistema',
-      description: 'Completada',
+      description: 'Diseñar el sistema em react',
       priority: 'review',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 12,
@@ -82,8 +96,26 @@ const Tarea: React.FC = () => {
   ];
 
   const handleEditTask = (taskId: number) => {
-    // Implement the edit task functionality here
-    console.log(`Edit task with id: ${taskId}`);
+    const taskToEdit = tasks.find(task => task.id === taskId);
+    setSelectedTaskForEdit(taskToEdit || null);
+    setEditModalOpen(true);
+    handleClose(); // Cierra el menú de opciones
+  };
+
+  const handleTaskUpdate = async (updatedTask: Task) => {
+    try {
+      // Aquí irá la llamada al backend
+      // const response = await updateTask(updatedTask);
+      
+      // Actualiza el estado local
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === updatedTask.id ? updatedTask : task
+        )
+      );
+    } catch (error) {
+      throw error; // El modal manejará el error
+    }
   };
 
   const handleOptionClick = (event: React.MouseEvent<HTMLButtonElement>, taskId: number) => {
@@ -117,7 +149,10 @@ const Tarea: React.FC = () => {
           title: 'Estado actualizado',
           text: 'La tarea ha sido actualizada exitosamente',
           timer: 2000,
-          showConfirmButton: false
+          showConfirmButton: false,
+          customClass: {
+              popup: 'swal2-popup-custom'
+          }
         });
       }
     } catch (error) {
@@ -125,7 +160,10 @@ const Tarea: React.FC = () => {
       await Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudo actualizar el estado de la tarea'
+        text: 'No se pudo actualizar el estado de la tarea',
+        customClass: {
+            popup: 'swal2-popup-custom'
+        }
       });
     } finally {
       handleClose();
@@ -133,6 +171,7 @@ const Tarea: React.FC = () => {
   };
 
   const handleStateChange = async (taskId: number, newStatus: string) => {
+    
     const currentTask = tasks.find(task => task.id === taskId);
     if (!currentTask) return;
 
@@ -147,7 +186,10 @@ const Tarea: React.FC = () => {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            popup: 'swal2-popup-custom'
+        }
       });
     } else {
       confirmationResult = await Swal.fire({
@@ -158,7 +200,10 @@ const Tarea: React.FC = () => {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Aceptar',
-        cancelButtonText: 'Cancelar'
+        cancelButtonText: 'Cancelar',
+        customClass: {
+            popup: 'swal2-popup-custom'
+        }
       });
     }
 
@@ -173,14 +218,16 @@ const Tarea: React.FC = () => {
       .map(task => (
         <Card key={task.id} className="task-card">
           <CardContent>
-            <Box className={`priority-label priority-${task.priority}`}>
-              {task.priority === 'low' ? 'Baja' : task.priority === 'high' ? 'Alta' : task.priority === 'review' ? 'En revisión' : 'Completada'}
-            </Box>
-            <Box className="options-menu">
-              <IconButton onClick={(e) => handleOptionClick(e, task.id)}>
-                <FaEllipsisH />
-              </IconButton>
-              <Menu
+              <Box className="priority-label-container">
+                <Box className={`priority-label priority-${task.priority}`}>
+                  {task.priority === 'low' ? 'Baja' : task.priority === 'medium' ? 'Media' : task.priority === 'high' ? 'Alta' : task.priority === 'review' ? 'En revisión' : task.priority === 'complete' ? 'Completada' : ''}
+                </Box>
+                <Box className="options-menu">
+                  <IconButton onClick={(e) => handleOptionClick(e, task.id)}>
+                    <FaEllipsisH />
+                  </IconButton>
+              </Box>
+              <Menu sx={{ zIndex: 0 }}
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl) && selectedTask === task.id}
                 onClose={handleClose}
@@ -189,7 +236,7 @@ const Tarea: React.FC = () => {
                   <ListItemIcon>
                     <FaEdit />
                   </ListItemIcon>
-                  <ListItemText>Editar</ListItemText>
+                  <ListItemText>Ver y editar tarea</ListItemText>
                 </MenuItem>
                 <MenuItem onClick={handleStatusMenuOpen}>
                   <ListItemIcon>
@@ -198,7 +245,7 @@ const Tarea: React.FC = () => {
                   <ListItemText>Cambiar estado</ListItemText>
                 </MenuItem>
               </Menu>
-              <Menu
+              <Menu sx={{ zIndex: 0 }}
                 anchorEl={statusAnchorEl}
                 open={Boolean(statusAnchorEl)}
                 onClose={handleClose}
@@ -225,18 +272,24 @@ const Tarea: React.FC = () => {
               </Box>
             </Box>
           </CardContent>
+          <TaskEditModal
+            open={editModalOpen}
+            task={selectedTaskForEdit}
+            onClose={() => {
+              setEditModalOpen(false);
+              setSelectedTaskForEdit(null);
+            }}
+            onSave={handleTaskUpdate}
+          />
         </Card>
       ));
   };
 
   return (
     <Box className="task-board">
-      <Box className="header">
-        <Typography variant="h4">Tablero de Tareas</Typography>
-        <Box className="filters">
-          <Button variant="outlined">Filtrar</Button>
-          <Button variant="outlined">Hoy</Button>
-        </Box>
+      <Box className="filters">
+        <Button variant="outlined">Filtrar</Button>
+        <Button variant="outlined">Hoy</Button>
       </Box>
 
       <Box className="columns mt-3">
