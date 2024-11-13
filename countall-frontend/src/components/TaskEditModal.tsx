@@ -21,9 +21,27 @@ import Swal from 'sweetalert2';
 
 interface TaskEditModalProps {
   open: boolean;
-  task: Task | null;
+  task: {
+    id: number;
+    title: string;
+    description: string;
+    priority: string;
+    assignees: string[];
+    comments: number;
+    status: string;
+    isLocked: boolean;
+  } | null;
   onClose: () => void;
-  onSave: (updatedTask: Task) => Promise<void>;
+  onSave: (updatedTask: {
+    id: number;
+    title: string;
+    description: string;
+    priority: string;
+    assignees: string[];
+    comments: number;
+    status: string;
+    isLocked: boolean;
+  }) => Promise<void>;
 }
 
 interface Task {
@@ -34,6 +52,7 @@ interface Task {
   assignees: string[];
   comments: number;
   status: string;
+  isLocked: boolean;
 }
 
 // Configuración base para Swal que asegura que siempre esté por encima del Dialog

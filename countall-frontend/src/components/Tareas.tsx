@@ -13,13 +13,14 @@ interface Task {
   assignees: string[];
   comments: number;
   status: string;
+  isLocked: boolean; // Nueva propiedad para indicar si la tarea está bloqueada
 }
 
 const Tarea: React.FC = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
 
-  const [tasks, setTasks] = useState([
+  const [tasks, setTasks] = useState<Task[]>([
     {
       id: 1,
       title: 'Lluvia de ideas',
@@ -27,7 +28,8 @@ const Tarea: React.FC = () => {
       priority: 'low',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 12,
-      status: 'todo'
+      status: 'todo',
+      isLocked: false
     },
     {
       id: 2,
@@ -36,7 +38,8 @@ const Tarea: React.FC = () => {
       priority: 'medium',
       assignees: ['avatar1.jpg', 'avatar2.jpg'],
       comments: 10,
-      status: 'todo'
+      status: 'todo',
+      isLocked: false
     },
     {
       id: 3,
@@ -45,7 +48,8 @@ const Tarea: React.FC = () => {
       priority: 'high',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 9,
-      status: 'todo'
+      status: 'todo',
+      isLocked: false
     },
     {
       id: 4,
@@ -54,7 +58,8 @@ const Tarea: React.FC = () => {
       priority: 'low',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 14,
-      status: 'in-progress'
+      status: 'in-progress',
+      isLocked: false
     },
     {
       id: 5,
@@ -63,7 +68,8 @@ const Tarea: React.FC = () => {
       priority: 'low',
       assignees: ['avatar1.jpg'],
       comments: 9,
-      status: 'in-progress'
+      status: 'in-progress',
+      isLocked: false
     },
     {
       id: 6,
@@ -72,7 +78,8 @@ const Tarea: React.FC = () => {
       priority: 'complete',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 12,
-      status: 'completed'
+      status: 'completed',
+      isLocked: true // Simulamos que esta tarea está bloqueada
     },
     {
       id: 7,
@@ -81,7 +88,8 @@ const Tarea: React.FC = () => {
       priority: 'review',
       assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
       comments: 12,
-      status: 'completed'
+      status: 'completed',
+      isLocked: true
     }
   ]);
 
@@ -140,7 +148,7 @@ const Tarea: React.FC = () => {
       if (success) {
         setTasks(prevTasks =>
           prevTasks.map(task =>
-            task.id === taskId ? { ...task, status: newStatus } : task
+            task.id === taskId ? { ...task, status: newStatus, isLocked: newStatus === 'completed' } : task
           )
         );
 
@@ -171,16 +179,28 @@ const Tarea: React.FC = () => {
   };
 
   const handleStateChange = async (taskId: number, newStatus: string) => {
-    
     const currentTask = tasks.find(task => task.id === taskId);
     if (!currentTask) return;
+
+    if (currentTask.isLocked && newStatus !== 'completed') {
+      await Swal.fire({
+        title: 'Tarea bloqueada',
+        text: 'No puedes cambiar el estado de esta tarea hasta que el líder la desbloquee.',
+        icon: 'error',
+        confirmButtonText: 'Aceptar',
+        customClass: {
+            popup: 'swal2-popup-custom'
+        }
+      });
+      return;
+    }
 
     let confirmationResult;
 
     if (newStatus === 'completed') {
       confirmationResult = await Swal.fire({
         title: '¿Marcar como completada?',
-        text: 'Se enviará un correo al líder para su revisión',
+        text: 'Se enviará un correo al líder para su revisión y no podrás cambiar su estado hasta que la revise.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -212,6 +232,42 @@ const Tarea: React.FC = () => {
     }
   };
 
+  const handleUnlockTask = async (taskId: number) => {
+    try {
+      // Simula la llamada al backend para desbloquear la tarea
+      const success = true;
+
+      if (success) {
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === taskId ? { ...task, isLocked: false } : task
+          )
+        );
+
+        await Swal.fire({
+          icon: 'success',
+          title: 'Tarea desbloqueada',
+          text: 'La tarea ha sido desbloqueada para cambiar su estado',
+          timer: 2000,
+          showConfirmButton: false,
+          customClass: {
+              popup: 'swal2-popup-custom'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error al desbloquear la tarea:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo desbloquear la tarea',
+        customClass: {
+            popup: 'swal2-popup-custom'
+        }
+      });
+    }
+  };
+
   const renderTasksList = (status: string) => {
     return tasks
       .filter(task => task.status === status)
@@ -238,12 +294,21 @@ const Tarea: React.FC = () => {
                   </ListItemIcon>
                   <ListItemText>Ver y editar tarea</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={handleStatusMenuOpen}>
+                <MenuItem onClick={handleStatusMenuOpen} disabled={task.isLocked}>
                   <ListItemIcon>
                     <FaCheck />
                   </ListItemIcon>
                   <ListItemText>Cambiar estado</ListItemText>
                 </MenuItem>
+                { /* Botón que solo debe mostrarse para el líder */}
+                {task.isLocked && (
+                  <MenuItem onClick={() => handleUnlockTask(task.id)}>
+                    <ListItemIcon>
+                      <FaCheck />
+                    </ListItemIcon>
+                    <ListItemText>Desbloquear tarea</ListItemText>
+                  </MenuItem>
+                )}
               </Menu>
               <Menu sx={{ zIndex: 0 }}
                 anchorEl={statusAnchorEl}
