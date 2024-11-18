@@ -22,6 +22,8 @@ import Tarea from '../components/Tareas';
 import Profile from '../components/Profile';
 import MyProjects from '../components/MyProjects';
 import MyTeams from '../components/MyTeams';
+import Estimaciones from '../components/Estimaciones';
+import MisEstimaciones from '../components/MisEstimaciones';
 
 const AppRouter: React.FC = () => {
   return (
@@ -131,6 +133,24 @@ const AppRouter: React.FC = () => {
         element={
           <PrivateRoute>
             <MyTeams />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/estimaciones"
+        element={
+          <PrivateRoute>
+            <Estimaciones />
+          </PrivateRoute>
+        }
+      />
+      
+      <Route
+        path="/mis-estimaciones"
+        element={
+          <PrivateRoute>
+            <MisEstimaciones />
           </PrivateRoute>
         }
       />

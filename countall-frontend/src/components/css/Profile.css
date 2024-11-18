@@ -4,7 +4,7 @@
     align-items: center;
     padding: 24px;
     background-color: #f8f9fa;
-    height: calc(100vh - 70px); /* Ajusta según la altura de tu header */
+    height: calc(100vh - 70px); 
     overflow-y: auto;
   }
   
