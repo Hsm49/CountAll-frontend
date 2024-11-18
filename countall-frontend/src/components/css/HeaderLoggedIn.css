@@ -205,7 +205,7 @@
 .mobile-menu {
   display: none;
   position: absolute;
-  top: 64px; /* Ajusta según la altura del header */
+  top: 64px;
   left: 0;
   width: 100%;
   background-color: white;

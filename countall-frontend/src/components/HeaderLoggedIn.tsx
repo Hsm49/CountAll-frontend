@@ -62,6 +62,7 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
   const [theme, setTheme] = useState<Theme>('light');
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,6 +88,15 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
     };
 
     fetchUsuario();
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleLogout = () => {
@@ -157,49 +167,49 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
           <div className="left-side">
             <button 
               className="hamburger-menu" 
-              onClick={() => setMenuOpen(!menuOpen)}
+              onClick={() => isMobile ? setMenuOpen(!menuOpen) : setCollapsed(!collapsed)}
             >
               ☰
             </button>
             <h1 className="title">{title}</h1>
           </div>
 
-            <div className="right-side">
-              <button 
-                className="icon-button notification-button"
-                onClick={() => navigate('/notifications')}
-              >
-                <FaBell />
-              </button>
-              <button 
-                className="icon-button config-button"
-                onClick={() => navigate('/config')}
-              >
-                <FaCog />
-              </button>
-              <div className="profile-button-container">
-                <div className="profile-button">
-                  <div className="user-info">
-                    <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>
-                    <span>{usuario ? usuario.nombre_usuario : 'User Role'}</span>
-                  </div>
-                  <div className="avatar-circle">
-                      <img 
-                          src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
-                          alt="User Avatar" 
-                      />
-                  </div>
+          <div className="right-side">
+            <button 
+              className="icon-button notification-button"
+              onClick={() => navigate('/notifications')}
+            >
+              <FaBell />
+            </button>
+            <button 
+              className="icon-button config-button"
+              onClick={() => navigate('/config')}
+            >
+              <FaCog />
+            </button>
+            <div className="profile-button-container">
+              <div className="profile-button">
+                <div className="user-info">
+                  <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>
+                  <span>{usuario ? usuario.nombre_usuario : 'User Role'}</span>
                 </div>
-                <div className="profile-menu">
-                  <button onClick={() => navigate('/profile')}>Perfil</button>
-                  <button onClick={() => navigate('/my-projects')}>Mis proyectos</button>
-                  <button onClick={() => navigate('/my-teams')}>Mis equipos</button>
-                  <button onClick={handleLogout}>Cerrar sesión</button>
+                <div className="avatar-circle">
+                    <img 
+                        src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
+                        alt="User Avatar" 
+                    />
                 </div>
               </div>
+              <div className="profile-menu">
+                <button onClick={() => navigate('/profile')}>Perfil</button>
+                <button onClick={() => navigate('/my-projects')}>Mis proyectos</button>
+                <button onClick={() => navigate('/my-teams')}>Mis equipos</button>
+                <button onClick={handleLogout}>Cerrar sesión</button>
+              </div>
             </div>
+          </div>
         </header>
-        {menuOpen && (
+        {isMobile && menuOpen && (
           <div className="mobile-menu">
             <Menu menuItemStyles={menuItemStyles}>
               <MenuItem icon={<FaHome />} onClick={() => navigate('/tracking')}>Inicio</MenuItem>
