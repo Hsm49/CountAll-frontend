@@ -36,16 +36,33 @@ const LeaderboardTable: React.FC = () => {
         }
         const data = await response.json();
         setClasificaciones(data);
-
-        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-        setUsuarioId(usuario.id_usuario);
       } catch (error) {
         console.error('Error fetching clasificaciones:', error);
         setError('Error fetching clasificaciones');
       }
     };
 
+    const fetchUsuarioActual = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:4444/api/usuario/actual', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setUsuarioId(data.id_usuario);
+      } catch (error) {
+        console.error('Error fetching usuario actual:', error);
+        setError('Error fetching usuario actual');
+      }
+    };
+
     fetchClasificaciones();
+    fetchUsuarioActual();
   }, []);
 
   return (
@@ -64,7 +81,7 @@ const LeaderboardTable: React.FC = () => {
           {clasificaciones.map((clasificacion, index) => {
             const isCurrentUser = clasificacion.usuario.id_usuario === usuarioId;
             return (
-              <tr key={clasificacion.id} className={isCurrentUser ? 'highlight' : ''}>
+              <tr key={clasificacion.id} className={isCurrentUser ? 'highlight underline' : ''}>
                 <td>{index + 1}</td>
                 <td>
                   <div className="user-photo-circle">

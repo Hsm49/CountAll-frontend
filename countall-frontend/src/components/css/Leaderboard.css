@@ -152,17 +152,17 @@
 }
 
 .podium-member.first {
-  background: #fff4e5;
+  background: #ffee00;
   padding-bottom: 48px;
 }
 
 .podium-member.second {
-  background: #f1f5f9;
+  background: #6cc9ff;
   padding-bottom: 32px;
 }
 
 .podium-member.third {
-  background: #fff1f0;
+  background: #da9657;
   padding-bottom: 24px;
 }
 
@@ -204,6 +204,13 @@
   object-fit: cover;
 }
 
+
+.underline {
+  text-decoration: underline;
+  font-size: 18px;
+  font-weight: bold;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .content-wrapper {
@@ -224,8 +231,4 @@
     width: 100%;
     max-width: 300px;
   }
-
-  .highlight {
-  background-color: #63a3db;
-}
 }

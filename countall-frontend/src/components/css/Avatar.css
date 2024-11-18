@@ -10,8 +10,8 @@
   }
   
   .avatars {
-    display: flex;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
     gap: 20px;
     padding: 20px 0;
   }
@@ -40,14 +40,14 @@
 }
   
   .avatar.selected {
-    border: 3px solid #f2541b;
-    transform: scale(1.1);
-    box-shadow: 0 0 10px rgba(36, 40, 255, 0.5);
+    border: 6px solid #1B70A6;
+    transform: scale(1.25);
+    box-shadow: 0 0 30px rgb(255, 204, 36);
   }
   
   .avatar:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 8px rgb(255, 204, 36);
   }
 
   .error-message {
