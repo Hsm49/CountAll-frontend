@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Dialog, 
   DialogTitle, 
@@ -24,69 +24,34 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import './css/TaskEditModal.css';
 
-interface TaskEditModalProps {
+interface TaskAddModalProps {
   open: boolean;
-  task: {
-    id: number;
-    title: string;
-    description: string;
-    priority: string;
-    difficulty: string; // Nueva propiedad para la dificultad
-    assignees: string[];
-    comments: number;
-    status: string;
-    isLocked: boolean;
-  } | null;
   onClose: () => void;
-  onSave: (updatedTask: {
-    id: number;
+  onSave: (newTask: {
     title: string;
     description: string;
     priority: string;
-    difficulty: string; // Nueva propiedad para la dificultad
+    difficulty: string;
     assignees: string[];
     comments: number;
     status: string;
-    isLocked: boolean;
   }) => Promise<void>;
 }
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  priority: string;
-  difficulty: string; // Nueva propiedad para la dificultad
-  assignees: string[];
-  comments: number;
-  status: string;
-  isLocked: boolean;
-}
-
-// Configuración base para Swal que asegura que siempre esté por encima del Dialog
-const swalConfig = {
-  customClass: {
-    popup: 'swal-over-dialog',
-    container: 'swal-over-dialog-container'
-  }
-};
-
-const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSave }) => {
+const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const availableUsers = ['user1.jpg', 'user2.jpg', 'user3.jpg', 'user4.jpg']; // Lista de usuarios disponibles
 
   const formik = useFormik({
     initialValues: {
-      id: 0,
       title: '',
       description: '',
       priority: 'low',
       difficulty: 'fácil',
       assignees: [],
       comments: 0,
-      status: 'todo',
-      isLocked: false
+      status: 'todo'
     },
     validationSchema: Yup.object({
       title: Yup.string().required('El título es requerido'),
@@ -98,9 +63,8 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
     onSubmit: async (values) => {
       try {
         const result = await Swal.fire({
-          ...swalConfig,
-          title: '¿Guardar cambios?',
-          text: 'Los cambios realizados se guardarán permanentemente',
+          title: '¿Guardar nueva tarea?',
+          text: 'La nueva tarea se agregará al tablero',
           icon: 'question',
           showCancelButton: true,
           confirmButtonColor: '#3085d6',
@@ -112,42 +76,24 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
         if (result.isConfirmed) {
           await onSave(values);
           await Swal.fire({
-            ...swalConfig,
             icon: 'success',
-            title: 'Cambios guardados',
-            text: 'Los cambios han sido guardados exitosamente',
+            title: 'Tarea agregada',
+            text: 'La nueva tarea ha sido agregada exitosamente',
             timer: 2000,
             showConfirmButton: false
           });
           onClose();
         }
       } catch (error) {
-        console.error('Error al guardar los cambios:', error);
+        console.error('Error al agregar la tarea:', error);
         await Swal.fire({
-          ...swalConfig,
           icon: 'error',
           title: 'Error',
-          text: 'No se pudieron guardar los cambios'
+          text: 'No se pudo agregar la tarea'
         });
       }
     }
   });
-
-  useEffect(() => {
-    if (task) {
-      formik.setValues({
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        priority: task.priority,
-        difficulty: task.difficulty,
-        assignees: task.assignees,
-        comments: task.comments,
-        status: task.status,
-        isLocked: task.isLocked
-      });
-    }
-  }, [task]);
 
   const handleAddAssignee = (assigneeToAdd: string) => {
     formik.setFieldValue('assignees', [...formik.values.assignees, assigneeToAdd]);
@@ -184,7 +130,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
     >
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h5">Detalles de la tarea</Typography>
+          <Typography variant="h5">Agregar nueva tarea</Typography>
           <IconButton onClick={onClose}>
             <FaTimes />
           </IconButton>
@@ -203,6 +149,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                   {...formik.getFieldProps('title')}
                   error={formik.touched.title && Boolean(formik.errors.title)}
                   helperText={formik.touched.title && formik.errors.title}
+                  autoFocus
                 />
               </Box>
             </Box>
@@ -218,8 +165,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                     <MenuItem value="low">Baja</MenuItem>
                     <MenuItem value="medium">Media</MenuItem>
                     <MenuItem value="high">Alta</MenuItem>
-                    <MenuItem value="review" disabled={formik.values.status !== 'completed'}>En revisión</MenuItem>
-                    <MenuItem value="complete" disabled={formik.values.status !== 'completed'}>Completada</MenuItem>
                   </Select>
                   {formik.touched.priority && formik.errors.priority && (
                     <Typography variant="caption" color="error">{formik.errors.priority}</Typography>
@@ -317,7 +262,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
               type="submit"
               startIcon={<FaSave />}
             >
-              Guardar cambios
+              Guardar tarea
             </Button>
           </DialogActions>
         </form>
@@ -326,4 +271,4 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
   );
 };
 
-export default TaskEditModal;
+export default TaskAddModal;
