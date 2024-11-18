@@ -7,6 +7,7 @@ interface Clasificacion {
   usuario: {
     id_usuario: number;
     nombre_usuario: string;
+    url_avatar: string;
   };
   rol: string;
 }
@@ -67,7 +68,7 @@ const LeaderboardTable: React.FC = () => {
                 <td>{index + 1}</td>
                 <td>
                   <div className="user-photo-circle">
-                    <img src="/api/placeholder/40/40" alt="User" />
+                    <img src={clasificacion.usuario.url_avatar} alt="User" />
                   </div>
                 </td>
                 <td>{clasificacion.usuario.nombre_usuario}</td>

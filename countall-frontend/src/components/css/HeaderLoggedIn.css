@@ -202,6 +202,17 @@
   color: #44596e;
 }
 
+.mobile-menu {
+  display: none;
+  position: absolute;
+  top: 64px; /* Ajusta según la altura del header */
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
 /* Media query para diseño responsive */
 @media (max-width: 768px) {
   .user-info {
@@ -216,5 +227,9 @@
   
   .right-side {
     gap: 8px;  /* Reduce el espacio entre elementos en móviles */
+  }
+
+  .mobile-menu {
+    display: block;
   }
 }

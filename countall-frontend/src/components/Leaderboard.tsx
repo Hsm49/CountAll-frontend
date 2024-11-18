@@ -9,6 +9,7 @@ interface Clasificacion {
   usuario: {
     id_usuario: number;
     nombre_usuario: string;
+    url_avatar: string;
   };
   rol: string;
 }
@@ -82,40 +83,40 @@ const Leaderboard: React.FC = () => {
           </div>
         </div>
 
-          {/* Podium and Table Section */}
-          <div className="podium-and-table">
-              <div className="podium">
-                {clasificaciones.length >= 3 && (
-                  <>
-                    <div key={`second-${clasificaciones[1].id_usuario_fk_UE}`} className="podium-member second">
-                      <div className="avatar">
-                        <img src="/api/placeholder/50/50" alt="2nd Place" />
-                      </div>
-                      <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
-                      <p>{`${clasificaciones[1].puntuacion_local} pts`}</p>
-                    </div>
-                    <div key={`first-${clasificaciones[0].id_usuario_fk_UE}`} className="podium-member first">
-                      <div className="avatar">
-                        <img src="/api/placeholder/50/50" alt="1st Place" />
-                      </div>
-                      <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
-                      <p>{`${clasificaciones[0].puntuacion_local} pts`}</p>
-                    </div>
-                    <div key={`third-${clasificaciones[2].id_usuario_fk_UE}`} className="podium-member third">
-                      <div className="avatar">
-                        <img src="/api/placeholder/50/50" alt="3rd Place" />
-                      </div>
-                      <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
-                      <p>{`${clasificaciones[2].puntuacion_local} pts`}</p>
-                    </div>
-                  </>
-                )}
-              </div>
+        {/* Podium and Table Section */}
+        <div className="podium-and-table">
+          <div className="podium">
+            {clasificaciones.length >= 3 && (
+              <>
+                <div key={`second-${clasificaciones[1].id_usuario_fk_UE}`} className="podium-member second">
+                  <div className="avatar">
+                    <img src={clasificaciones[1].usuario.url_avatar} alt="2nd Place" />
+                  </div>
+                  <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
+                  <p>{`${clasificaciones[1].puntuacion_local} pts`}</p>
+                </div>
+                <div key={`first-${clasificaciones[0].id_usuario_fk_UE}`} className="podium-member first">
+                  <div className="avatar">
+                    <img src={clasificaciones[0].usuario.url_avatar} alt="1st Place" />
+                  </div>
+                  <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
+                  <p>{`${clasificaciones[0].puntuacion_local} pts`}</p>
+                </div>
+                <div key={`third-${clasificaciones[2].id_usuario_fk_UE}`} className="podium-member third">
+                  <div className="avatar">
+                    <img src={clasificaciones[2].usuario.url_avatar} alt="3rd Place" />
+                  </div>
+                  <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
+                  <p>{`${clasificaciones[2].puntuacion_local} pts`}</p>
+                </div>
+              </>
+            )}
+          </div>
 
-            {/* Leaderboard Table */}
-            <div className="leaderboard">
+          {/* Leaderboard Table */}
+          <div className="leaderboard">
             <LeaderboardTable />
-            </div>
+          </div>
         </div>
       </div>
     </div>
