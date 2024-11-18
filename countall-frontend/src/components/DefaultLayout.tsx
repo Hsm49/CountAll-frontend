@@ -36,6 +36,9 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     '/usuario': 'Usuario',
     '/estadisticas': 'Estadísticas y tablas',
     '/notificaciones': 'Notificaciones',
+    '/profile': 'Mi Perfil',
+    '/my-projects': 'Mis Proyectos',
+    '/my-teams': 'Mis Equipos',
   };
 
   const currentTitle = titles[location.pathname] || 'Default Title';

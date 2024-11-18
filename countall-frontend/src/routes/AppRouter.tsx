@@ -19,6 +19,9 @@ import Notifications from '../components/Notifications';
 import ManageTeam from '../components/ManageTeam';
 import Avatar from '../components/Avatar';
 import Tarea from '../components/Tareas';
+import Profile from '../components/Profile';
+import MyProjects from '../components/MyProjects';
+import MyTeams from '../components/MyTeams';
 
 const AppRouter: React.FC = () => {
   return (
@@ -101,6 +104,33 @@ const AppRouter: React.FC = () => {
         element={
           <PrivateRoute>
             <Tarea />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <Profile />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/my-projects"
+        element={
+          <PrivateRoute>
+            <MyProjects />
+          </PrivateRoute>
+        }
+      />
+
+    <Route
+        path="/my-teams"
+        element={
+          <PrivateRoute>
+            <MyTeams />
           </PrivateRoute>
         }
       />

@@ -1,0 +1,51 @@
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+    background-color: #f8f9fa;
+    height: calc(100vh - 70px); /* Ajusta según la altura de tu header */
+    overflow-y: auto;
+  }
+  
+  
+  .profile-info {
+    width: 100%;
+    margin-bottom: 24px;
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .profile-info label {
+    display: block;
+    margin-bottom: 8px;
+    color: #607489;
+  }
+  
+  .profile-info p {
+    margin: 0;
+    color: #333;
+  }
+  
+  .profile-info input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .btn-azul {
+    background-color: #1b70a6;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn-azul:hover {
+    background-color: rgba(27, 112, 166, 0.8);
+  }
