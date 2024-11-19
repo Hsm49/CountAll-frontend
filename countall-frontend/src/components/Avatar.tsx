@@ -28,6 +28,8 @@ const Avatar: React.FC = () => {
         if (response.status === 200) {
           setUser(response.data);
           setSelectedAvatar(response.data.url_avatar);
+          // Llamar a fetchAvatars después de obtener el usuario
+          fetchAvatars(response.data.id_usuario, token);
         } else {
           console.error('Failed to fetch user data');
         }
@@ -39,19 +41,19 @@ const Avatar: React.FC = () => {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    // Fetch available avatars from the backend
-    const fetchAvatars = async () => {
-      try {
-        const response = await axios.get('http://localhost:4444/api/obtenerRecompensas');
-        setAvatars(response.data);
-      } catch (error) {
-        console.error('Error fetching avatars:', error);
-      }
-    };
-
-    fetchAvatars();
-  }, []);
+  // Modificamos fetchAvatars para recibir el id_usuario y el token
+  const fetchAvatars = async (id_usuario: string, token: string) => {
+    try {
+      const response = await axios.get(`http://localhost:4444/api/obtenerRecompensas/${id_usuario}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      setAvatars(response.data);
+    } catch (error) {
+      console.error('Error fetching avatars:', error);
+    }
+  };
 
   const handleAvatarChange = async (id_recompensa: string) => {
     if (!user || !user.id_usuario) {
@@ -59,10 +61,17 @@ const Avatar: React.FC = () => {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     try {
       await axios.post('http://localhost:4444/api/cambiar-avatar', {
         id_usuario: user.id_usuario,
         id_recompensa: id_recompensa,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       setSelectedAvatar(id_recompensa);
       // Update user context or state with the new avatar
@@ -80,10 +89,10 @@ const Avatar: React.FC = () => {
           {avatars.map((avatar) => (
             <div key={avatar.id_recompensa} className="avatar-container">
               <img
-          src={avatar.url_avatar}
-          alt={avatar.nombre_recompensa}
-          className={`avatar ${selectedAvatar === avatar.url_avatar ? 'selected' : ''}`}
-          onClick={() => handleAvatarChange(avatar.id_recompensa)}
+                src={avatar.url_avatar}
+                alt={avatar.nombre_recompensa}
+                className={`avatar ${selectedAvatar === avatar.url_avatar ? 'selected' : ''}`}
+                onClick={() => handleAvatarChange(avatar.id_recompensa)}
               />
               <span className="avatar-name">{avatar.nombre_recompensa}</span>
             </div>

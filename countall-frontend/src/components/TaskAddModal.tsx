@@ -35,6 +35,7 @@ interface TaskAddModalProps {
     assignees: string[];
     comments: number;
     status: string;
+    isLocked: boolean;
   }) => Promise<void>;
 }
 
@@ -51,7 +52,8 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
       difficulty: 'fácil',
       assignees: [],
       comments: 0,
-      status: 'todo'
+      status: 'todo',
+      isLocked: false
     },
     validationSchema: Yup.object({
       title: Yup.string().required('El título es requerido'),

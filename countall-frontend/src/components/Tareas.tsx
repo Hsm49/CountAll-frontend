@@ -136,13 +136,13 @@ const Tarea: React.FC = () => {
     }
   };
 
-  const handleTaskAdd = async (newTask: Omit<Task, 'id'>) => {
+  const handleTaskAdd = async (newTask: Omit<Task, 'id' | 'isLocked'> & { isLocked?: boolean }) => {
     try {
       // Aquí irá la llamada al backend
       // const response = await addTask(newTask);
       
       // Simula la adición de una nueva tarea con un ID único
-      const newTaskWithId = { ...newTask, id: tasks.length + 1 };
+      const newTaskWithId = { ...newTask, id: tasks.length + 1, isLocked: newTask.isLocked ?? false };
       setTasks(prevTasks => [...prevTasks, newTaskWithId]);
     } catch (error) {
       throw error; // El modal manejará el error
