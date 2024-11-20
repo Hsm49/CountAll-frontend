@@ -31,9 +31,8 @@ const MyTeams: React.FC = () => {
     fetchEquipos();
   }, []);
 
-  const handleTeamClick = (id: number) => {
-    // Aquí puedes manejar lo que sucede al hacer clic en una tarjeta de equipo
-    console.log(`Equipo clickeado: ${id}`);
+  const handleTeamClick = (id_equipo: number) => {
+    navigate(`/equipo/${id_equipo}`);
   };
 
   return (

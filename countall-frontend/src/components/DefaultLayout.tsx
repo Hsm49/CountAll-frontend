@@ -43,11 +43,22 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     '/mis-estimaciones': 'Mis Estimaciones',
   };
 
-  const currentTitle = titles[location.pathname] || 'Default Title';
+  let currentTitle = titles[location.pathname] || 'Default Title';
 
   // Determine which header to show based on auth state and current path
   const showPublicHeader = !isLoggedIn || publicOnlyPaths.includes(location.pathname);
   const showPrivateHeader = isLoggedIn && !publicOnlyPaths.includes(location.pathname);
+
+
+  if (location.pathname.startsWith('/proyecto/')) {
+    const projectName = location.pathname.split('/proyecto/')[1];
+    currentTitle = `Proyecto`;
+  }
+
+  if (location.pathname.startsWith('/equipo/')) {
+    const teamName = location.pathname.split('/equipo/')[1];
+    currentTitle = `Equipo`;
+  }
 
   return (
     <>

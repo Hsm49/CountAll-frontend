@@ -15,31 +15,26 @@ const MyProjects: React.FC = () => {
 
   useEffect(() => {
     const fetchProyectos = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:4444/api/proyecto/misProyectos', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setProyectos(response.data.proyectos_usuario);
-      } catch (error) {
-        console.error('Error fetching proyectos:', error);
-      }
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:4444/api/proyecto/misProyectos', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setProyectos(response.data.proyectos_usuario);
     };
 
     fetchProyectos();
   }, []);
 
-  const handleProjectClick = (id: number) => {
-    // Aquí puedes manejar lo que sucede al hacer clic en una tarjeta de proyecto
-    console.log(`Proyecto clickeado: ${id}`);
+  const handleProjectClick = (nombre_proyecto: string) => {
+    navigate(`/proyecto/${nombre_proyecto}`);
   };
 
   return (
     <div className="my-projects-container">
       {proyectos.map((proyecto) => (
-        <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.id_proyecto)}>
+        <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
           <h3>{proyecto.nombre_proyecto}</h3>
           <p>{proyecto.descr_proyecto}</p>
         </div>
