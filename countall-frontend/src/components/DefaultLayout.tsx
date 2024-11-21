@@ -24,6 +24,12 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     '/recover-sent',
   ];
 
+  // Paths that should not show any header
+  const noHeaderPaths = [
+    '/select-project',
+    '/select-team',
+  ];
+
   // Define titles for different routes
   const titles: { [key: string]: string } = {
     '/': 'CountAll',
@@ -48,7 +54,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   // Determine which header to show based on auth state and current path
   const showPublicHeader = !isLoggedIn || publicOnlyPaths.includes(location.pathname);
   const showPrivateHeader = isLoggedIn && !publicOnlyPaths.includes(location.pathname);
-
+  const showNoHeader = noHeaderPaths.some(path => location.pathname.startsWith(path));
 
   if (location.pathname.startsWith('/proyecto/')) {
     const projectName = location.pathname.split('/proyecto/')[1];
@@ -62,7 +68,11 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
 
   return (
     <>
-      {showPrivateHeader ? (
+      {showNoHeader ? (
+        <div className="main-content no-header">
+          {children}
+        </div>
+      ) : showPrivateHeader ? (
         <HeaderLoggedIn title={currentTitle}>
           <div className="main-content private-path">
             {children}

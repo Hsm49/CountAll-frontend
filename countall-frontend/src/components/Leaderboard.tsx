@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { FaTrophy, FaCheck, FaArrowUp } from 'react-icons/fa';
 import './css/Leaderboard.css';
 import LeaderboardTable from './LeaderboardTable';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 
 interface Clasificacion {
   id_usuario_fk_UE: number;
@@ -18,12 +19,15 @@ const Leaderboard: React.FC = () => {
   const [clasificaciones, setClasificaciones] = useState<Clasificacion[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [usuarioId, setUsuarioId] = useState<number | null>(null);
+  const { selectedTeam } = useContext(ProjectTeamContext)!;
 
   useEffect(() => {
     const fetchClasificaciones = async () => {
+      if (!selectedTeam) return;
+
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:4444/api/clasificaciones', {
+        const response = await fetch(`http://localhost:4444/api/clasificaciones/${selectedTeam.id_equipo}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -48,7 +52,7 @@ const Leaderboard: React.FC = () => {
     };
 
     fetchClasificaciones();
-  }, []);
+  }, [selectedTeam]);
 
   return (
     <div className="content-wrapper">

@@ -3,6 +3,7 @@ import LoadingScreen from './components/LoadingScreen';
 import AppRouter from './routes/AppRouter';
 import DefaultLayout from './components/DefaultLayout';
 import { AuthProvider } from './context/AuthContext';
+import { ProjectTeamProvider } from './context/ProjectTeamContext';
 
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -18,11 +19,13 @@ const App: React.FC = () => {
 
   return (
     <AuthProvider>
-      {loading ? <LoadingScreen /> : (
-        <DefaultLayout>
-          <AppRouter />
-        </DefaultLayout>
-      )}
+      <ProjectTeamProvider>
+        {loading ? <LoadingScreen /> : (
+          <DefaultLayout>
+            <AppRouter />
+          </DefaultLayout>
+        )}
+      </ProjectTeamProvider>
     </AuthProvider>
   );
 };

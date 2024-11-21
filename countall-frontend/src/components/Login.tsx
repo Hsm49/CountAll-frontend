@@ -37,7 +37,7 @@ const Login: React.FC = () => {
         console.log('Login successful:', data);
         localStorage.setItem('token', data.token); // Store the token in localStorage
         setIsLoggedIn(true); // Update the context
-        navigate('/tracking'); // Redirect to the tracking screen
+        navigate('/select-project'); // Redirect to the tracking screen
       } else {
         if (data.errors && data.errors[0].msg === 'El usuario no ha sido confirmado') {
           Swal.fire({

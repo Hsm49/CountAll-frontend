@@ -26,6 +26,8 @@ import Estimaciones from '../components/Estimaciones';
 import MisEstimaciones from '../components/MisEstimaciones';
 import ProjectDetails from '../components/ProjectDetails';
 import TeamDetails from '../components/TeamDetails';
+import SelectProject from '../components/SelectProject';
+import SelectTeam from '../components/SelectTeam';
 
 const AppRouter: React.FC = () => {
   return (
@@ -41,6 +43,24 @@ const AppRouter: React.FC = () => {
       <Route path="/account-verified" element={<AccountVerified />} />
       <Route path="/recover-sent" element={<RecoverSent />} />
       <Route path="/" element={<LandingPage />} />
+
+      {/* Project and Team Selection */}
+      <Route
+        path="/select-project"
+        element={
+          <PrivateRoute>
+            <SelectProject />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/select-team/:nombre_proyecto"
+        element={
+          <PrivateRoute>
+            <SelectTeam />
+          </PrivateRoute>
+        }
+      />
 
       {/* Private Routes */}
       <Route

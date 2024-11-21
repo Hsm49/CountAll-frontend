@@ -5,6 +5,7 @@ import { FaBell, FaCog, FaHome, FaUsers, FaTasks, FaUser, FaCogs,
          FaTrophy, FaUserCircle, FaChartBar, FaBellSlash } from 'react-icons/fa';
 import './css/HeaderLoggedIn.css';
 import axios from 'axios';
+import LoadingScreen from './LoadingScreen';
 
 type Theme = 'light' | 'dark';
 
@@ -63,6 +64,7 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -100,13 +102,14 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
   }, []);
 
   const handleLogout = () => {
-    try {
+    setLoggingOut(true);
+    setTimeout(() => {
       localStorage.removeItem('token');
+      localStorage.removeItem('selectedProject');
+      localStorage.removeItem('selectedTeam');
       navigate('/');
       window.location.reload();
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+    }, 500); // Adjust the delay as needed
   };
 
   const menuItemStyles = {
@@ -130,6 +133,10 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
       },
     },
   };
+
+  if (loggingOut) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="layout-container">
