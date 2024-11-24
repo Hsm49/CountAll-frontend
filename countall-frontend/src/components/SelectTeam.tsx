@@ -27,7 +27,7 @@ const SelectTeam: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const { setSelectedTeam, selectedProject } = useContext(ProjectTeamContext)!;
+  const { setSelectedTeam, selectedProject, setUserRole } = useContext(ProjectTeamContext)!;
   const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
   const location = useLocation();
   const proyecto = location.state?.proyecto;
@@ -88,9 +88,21 @@ const SelectTeam: React.FC = () => {
     setTimeout(async () => {
       setSelectedTeam(equipo);
 
+      // Fetch user role
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${equipo.id_equipo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUserRole(response.data.rol_sesion);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+
       // Verificar si los detalles del proyecto ya han sido proporcionados
       try {
-        const token = localStorage.getItem('token');
         const response = await axios.get(`http://localhost:4444/api/proyecto/misProyectos/${selectedProject?.nombre_proyecto}`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -142,6 +154,18 @@ const SelectTeam: React.FC = () => {
       const newTeam = response.data;
       setEquipos([...equipos, newTeam]);
       setSelectedTeam(newTeam);
+
+      // Fetch user role
+      try {
+        const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${newTeam.id_equipo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUserRole(response.data.rol_sesion);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
 
       // Verificar si los detalles del proyecto ya han sido proporcionados
       try {

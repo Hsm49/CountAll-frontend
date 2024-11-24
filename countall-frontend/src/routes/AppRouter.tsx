@@ -1,5 +1,5 @@
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import Login from '../components/Login';
 import HeaderLg from '../components/HeaderLg';
 import SignUp from '../components/SignUp';
@@ -30,8 +30,11 @@ import SelectProject from '../components/SelectProject';
 import SelectTeam from '../components/SelectTeam';
 import SetProjectDetails from '../components/SetProjectDetails';
 import SelectTeamUser from '../components/SelectTeamUser';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 
 const AppRouter: React.FC = () => {
+  const { userRole } = useContext(ProjectTeamContext)!;
+
   return (
     <Routes>
       {/* Public Routes */}
@@ -110,9 +113,13 @@ const AppRouter: React.FC = () => {
       <Route
         path="/configurar-sitios"
         element={
-          <PrivateRoute>
-            <ManageSites />
-          </PrivateRoute>
+          userRole === 'Líder' ? (
+            <PrivateRoute>
+              <ManageSites />
+            </PrivateRoute>
+          ) : (
+            <Navigate to="/tracking" />
+          )
         }
       />
 
@@ -128,9 +135,13 @@ const AppRouter: React.FC = () => {
       <Route
         path="/gestionar-equipo"
         element={
-          <PrivateRoute>
-            <ManageTeam />
-          </PrivateRoute>
+          userRole === 'Líder' ? (
+            <PrivateRoute>
+              <ManageTeam />
+            </PrivateRoute>
+          ) : (
+            <Navigate to="/tracking" />
+          )
         }
       />
 

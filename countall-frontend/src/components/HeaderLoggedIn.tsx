@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Sidebar, Menu, MenuItem, menuClasses } from 'react-pro-sidebar';
 import { useNavigate } from 'react-router-dom';
 import { FaBell, FaCog, FaHome, FaUsers, FaTasks, FaUser, FaCogs, 
@@ -6,6 +6,7 @@ import { FaBell, FaCog, FaHome, FaUsers, FaTasks, FaUser, FaCogs,
 import './css/HeaderLoggedIn.css';
 import axios from 'axios';
 import LoadingScreen from './LoadingScreen';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 
 type Theme = 'light' | 'dark';
 
@@ -66,6 +67,7 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
+  const { userRole } = useContext(ProjectTeamContext)!;
 
   useEffect(() => {
     const fetchUsuario = async () => {
@@ -112,13 +114,15 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
     }, 500); // Adjust the delay as needed
   };
 
+  const iconColor = userRole === 'Líder' ? '#f2541b' : '#1b70a6';
+
   const menuItemStyles = {
     root: {
       fontSize: '13px',
       fontWeight: 400,
     },
     icon: {
-      color: themes[theme].menu.icon,
+      color: iconColor,
       [`&.${menuClasses.disabled}`]: {
         color: themes[theme].menu.disabled.color,
       },
@@ -158,10 +162,14 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
         </div>
         <Menu menuItemStyles={menuItemStyles}>
           <MenuItem icon={<FaHome />} onClick={() => navigate('/tracking')}>Inicio</MenuItem>
-          <MenuItem icon={<FaUsers />} onClick={() => navigate('/gestionar-equipo')}>Gestionar equipo</MenuItem>
+          {userRole === 'Líder' && (
+            <>
+              <MenuItem icon={<FaUsers />} onClick={() => navigate('/gestionar-equipo')}>Gestionar equipo</MenuItem>
+              <MenuItem icon={<FaCogs />} onClick={() => navigate('/configurar-sitios')}>Configurar sitios</MenuItem>
+            </>
+          )}
           <MenuItem icon={<FaTasks />} onClick={() => navigate('/tareas')}>Tareas</MenuItem>
           <MenuItem icon={<FaUser />} onClick={() => navigate('/avatar')}>Avatar</MenuItem>
-          <MenuItem icon={<FaCogs />} onClick={() => navigate('/configurar-sitios')}>Configurar sitios</MenuItem>
           <MenuItem icon={<FaTrophy />} onClick={() => navigate('/leaderboard')}>Clasificatorias</MenuItem>
           <MenuItem icon={<FaUserCircle />} onClick={() => navigate('/usuario')}>Usuario</MenuItem>
           <MenuItem icon={<FaChartBar />} onClick={() => navigate('/estadisticas')}>Estadísticas</MenuItem>
@@ -186,13 +194,13 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
               className="icon-button notification-button"
               onClick={() => navigate('/notifications')}
             >
-              <FaBell />
+              <FaBell style={{ color: iconColor }} />
             </button>
             <button 
               className="icon-button config-button"
               onClick={() => navigate('/config')}
             >
-              <FaCog />
+              <FaCog style={{ color: iconColor }} />
             </button>
             <div className="profile-button-container">
               <div className="profile-button">
@@ -220,10 +228,14 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
           <div className="mobile-menu">
             <Menu menuItemStyles={menuItemStyles}>
               <MenuItem icon={<FaHome />} onClick={() => navigate('/tracking')}>Inicio</MenuItem>
-              <MenuItem icon={<FaUsers />} onClick={() => navigate('/gestionar-equipo')}>Gestionar equipo</MenuItem>
+              {userRole === 'Líder' && (
+                <>
+                  <MenuItem icon={<FaUsers />} onClick={() => navigate('/gestionar-equipo')}>Gestionar equipo</MenuItem>
+                  <MenuItem icon={<FaCogs />} onClick={() => navigate('/configurar-sitios')}>Configurar sitios</MenuItem>
+                </>
+              )}
               <MenuItem icon={<FaTasks />} onClick={() => navigate('/tareas')}>Tareas</MenuItem>
               <MenuItem icon={<FaUser />} onClick={() => navigate('/avatar')}>Avatar</MenuItem>
-              <MenuItem icon={<FaCogs />} onClick={() => navigate('/configurar-sitios')}>Configurar sitios</MenuItem>
               <MenuItem icon={<FaTrophy />} onClick={() => navigate('/leaderboard')}>Clasificatorias</MenuItem>
               <MenuItem icon={<FaUserCircle />} onClick={() => navigate('/usuario')}>Usuario</MenuItem>
               <MenuItem icon={<FaChartBar />} onClick={() => navigate('/estadisticas')}>Estadísticas</MenuItem>

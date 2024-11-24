@@ -1,4 +1,5 @@
 import React, { createContext, useState, ReactNode, useEffect } from 'react';
+import axios from 'axios';
 
 interface Project {
   id_proyecto: number;
@@ -17,6 +18,8 @@ interface ProjectTeamContextProps {
   setSelectedProject: (project: Project | null) => void;
   selectedTeam: Team | null;
   setSelectedTeam: (team: Team | null) => void;
+  userRole: string | null;
+  setUserRole: (role: string | null) => void;
 }
 
 export const ProjectTeamContext = createContext<ProjectTeamContextProps | undefined>(undefined);
@@ -31,6 +34,8 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
     const savedTeam = localStorage.getItem('selectedTeam');
     return savedTeam ? JSON.parse(savedTeam) : null;
   });
+
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedProject) {
@@ -48,8 +53,28 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
     }
   }, [selectedTeam]);
 
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      if (selectedTeam) {
+        const token = localStorage.getItem('token');
+        try {
+          const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${selectedTeam.id_equipo}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setUserRole(response.data.rol_sesion);
+        } catch (error) {
+          console.error('Error fetching user role:', error);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, [selectedTeam]);
+
   return (
-    <ProjectTeamContext.Provider value={{ selectedProject, setSelectedProject, selectedTeam, setSelectedTeam }}>
+    <ProjectTeamContext.Provider value={{ selectedProject, setSelectedProject, selectedTeam, setSelectedTeam, userRole, setUserRole }}>
       {children}
     </ProjectTeamContext.Provider>
   );

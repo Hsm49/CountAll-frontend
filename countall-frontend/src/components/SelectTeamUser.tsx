@@ -27,7 +27,7 @@ const SelectTeamUser: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const { setSelectedTeam } = useContext(ProjectTeamContext)!;
+  const { setSelectedTeam, userRole, setUserRole } = useContext(ProjectTeamContext)!;
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -74,10 +74,24 @@ const SelectTeamUser: React.FC = () => {
     fetchEquipos();
   }, []);
 
-  const handleTeamClick = (equipo: Equipo) => {
+  const handleTeamClick = async (equipo: Equipo) => {
     setIsVisible(false);
-    setTimeout(() => {
+    setTimeout(async () => {
       setSelectedTeam(equipo);
+
+      // Fetch user role
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${equipo.id_equipo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUserRole(response.data.rol_sesion);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+
       navigate('/tracking');
     }, 300);
   };
@@ -114,6 +128,19 @@ const SelectTeamUser: React.FC = () => {
       const newTeam = response.data;
       setEquipos([...equipos, newTeam]);
       setSelectedTeam(newTeam);
+
+      // Fetch user role
+      try {
+        const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${newTeam.id_equipo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUserRole(response.data.rol_sesion);
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+
       navigate('/tracking');
     } catch (error) {
       console.error('Error creating team:', error);
