@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import axios from 'axios';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import LoadingScreen from './LoadingScreen';
 import './css/SelectProject.css';
@@ -12,7 +12,7 @@ interface Equipo {
   descr_equipo: string;
 }
 
-const SelectTeam: React.FC = () => {
+const SelectTeamUser: React.FC = () => {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -27,17 +27,9 @@ const SelectTeam: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const { setSelectedTeam, selectedProject } = useContext(ProjectTeamContext)!;
-  const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
-  const location = useLocation();
-  const proyecto = location.state?.proyecto;
+  const { setSelectedTeam } = useContext(ProjectTeamContext)!;
 
   useEffect(() => {
-    if (!selectedProject) {
-      navigate('/select-project');
-      return;
-    }
-
     const fetchCurrentUser = async () => {
       const token = localStorage.getItem('token');
       if (!token) return;
@@ -55,14 +47,13 @@ const SelectTeam: React.FC = () => {
     };
 
     fetchCurrentUser();
-  }, [selectedProject, navigate]);
+  }, []);
 
   useEffect(() => {
     const fetchEquipos = async () => {
-      if (!nombre_proyecto) return;
       const token = localStorage.getItem('token');
       try {
-        const response = await axios.get(`http://localhost:4444/api/equipo/misEquiposProyecto/${nombre_proyecto}`, {
+        const response = await axios.get('http://localhost:4444/api/equipo/misEquipos', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -81,31 +72,13 @@ const SelectTeam: React.FC = () => {
     };
 
     fetchEquipos();
-  }, [nombre_proyecto]);
+  }, []);
 
-  const handleTeamClick = async (equipo: Equipo) => {
+  const handleTeamClick = (equipo: Equipo) => {
     setIsVisible(false);
-    setTimeout(async () => {
+    setTimeout(() => {
       setSelectedTeam(equipo);
-
-      // Verificar si los detalles del proyecto ya han sido proporcionados
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`http://localhost:4444/api/proyecto/misProyectos/${selectedProject?.nombre_proyecto}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.data.proyecto.estado_proyecto) {
-          navigate('/tracking', { state: { equipo } });
-        } else {
-          navigate(`/set-project-details/${selectedProject?.id_proyecto}`, { state: { proyecto: selectedProject } });
-        }
-      } catch (error) {
-        console.error('Error verifying project details:', error);
-        navigate('/tracking', { state: { equipo } });
-      }
+      navigate('/tracking');
     }, 300);
   };
 
@@ -131,8 +104,7 @@ const SelectTeam: React.FC = () => {
       const response = await axios.post('http://localhost:4444/api/equipo/crearEquipo', {
         nombre_equipo: nombreEquipo,
         descr_equipo: descrEquipo,
-        usuarios,
-        proyecto: nombre_proyecto
+        usuarios
       }, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -142,24 +114,7 @@ const SelectTeam: React.FC = () => {
       const newTeam = response.data;
       setEquipos([...equipos, newTeam]);
       setSelectedTeam(newTeam);
-
-      // Verificar si los detalles del proyecto ya han sido proporcionados
-      try {
-        const response = await axios.get(`http://localhost:4444/api/proyecto/misProyectos/${selectedProject?.nombre_proyecto}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.data.proyecto.estado_proyecto) {
-          navigate('/tracking');
-        } else {
-          navigate(`/set-project-details/${selectedProject?.id_proyecto}`, { state: { proyecto: selectedProject } });
-        }
-      } catch (error) {
-        console.error('Error verifying project details:', error);
-        navigate('/tracking');
-      }
+      navigate('/tracking');
     } catch (error) {
       console.error('Error creating team:', error);
       setCreateError('Error al crear el equipo');
@@ -181,7 +136,7 @@ const SelectTeam: React.FC = () => {
     >
       <div className="select-team-container">
         <button className="back-button" onClick={() => navigate(-1)}>Regresar</button>
-        <h2>Proyecto: {nombre_proyecto}</h2>
+        <h2>Mis Equipos</h2>
         
         {!isCreating ? (
           <>
@@ -271,4 +226,4 @@ const SelectTeam: React.FC = () => {
   );
 };
 
-export default SelectTeam;
+export default SelectTeamUser;

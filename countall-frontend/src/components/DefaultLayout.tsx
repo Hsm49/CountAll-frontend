@@ -28,6 +28,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
   const noHeaderPaths = [
     '/select-project',
     '/select-team',
+    '/set-project-details'
   ];
 
   // Define titles for different routes

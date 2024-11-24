@@ -28,6 +28,8 @@ import ProjectDetails from '../components/ProjectDetails';
 import TeamDetails from '../components/TeamDetails';
 import SelectProject from '../components/SelectProject';
 import SelectTeam from '../components/SelectTeam';
+import SetProjectDetails from '../components/SetProjectDetails';
+import SelectTeamUser from '../components/SelectTeamUser';
 
 const AppRouter: React.FC = () => {
   return (
@@ -58,6 +60,24 @@ const AppRouter: React.FC = () => {
         element={
           <PrivateRoute>
             <SelectTeam />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/select-team-user"
+        element={
+          <PrivateRoute>
+            <SelectTeamUser />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/set-project-details/:projectId"
+        element={
+          <PrivateRoute>
+            <SetProjectDetails />
           </PrivateRoute>
         }
       />

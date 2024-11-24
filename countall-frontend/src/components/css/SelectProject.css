@@ -106,3 +106,261 @@
     background-color: #357abd;
     transform: translateY(-2px);
   }
+  
+
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    z-index: 10000;
+  }
+  
+  .modal-content h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+  
+  .modal-content input,
+  .modal-content textarea,
+  .modal-content select,
+  .create-form input,
+  .create-form textarea,
+  .create-form select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .modal-content textarea,
+  .create-form textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .modal-content input:focus,
+  .modal-content textarea:focus,
+  .modal-content select:focus,
+  .create-form input:focus,
+  .create-form textarea:focus,
+  .create-form select:focus {
+    outline: none;
+    border-color: #1b70a6;
+    box-shadow: 0 0 0 2px rgba(27, 112, 166, 0.1);
+  }
+  
+  .modal-content button,
+  .create-form button {
+    background-color: #1b70a6;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 32px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 10px;
+  }
+  
+  .modal-content button:hover,
+  .create-form button:hover {
+    background-color: #357abd;
+    transform: translateY(-2px);
+  }
+  
+  .modal-content button:disabled,
+  .create-form button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  .modal-content .error,
+  .create-form .error {
+    color: #dc3545;
+    margin-bottom: 16px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: rgba(220, 53, 69, 0.1);
+    font-size: 0.9rem;
+  }
+  
+  .user-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .user-input input {
+    flex: 1;
+    margin-bottom: 0;
+  }
+  
+  .user-input button {
+    flex-shrink: 0;
+    margin-top: 0;
+    white-space: nowrap;
+  }
+  
+  .modal ul,
+  .create-form ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+  }
+  
+  .modal ul li,
+  .create-form ul li {
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .create-form {
+    background-color: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .create-form h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+  }
+  
+  .create-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .button-group {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+  
+  .cancel-btn {
+    background-color: #e0e0e0 !important;
+    color: #333 !important;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #d0d0d0 !important;
+  }
+  
+  /* Animaciones */
+  .fade-enter {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .fade-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  .fade-exit {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .fade-exit-active {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 300ms, transform 300ms;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .create-form {
+      width: 95%;
+      padding: 16px;
+    }
+  
+    .button-group {
+      flex-direction: column;
+    }
+  
+    .button-group button {
+      width: 100%;
+    }
+  
+    .user-input {
+      flex-direction: column;
+    }
+  
+    .user-input button {
+      width: 100%;
+    }
+  }
+  
+  /* Mejoras visuales adicionales */
+  .create-project-btn,
+  .create-team-btn {
+    margin: 24px auto;
+    display: block;
+    min-width: 200px;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  
+  .empty-state h3 {
+    color: #666;
+    margin-bottom: 24px;
+  }
+
+  .back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #F2541B;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 32px;
+    cursor: pointer;
+  }
+  
+  .skip-link {
+    color: #1b70a6;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-bottom: 20px;
+  }
