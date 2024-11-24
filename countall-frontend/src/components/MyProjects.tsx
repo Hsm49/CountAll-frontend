@@ -31,8 +31,13 @@ const MyProjects: React.FC = () => {
     navigate(`/proyecto/${nombre_proyecto}`);
   };
 
+  const handleChangeProject = () => {
+    navigate('/select-project');
+  };
+
   return (
     <div className="my-projects-container">
+      <button className="btn-naranja" onClick={handleChangeProject}>Cambiar de proyecto</button>
       {proyectos.map((proyecto) => (
         <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
           <h3>{proyecto.nombre_proyecto}</h3>

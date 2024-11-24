@@ -35,8 +35,13 @@ const MyTeams: React.FC = () => {
     navigate(`/equipo/${id_equipo}`);
   };
 
+  const handleChangeTeam = () => {
+    navigate('/select-team-user');
+  };
+
   return (
     <div className="my-projects-container">
+      <button className="btn-naranja" onClick={handleChangeTeam}>Cambiar de equipo</button>
       {equipos.map((equipo) => (
         <div key={equipo.id_equipo} className="project-card" onClick={() => handleTeamClick(equipo.id_equipo)}>
           <h3>{equipo.nombre_equipo}</h3>
