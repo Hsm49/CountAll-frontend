@@ -1,108 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { FaPlus, FaComment, FaEllipsisH, FaCheck, FaEdit, FaFlag, FaCircle, FaTrash } from 'react-icons/fa';
 import { Avatar, Button, Card, CardContent, Typography, Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import Swal from 'sweetalert2';
 import './css/Tareas.css';
 import TaskEditModal from './TaskEditModal';
 import TaskAddModal from './TaskAddModal';
+import axios from 'axios';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 
 interface Task {
   id: number;
   title: string;
   description: string;
   priority: string;
-  difficulty: string; // Nueva propiedad para la dificultad
-  assignees: string[];
+  difficulty: string;
+  assignees: { nombre_usuario: string, url_avatar: string }[];
   comments: number;
   status: string;
-  isLocked: boolean; // Nueva propiedad para indicar si la tarea está bloqueada
+  isLocked: boolean;
 }
 
 const Tarea: React.FC = () => {
+  const projectTeamContext = useContext(ProjectTeamContext);
+  const selectedTeam = projectTeamContext?.selectedTeam;
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
-
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: 'Lluvia de ideas',
-      description: 'Hacer lluvia de ideas',
-      priority: 'low',
-      difficulty: 'fácil',
-      assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg', 'avatar4.jpg'],
-      comments: 12,
-      status: 'todo',
-      isLocked: false
-    },
-    {
-      id: 2,
-      title: 'Investigación',
-      description: 'Investigar sobre el proyecto',
-      priority: 'medium',
-      difficulty: 'media',
-      assignees: ['avatar1.jpg', 'avatar2.jpg'],
-      comments: 10,
-      status: 'todo',
-      isLocked: false
-    },
-    {
-      id: 3,
-      title: 'Estimaciones',
-      description: 'Realizar estimaciones',
-      priority: 'high',
-      difficulty: 'difícil',
-      assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
-      comments: 9,
-      status: 'todo',
-      isLocked: false
-    },
-    {
-      id: 4,
-      title: 'Recolectar imágenes',
-      description: 'Descargar imágenes de stock',
-      priority: 'low',
-      difficulty: 'fácil',
-      assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
-      comments: 14,
-      status: 'in-progress',
-      isLocked: false
-    },
-    {
-      id: 5,
-      title: 'Página de inicio',
-      description: 'Programar la página de inicio',
-      priority: 'low',
-      difficulty: 'media',
-      assignees: ['avatar1.jpg'],
-      comments: 9,
-      status: 'in-progress',
-      isLocked: false
-    },
-    {
-      id: 6,
-      title: 'Diseño móvil del sistema',
-      description: 'Diseñar la versión móvil del sistema',
-      priority: 'complete',
-      difficulty: 'difícil',
-      assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
-      comments: 12,
-      status: 'completed',
-      isLocked: true // Simulamos que esta tarea está bloqueada
-    },
-    {
-      id: 7,
-      title: 'Diseñar el sistema',
-      description: 'Diseñar el sistema em react',
-      priority: 'review',
-      difficulty: 'media',
-      assignees: ['avatar1.jpg', 'avatar2.jpg', 'avatar3.jpg'],
-      comments: 12,
-      status: 'completed',
-      isLocked: true
-    }
-  ]);
-
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [statusAnchorEl, setStatusAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
@@ -112,6 +36,42 @@ const Tarea: React.FC = () => {
     { value: 'in-progress', label: 'En progreso' },
     { value: 'completed', label: 'Completada' }
   ];
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      if (!selectedTeam) return;
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      try {
+        const response = await axios.get(`http://localhost:4444/api/tarea/verTareas/${selectedTeam.id_equipo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const fetchedTasks = response.data.tareas_equipo.map((taskData: any) => ({
+          id: taskData.datos_tarea.tarea.id_tarea,
+          title: taskData.datos_tarea.tarea.nombre_tarea,
+          description: taskData.datos_tarea.tarea.descr_tarea,
+          priority: taskData.datos_tarea.tarea.prioridad_tarea.toLowerCase(),
+          difficulty: taskData.datos_tarea.tarea.dificultad_tarea.toLowerCase(),
+          assignees: taskData.asignados,
+          comments: taskData.datos_tarea.tarea.comentarios_tarea,
+          status: taskData.datos_tarea.tarea.estado_tarea.toLowerCase().replace(' ', '-'),
+          isLocked: false // Assuming tasks are not locked initially
+        }));
+        setTasks(fetchedTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    fetchTasks();
+  }, [selectedTeam]);
 
   const handleEditTask = (taskId: number) => {
     const taskToEdit = tasks.find(task => task.id === taskId);
@@ -337,11 +297,11 @@ const Tarea: React.FC = () => {
           <CardContent>
               <Box className="priority-label-container">
                 <Box className="priority-label">
-                  {task.priority === 'low' && <FaFlag className="urgency-icon green" />}
-                  {task.priority === 'medium' && <FaFlag className="urgency-icon yellow" />}
-                  {task.priority === 'high' && <FaFlag className="urgency-icon red" />}
-                  {task.priority === 'complete' && <FaCheck className="urgency-icon green" />}
-                  {task.priority === 'review' && <FaCircle className="urgency-icon yellow" />}
+                  {task.priority === 'baja' && <FaFlag className="urgency-icon green" />}
+                  {task.priority === 'media' && <FaFlag className="urgency-icon yellow" />}
+                  {task.priority === 'alta' && <FaFlag className="urgency-icon red" />}
+                  {task.priority === 'completada' && <FaCheck className="urgency-icon green" />}
+                  {task.priority === 'revisión' && <FaCircle className="urgency-icon yellow" />}
                 </Box>
                 <Box className={`difficulty-label difficulty-${task.difficulty}`}>
                   {task.difficulty === 'fácil' ? 'Fácil' : task.difficulty === 'media' ? 'Media' : 'Difícil'}
@@ -403,8 +363,8 @@ const Tarea: React.FC = () => {
             <Typography variant="h6">{task.title}</Typography>
             <Typography variant="body2">{task.description}</Typography>
             <Box className="avatars">
-              {task.assignees.slice(0, 2).map((avatar, index) => (
-                <Avatar key={index} alt={`Miembro ${index + 1}`} src={`/path/to/${avatar}`} />
+              {task.assignees.slice(0, 2).map((assignee, index) => (
+                <Avatar key={index} alt={assignee.nombre_usuario} src={assignee.url_avatar} />
               ))}
               {task.assignees.length > 2 && (
                 <Avatar className="more-avatars">...</Avatar>
@@ -439,46 +399,46 @@ const Tarea: React.FC = () => {
           <Box className="column-header to-do">
             <Typography variant="h6">Por hacer</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'todo').length}
+              {tasks.filter(task => task.status === 'por-hacer').length}
             </Typography>
             <IconButton onClick={() => setAddModalOpen(true)}>
               <FaPlus />
             </IconButton>
           </Box>
-          {renderTasksList('todo')}
+          {renderTasksList('por-hacer')}
         </Box>
 
         <Box className="column">
           <Box className="column-header in-progress">
             <Typography variant="h6">En progreso</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'in-progress').length}
+              {tasks.filter(task => task.status === 'en-progreso').length}
             </Typography>
             <IconButton onClick={() => setAddModalOpen(true)}>
               <FaPlus />
             </IconButton>
           </Box>
-          {renderTasksList('in-progress')}
+          {renderTasksList('en-progreso')}
         </Box>
 
         <Box className="column">
           <Box className="column-header completed">
             <Typography variant="h6">Completados</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'completed').length}
+              {tasks.filter(task => task.status === 'completada').length}
             </Typography>
             <IconButton onClick={() => setAddModalOpen(true)}>
               <FaPlus />
             </IconButton>
           </Box>
-          {renderTasksList('completed')}
+          {renderTasksList('completada')}
         </Box>
       </Box>
-      <TaskAddModal
+      {/*<TaskAddModal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         onSave={handleTaskAdd}
-      />
+      />*/}
     </Box>
   );
 };

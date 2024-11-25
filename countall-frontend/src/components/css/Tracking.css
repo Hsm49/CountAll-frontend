@@ -4,16 +4,16 @@
   align-items: center;
   padding: 24px;
   background-color: #f8f9fa;
-  height: calc(100vh - 70px); /* Adjust based on your header height */
+  height: calc(100vh - 70px);
   overflow-y: auto;
 }
 
-/* Recuadros de información */
+/* Info cards section */
 .info-cards {
   display: flex;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 24px;
   margin-bottom: 24px;
+  width: 100%;
 }
 
 .score-card {
@@ -24,155 +24,190 @@
   align-items: flex-start;
   gap: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.score-icon {
-  background: #e8f4ff;
-  color: #0098e5;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-}
-
-.score-content {
   flex: 1;
 }
 
-.score-content h3 {
-  color: #607489;
-  font-size: 14px;
-  margin: 0 0 8px 0;
-}
-
-.score-content .score {
-  color: #44596e;
-  font-size: 24px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-}
-
-/* Contenedor de tablas */
+/* Tables container and common styles */
 .tables-container {
   display: flex;
   width: 100%;
   gap: 24px;
-  padding: 24px;
 }
 
-/* Tabla Resumen del Proyecto y Tareas para Hoy */
-.project-summary {
-  flex: 1;
-}
-
-.task-filter {
-  margin: 10px 0;
-}
-
-.task-filter button {
-  margin-right: 5px;
-  background-color: #f2541b;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.task-filter button:hover {
-  background-color: rgba(224, 126, 13, 0.8);
-}
-
-/* Tabla */
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  margin-top: 1rem;
-  border: 2px solid #1b70a6; /* Visible border for all tables */
-  background-color: #ffffff; /* White background for better contrast */
-  text-align: center;
-}
-
-th,
-td {
-  padding: 10px;
-  text-align: center;
-  border: 1px solid #6e6e6e;
-}
-
-th {
-  background-color: #1b70a6; /* Darker header background */
-  color: #ffffff; /* White text for header */
-}
-
-td {
-  background-color: #ffffff; /* Light gray for table rows */
-  color: #44596e; /* Dark text for better readability */
-}
-
-/* Icono de urgencia */
-.urgency-icon {
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
-}
-
-.urgency-icon.red {
-  color: red;
-}
-
-.urgency-icon.yellow {
-  color: rgb(255, 231, 15);
-}
-
-.urgency-icon.green {
-  color: green;
-}
-
-/* Tabla de Clasificatorias */
+.task-table,
 .leaderboard {
   flex: 1;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
+.task-table h4,
+.leaderboard h4 {
+  margin: 0;
+  padding: 20px 24px;
+  font-size: 18px;
+  color: #2c3e50;
+  border-bottom: 1px solid #edf2f7;
+  background: white;
+}
+
+.table-container {
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+  padding: 0 12px;
+}
+
+/* Enhanced table styles */
+.task-table table,
 .leaderboard table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-top: 1rem;
-  border: 2px solid #1b70a6; /* Visible border for all tables */
-  background-color: #ffffff
+  margin: 12px 0;
+  border: none;
+  background-color: transparent;
 }
 
-.leaderboard table th {
-    background-color: #1b70a6; /* Darker header background */
-    color: #ffffff; /* White text for header */
+.task-table th,
+.leaderboard th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  padding: 16px;
+  text-align: left;
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+.task-table td,
+.leaderboard td {
+  padding: 16px;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+/* Row hover effect */
+.task-table tr:hover td,
+.leaderboard tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* Current user highlight in leaderboard */
+.leaderboard tr.highlight td {
+  background-color: #eff6ff;
+}
+
+.leaderboard tr.highlight:hover td {
+  background-color: #e0f2fe;
+}
+
+/* User photo styles */
 .user-photo-circle {
-  width: 40px;
-  height: 40px;
-  background-color: #f2541b;
+  width: 36px;
+  height: 36px;
+  background-color: #e2e8f0;
   border-radius: 50%;
-  margin: 0 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-photo-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Priority icons */
+.urgency-icon {
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+}
+
+.urgency-icon.red {
+  color: #ef4444;
+}
+
+.urgency-icon.yellow {
+  color: #f59e0b;
+}
+
+.urgency-icon.green {
+  color: #10b981;
+}
+
+/* Scrollbar styling */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .info-cards {
+    flex-wrap: wrap;
+  }
+  
+  .score-card {
+    flex: 1 1 calc(50% - 24px);
+    min-width: 250px;
+  }
+}
+
 @media (max-width: 768px) {
   .tracking-container {
     padding: 16px;
   }
 
   .info-cards {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .score-card {
+    width: 100%;
   }
 
   .tables-container {
     flex-direction: column;
-    gap: 16px;
+  }
+
+  .task-table,
+  .leaderboard {
+    width: 100%;
+  }
+
+  .task-table th,
+  .leaderboard th,
+  .task-table td,
+  .leaderboard td {
+    padding: 12px;
+    font-size: 13px;
   }
 }

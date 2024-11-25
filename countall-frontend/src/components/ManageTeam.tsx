@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { ENDPOINTS, API_BASE_URL } from '../config/api.config';
+import React, { useState, useMemo, useContext, useEffect } from 'react';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
   Select,
   FormControl,
   InputLabel,
+  MenuItem as SelectMenuItem,
 } from '@mui/material';
 import {
   MaterialReactTable,
@@ -27,25 +28,46 @@ import {
 import { AccountCircle, Send, Add, MoreVert } from '@mui/icons-material';
 import './css/ManageTeam.css';
 import Swal from 'sweetalert2';
+import axios from 'axios';
 
 type TeamMember = {
-  id: string;
-  name: string;
-  email: string;
-  lastActivity: string;
-  role: 'Lider' | 'Miembro' | 'Invitado';
+  nombre_usuario: string;
+  id_usuario: number;
+  email_usuario: string;
+  tareas_asignadas: number;
+  tareas_completadas: number;
+  rol: string;
 };
 
 const ManageTeam: React.FC = () => {
+  const { selectedTeam } = useContext(ProjectTeamContext)!;
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [emailList, setEmailList] = useState<{ email: string; role: 'Lider' | 'Miembro' | 'Invitado' }[]>([]);
   const [newEmails, setNewEmails] = useState<string>('');
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
-    // Mock data
-    { id: '1', name: 'John Doe', email: 'john@example.com', lastActivity: '2023-10-01', role: 'Lider' },
-    { id: '2', name: 'Jane Smith', email: 'jane@example.com', lastActivity: '2023-10-02', role: 'Miembro' },
-  ]);
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [emailError, setEmailError] = useState('');
+  const [roleDialogOpen, setRoleDialogOpen] = useState<boolean>(false);
+  const [selectedRole, setSelectedRole] = useState<string>('Miembro');
+
+  useEffect(() => {
+    const fetchTeamDetails = async () => {
+      if (selectedTeam) {
+        const token = localStorage.getItem('token');
+        try {
+          const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${selectedTeam.id_equipo}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setTeamMembers(response.data.equipo.integrantes_equipo);
+        } catch (error) {
+          console.error('Error fetching team details:', error);
+        }
+      }
+    };
+
+    fetchTeamDetails();
+  }, [selectedTeam]);
 
   const validateEmails = (emailString: string) => {
     const emailArray = emailString.split(',').map(email => email.trim());
@@ -81,11 +103,11 @@ const ManageTeam: React.FC = () => {
   };
 
   const handleRemoveEmail = (emailToRemove: string) => {
-      const updatedEmailList = emailList.filter(({ email }) => email !== emailToRemove);
-      setEmailList(updatedEmailList);
-      if (updatedEmailList.length === 0) {
-          setDialogOpen(false);
-      }
+    const updatedEmailList = emailList.filter(({ email }) => email !== emailToRemove);
+    setEmailList(updatedEmailList);
+    if (updatedEmailList.length === 0) {
+      setDialogOpen(false);
+    }
   };
 
   const handleSendInvitations = async () => {
@@ -96,114 +118,217 @@ const ManageTeam: React.FC = () => {
 
     const emailArray = newEmails.split(',').map(email => email.trim());
 
+    Swal.fire({
+      title: 'Enviando invitaciones',
+      text: 'Por favor espera...',
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    if (!selectedTeam) {
+      Swal.fire({
+        title: 'Error',
+        text: 'No se ha seleccionado un equipo.',
+        icon: 'error',
+        customClass: {
+          popup: 'swal2-popup-custom'
+        }
+      });
+      return;
+    }
+
+    const token = localStorage.getItem('token');
     try {
-      const response = await fetch('/api/equipos/agregarMiembro', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      for (const email of emailArray) {
+        await axios.put(`http://localhost:4444/api/equipo/misEquipos/${selectedTeam.id_equipo}/agregarMiembro`, {
+          email_usuario: email,
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+      Swal.close();
+      Swal.fire({
+        title: 'Invitaciones enviadas',
+        text: 'Las invitaciones se han enviado correctamente.',
+        icon: 'success',
+        customClass: {
+          popup: 'swal2-popup-custom'
+        }
+      }).then(() => {
+        setDialogOpen(false);
+      });
+    } catch (error) {
+      console.error('Error sending invitations:', error);
+      Swal.fire({
+        title: 'Error',
+        text: 'Error al enviar las invitaciones.',
+        icon: 'error',
+        customClass: {
+          popup: 'swal2-popup-custom'
+        }
+      });
+    }
+  };
+
+  const handleDelete = async () => {
+    const selectedRows = table.getSelectedRowModel().flatRows;
+    if (selectedRows.length === 0 || !selectedTeam) return;
+
+    const result = await Swal.fire({
+      title: 'Confirmar eliminación',
+      text: `¿Estás seguro de que deseas eliminar ${selectedRows.length > 1 ? 'estos usuarios' : 'este usuario'}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: 'Eliminando usuarios',
+        text: 'Por favor espera...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
         },
-        body: JSON.stringify({ emails: emailArray }),
       });
 
-      if (response.ok) {
-        Swal.fire({
-            title: 'Success',
-            text: 'Invitations sent successfully!',
-            icon: 'success',
-            customClass: {
-                popup: 'swal2-popup-custom'
-            }
-        });
-      } else {
-          Swal.fire({
-              title: 'Error',
-              text: 'Failed to send invitations.',
-              icon: 'error',
-              customClass: {
-                  popup: 'swal2-popup-custom'
-              }
+      const token = localStorage.getItem('token');
+      for (const row of selectedRows) {
+        try {
+          await axios.delete(`http://localhost:4444/api/equipo/misEquipos/${selectedTeam.id_equipo}/eliminarMiembro`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            data: { nombre_usuario: row.getValue('nombre_usuario') },
           });
-      }
-  } catch (error) {
-      Swal.fire({
-          title: 'Error',
-          text: 'An error occurred while sending invitations.',
-          icon: 'error',
-          customClass: {
+          setTeamMembers(prevMembers => prevMembers.filter(member => member.nombre_usuario !== row.getValue('nombre_usuario')));
+        } catch (error) {
+          console.error('Error deleting team member:', error);
+          Swal.fire({
+            title: 'Error',
+            text: `Error al eliminar el usuario ${row.getValue('nombre_usuario')}.`,
+            icon: 'error',
+            customClass: {
               popup: 'swal2-popup-custom'
-          }
+            }
+          });
+        }
+      }
+      Swal.fire({
+        title: 'Eliminado',
+        text: 'Usuario(s) eliminado(s) correctamente.',
+        icon: 'success',
+        customClass: {
+          popup: 'swal2-popup-custom'
+        }
+      }).then(() => {
+        window.location.reload();
       });
-  }
-};
+    }
+  };
+
+  const handleChangeRole = async () => {
+    const selectedRows = table.getSelectedRowModel().flatRows;
+    if (selectedRows.length === 0 || !selectedTeam) return;
+
+    const result = await Swal.fire({
+      title: 'Confirmar cambio de rol',
+      text: `¿Estás seguro de que deseas cambiar el rol de ${selectedRows.length > 1 ? 'estos usuarios' : 'este usuario'} a ${selectedRole}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cambiar',
+      cancelButtonText: 'Cancelar',
+    });
+
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: 'Cambiando roles',
+        text: 'Por favor espera...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      const token = localStorage.getItem('token');
+      for (const row of selectedRows) {
+        try {
+          await axios.put(`http://localhost:4444/api/equipo/misEquipos/${selectedTeam.id_equipo}/asignarRoles`, {
+            nombre_usuario: row.getValue('nombre_usuario'),
+            rol: selectedRole,
+          }, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          setTeamMembers(prevMembers => prevMembers.map(member => 
+            member.nombre_usuario === row.getValue('nombre_usuario') ? { ...member, rol: selectedRole } : member
+          ));
+        } catch (error) {
+          console.error('Error changing role:', error);
+          Swal.fire({
+            title: 'Error',
+            text: `Error al cambiar el rol del usuario ${row.getValue('nombre_usuario')}.`,
+            icon: 'error',
+            customClass: {
+              popup: 'swal2-popup-custom'
+            }
+          });
+        }
+      }
+      Swal.close();
+      Swal.fire({
+        title: 'Rol cambiado',
+        text: 'Rol de usuario(s) cambiado correctamente.',
+        icon: 'success',
+        customClass: {
+          popup: 'swal2-popup-custom'
+        }
+      }).then(() => {
+        setRoleDialogOpen(false);
+      });
+    }
+  };
 
   const columns = useMemo<MRT_ColumnDef<TeamMember>[]>(
     () => [
       {
-        accessorKey: 'name',
+        accessorKey: 'nombre_usuario',
         header: 'Nombre',
         size: 150,
       },
       {
-        accessorKey: 'id',
+        accessorKey: 'id_usuario',
         header: 'ID',
         size: 100,
       },
       {
-        accessorKey: 'email',
+        accessorKey: 'email_usuario',
         header: 'Correo',
         size: 200,
       },
       {
-        accessorKey: 'lastActivity',
-        header: 'Última actividad',
+        accessorKey: 'tareas_asignadas',
+        header: 'Tareas Asignadas',
         size: 150,
       },
       {
-        accessorKey: 'role',
-        header: 'Rol',
-        size: 100,
+        accessorKey: 'tareas_completadas',
+        header: 'Tareas Completadas',
+        size: 150,
       },
       {
-        id: 'actions',
-        header: 'Acciones',
+        accessorKey: 'rol',
+        header: 'Rol',
         size: 100,
-        Cell: ({ row }) => {
-          const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-          const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-            setAnchorEl(event.currentTarget);
-          };
-
-          const handleClose = () => {
-            setAnchorEl(null);
-          };
-
-          return (
-            <>
-              <IconButton onClick={handleClick}>
-                <MoreVert />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handleClose}>
-                  <ListItemIcon>
-                    <AccountCircle />
-                  </ListItemIcon>
-                  Ver perfil
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <ListItemIcon>
-                    <Send />
-                  </ListItemIcon>
-                  Enviar correo
-                </MenuItem>
-              </Menu>
-            </>
-          );
-        },
       },
     ],
     []
@@ -215,24 +340,6 @@ const ManageTeam: React.FC = () => {
     enableRowSelection: true,
     enableGlobalFilter: true,
     renderTopToolbar: ({ table }) => {
-      const handleDelete = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert('Eliminando ' + row.getValue('name'));
-        });
-      };
-
-      const handleChangeRole = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert('Cambiando rol de ' + row.getValue('name'));
-        });
-      };
-
-      const handleEdit = () => {
-        table.getSelectedRowModel().flatRows.map((row) => {
-          alert('Editando ' + row.getValue('name'));
-        });
-      };
-
       const isSomeRowsSelected = table.getIsSomeRowsSelected() || table.getIsAllRowsSelected();
 
       return (
@@ -259,18 +366,10 @@ const ManageTeam: React.FC = () => {
             <Button
               color="warning"
               disabled={!isSomeRowsSelected}
-              onClick={handleChangeRole}
+              onClick={() => setRoleDialogOpen(true)}
               variant="contained"
             >
               Cambiar Rol
-            </Button>
-            <Button
-              color="info"
-              disabled={!isSomeRowsSelected}
-              onClick={handleEdit}
-              variant="contained"
-            >
-              Editar
             </Button>
           </Box>
         </Box>
@@ -309,9 +408,9 @@ const ManageTeam: React.FC = () => {
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} sx={{ zIndex: 1000 }}>
         <DialogTitle>Invitar miembros</DialogTitle>
         <DialogContent>
-          {emailList.map(({ email}) => (
+          {emailList.map(({ email }) => (
             <Box key={email} className="email-item">
-              <Typography sx={{ mr: 3}}>{email}</Typography>
+              <Typography sx={{ mr: 3 }}>{email}</Typography>
               <Button
                 color="error"
                 onClick={() => handleRemoveEmail(email)}
@@ -322,9 +421,30 @@ const ManageTeam: React.FC = () => {
           ))}
         </DialogContent>
         <DialogActions>
-            <Button onClick={() => setDialogOpen(false)} sx={{ color: 'gray' }}>Cancelar</Button>
+          <Button onClick={() => setDialogOpen(false)} sx={{ color: 'gray' }}>Cancelar</Button>
           <Button onClick={handleSendInvitations} color="primary" variant="contained">
             Enviar invitación
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={roleDialogOpen} onClose={() => setRoleDialogOpen(false)} sx={{ zIndex: 1000, minHeight: 100 }}>
+        <DialogTitle>Selecciona el rol a otorgar:</DialogTitle>
+        <DialogContent sx={{ minWidth: 300 }}>
+          <FormControl fullWidth>
+            <InputLabel>Rol</InputLabel>
+            <Select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value as string)}
+            >
+              <SelectMenuItem value="Líder">Líder</SelectMenuItem>
+              <SelectMenuItem value="Miembro">Miembro</SelectMenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRoleDialogOpen(false)} sx={{ color: 'gray' }}>Cancelar</Button>
+          <Button onClick={handleChangeRole} color="primary" variant="contained">
+            Aceptar
           </Button>
         </DialogActions>
       </Dialog>

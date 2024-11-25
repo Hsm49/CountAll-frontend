@@ -6,32 +6,31 @@
     height: 100%;
     min-height: calc(100vh - 66px);
     overflow-y: auto;
-  }
+}
 
-  .columns h6{
+.columns h6 {
     color: white;
-  }
-
+}
 
 .task-card h6 {
     color: black;
-    font-weight:bold;
+    font-weight: bold;
 }
-  
-  .filters {
+
+.filters {
     display: flex;
     gap: 16px;
     justify-content: right;
     z-index: 1;
-  }
-  
-  .columns {
+}
+
+.columns {
     display: flex;
     gap: 24px;
     flex-wrap: wrap;
-  }
-  
-  .column {
+}
+
+.column {
     background: white;
     border-radius: 12px;
     padding: 16px;
@@ -39,100 +38,123 @@
     flex: 1 1 calc(33% - 24px);
     display: flex;
     flex-direction: column;
-  }
-  
-  .column-header {
+}
+
+.column-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 8px 16px;
     border-radius: 8px;
     margin-bottom: 16px;
-  }
+}
 
-  .to-do {
+.to-do {
     background-color: green;
-  }
+}
 
-  .in-progress {
+.in-progress {
     background-color: #F2541B;
-  }
+}
 
-  .completed {
+.completed {
     background-color: #1b70a6;
-  }
-  
-  .task-card {
+}
+
+.task-card {
     background: white;
     border-radius: 12px;
     padding: 16px;
     border: 1px solid #d3d3d3;
     margin-bottom: 16px;
-  }
+}
 
-  .priority-label-container {
+.priority-label-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  
-  .task-card .priority-label {
+}
+
+.task-card .priority-label {
     display: inline-block;
     padding: 4px 8px;
     border-radius: 8px;
     font-size: 12px;
     margin-bottom: 8px;
-  }
-  
-  .priority-low {
+}
+
+.priority-low {
     background-color: #e0f7e9;
     color: #388e3c;
-  }
+}
 
-  .priority-complete {
+.priority-complete {
     background-color: #e0f7e9;
     color: #38568e;
-  }
-  
-  .priority-medium {
-    background-color: #fff3e0;
-    color: #fbc02d;
-  }
+}
 
-  .priority-review {
+.priority-medium {
     background-color: #fff3e0;
     color: #fbc02d;
-  }
-  
-  .priority-high {
+}
+
+.priority-review {
+    background-color: #fff3e0;
+    color: #fbc02d;
+}
+
+.priority-high {
     background-color: #ffebee;
     color: #d32f2f;
-  }
-  
-  .task-card .avatars {
+}
+
+.task-card .avatars {
     display: flex;
     gap: 8px;
     margin-top: 8px;
-  }
+}
 
-  .task-info {
+.task-info {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-top: 8px;
     color: #607489;
-  }
-  
-  .task-info svg {
+}
+
+.task-info svg {
     font-size: 16px;
-  }
-  
-  @media (max-width: 768px) {
+}
+
+.difficulty-label {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.difficulty-fácil {
+    background-color: #e0f7fa;
+    color: #00796b;
+}
+
+.difficulty-media {
+    background-color: #fffde7;
+    color: #fbc02d;
+}
+
+.difficulty-difícil {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+@media (max-width: 768px) {
     .columns {
-      flex-direction: column;
+        flex-direction: column;
     }
-  
+
     .column {
-      flex: 1 1 100%;
+        flex: 1 1 100%;
     }
-  }
+}
