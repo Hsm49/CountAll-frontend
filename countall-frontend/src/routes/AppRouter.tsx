@@ -31,6 +31,7 @@ import SelectTeam from '../components/SelectTeam';
 import SetProjectDetails from '../components/SetProjectDetails';
 import SelectTeamUser from '../components/SelectTeamUser';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
+import UserManual from '../components/UserManual';
 
 const AppRouter: React.FC = () => {
   const { userRole } = useContext(ProjectTeamContext)!;
@@ -222,6 +223,15 @@ const AppRouter: React.FC = () => {
         element={
           <PrivateRoute>
             <TeamDetails />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/user-manual"
+        element={
+          <PrivateRoute>
+            <UserManual />
           </PrivateRoute>
         }
       />

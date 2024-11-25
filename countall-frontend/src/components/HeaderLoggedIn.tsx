@@ -237,9 +237,9 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
               <MenuItem icon={<FaTasks />} onClick={() => navigate('/tareas')}>Tareas</MenuItem>
               <MenuItem icon={<FaUser />} onClick={() => navigate('/avatar')}>Avatar</MenuItem>
               <MenuItem icon={<FaTrophy />} onClick={() => navigate('/leaderboard')}>Clasificatorias</MenuItem>
-              <MenuItem icon={<FaUserCircle />} onClick={() => navigate('/usuario')}>Usuario</MenuItem>
               <MenuItem icon={<FaChartBar />} onClick={() => navigate('/estadisticas')}>Estadísticas</MenuItem>
               <MenuItem icon={<FaBellSlash />} onClick={() => navigate('/notificaciones')}>Notificaciones</MenuItem>
+              <MenuItem icon={<FaBook />} onClick={() => navigate('/user-manual')}>Manual de usuario</MenuItem>
             </Menu>
           </div>
         )}
