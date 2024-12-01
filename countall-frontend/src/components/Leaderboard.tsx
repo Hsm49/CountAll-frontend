@@ -22,6 +22,7 @@ const Leaderboard: React.FC = () => {
   const [usuarioId, setUsuarioId] = useState<number | null>(null);
   const { selectedTeam, userRole } = useContext(ProjectTeamContext)!;
   const navigate = useNavigate();
+  const [premio, setPremio] = useState<string>('Avatar de rareza alta');
 
   useEffect(() => {
     const fetchClasificaciones = async () => {
@@ -101,6 +102,7 @@ const Leaderboard: React.FC = () => {
 
         {/* Podium and Table Section */}
         <div className="podium-and-table">
+        <h2 className="premio-title text-center">Premio: {premio}</h2>
           <div className="podium">
             {clasificaciones.length >= 3 && (
               <>
