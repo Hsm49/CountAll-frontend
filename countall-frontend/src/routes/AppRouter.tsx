@@ -32,6 +32,7 @@ import SetProjectDetails from '../components/SetProjectDetails';
 import SelectTeamUser from '../components/SelectTeamUser';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import UserManual from '../components/UserManual';
+import LeaderboardConfig from '../components/LeaderboardConfig';
 
 const AppRouter: React.FC = () => {
   const { userRole } = useContext(ProjectTeamContext)!;
@@ -139,6 +140,19 @@ const AppRouter: React.FC = () => {
           userRole === 'Líder' ? (
             <PrivateRoute>
               <ManageTeam />
+            </PrivateRoute>
+          ) : (
+            <Navigate to="/tracking" />
+          )
+        }
+      />
+
+      <Route
+        path="/leaderboard-config"
+        element={
+          userRole === 'Líder' ? (
+            <PrivateRoute>
+              <LeaderboardConfig />
             </PrivateRoute>
           ) : (
             <Navigate to="/tracking" />

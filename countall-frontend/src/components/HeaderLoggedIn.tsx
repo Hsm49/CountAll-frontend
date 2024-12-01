@@ -109,6 +109,8 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
       localStorage.removeItem('token');
       localStorage.removeItem('selectedProject');
       localStorage.removeItem('selectedTeam');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('teamMembers');
       navigate('/');
       window.location.reload();
     }, 500); // Adjust the delay as needed

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { FaTrophy, FaCheck, FaArrowUp } from 'react-icons/fa';
+import { FaTrophy, FaCheck, FaArrowUp, FaCog } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import './css/Leaderboard.css';
 import LeaderboardTable from './LeaderboardTable';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
@@ -19,7 +20,8 @@ const Leaderboard: React.FC = () => {
   const [clasificaciones, setClasificaciones] = useState<Clasificacion[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [usuarioId, setUsuarioId] = useState<number | null>(null);
-  const { selectedTeam } = useContext(ProjectTeamContext)!;
+  const { selectedTeam, userRole } = useContext(ProjectTeamContext)!;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchClasificaciones = async () => {
@@ -54,8 +56,18 @@ const Leaderboard: React.FC = () => {
     fetchClasificaciones();
   }, [selectedTeam]);
 
+  const handleConfigClick = () => {
+    navigate('/leaderboard-config');
+  };
+
   return (
     <div className="content-wrapper">
+      {/* Config Button */}
+      {userRole === 'Líder' && (
+          <button className="config-button mb-4 btn-naranja" onClick={handleConfigClick}>
+            <FaCog /> Configurar clasificatorias
+          </button>
+        )}
       <div className="ranking-container">
         {/* User Scores Section */}
         <div className="user-scores">

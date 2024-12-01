@@ -12,7 +12,6 @@ const PasswordSaved: React.FC = () => {
 
   return (
     <>
-    <Header />
     <div className="main-content">
       <div className="confirm-container">
         <h1 className="text-center mb-4">Contraseña guardada</h1>

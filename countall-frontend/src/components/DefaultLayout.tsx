@@ -49,6 +49,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     '/estimaciones': 'Generar Estimaciones',
     '/mis-estimaciones': 'Mis Estimaciones',
     '/user-manual': 'Manual de Usuario',
+    '/leaderboard-config': 'Configurar Clasificatorias',
   };
 
   let currentTitle = titles[location.pathname] || 'Default Title';
