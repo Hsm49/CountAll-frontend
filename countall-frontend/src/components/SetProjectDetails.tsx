@@ -11,7 +11,7 @@ const SetProjectDetails: React.FC = () => {
   const [nombreProyecto, setNombreProyecto] = useState(proyecto?.nombre_proyecto || '');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
-  const [estado, setEstado] = useState('Activo');
+  const [estado, setEstado] = useState('En Progreso');
   const [metodologia, setMetodologia] = useState('Scrum');
   const [numeroEtapas, setNumeroEtapas] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -44,22 +44,9 @@ const SetProjectDetails: React.FC = () => {
     }
   }, [projectId, nombreProyecto]);
 
-  // Función para normalizar una fecha a medianoche en UTC
-  const normalizeDateToUTC = (dateString: string): Date => {
-    const date = new Date(dateString);
-    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-  };
-
-  // Función para obtener la fecha actual normalizada a medianoche UTC
-  const getTodayUTC = (): Date => {
-    const now = new Date();
-    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
-  };
-
   // Función para formatear la fecha para el backend
   const formatDateForBackend = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return `${dateString} 00:00:00-06`;
   };
 
   const handleProvideDetails = async () => {
@@ -68,27 +55,15 @@ const SetProjectDetails: React.FC = () => {
       return;
     }
 
-    const fechaInicioUTC = normalizeDateToUTC(fechaInicio);
-    const fechaFinUTC = normalizeDateToUTC(fechaFin);
-    const todayUTC = getTodayUTC();
-
-    // Comparación de fechas normalizadas
-    if (fechaInicioUTC < todayUTC) {
-      setError('La fecha de inicio debe ser hoy o en el futuro');
-      return;
-    }
-
-    if (fechaInicioUTC >= fechaFinUTC) {
-      setError('La fecha de inicio debe ser anterior a la fecha de fin');
-      return;
-    }
+    const fechaInicioFormatted = formatDateForBackend(fechaInicio);
+    const fechaFinFormatted = formatDateForBackend(fechaFin);
 
     setLoading(true);
     setError(null);
 
     const projectDetails = {
-      fecha_inicio_proyecto: formatDateForBackend(fechaInicio),
-      fecha_fin_proyecto: formatDateForBackend(fechaFin),
+      fecha_inicio_proyecto: fechaInicioFormatted,
+      fecha_fin_proyecto: fechaFinFormatted,
       estado_proyecto: estado,
       metodologia_proyecto: metodologia,
       numero_etapas_proyecto: numeroEtapas
@@ -129,7 +104,6 @@ const SetProjectDetails: React.FC = () => {
     <div className="page-container">
       <button className="back-button" onClick={() => navigate(-1)}>Regresar</button>
       <div className="create-form">
-        <h3>Detalles del Proyecto: {nombreProyecto}</h3>
         <input
           type="date"
           placeholder="Fecha de Inicio"
@@ -152,6 +126,7 @@ const SetProjectDetails: React.FC = () => {
           value={estado}
           onChange={(e) => setEstado(e.target.value)}
           required
+          disabled
         />
         <select
           value={metodologia}
