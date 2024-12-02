@@ -33,6 +33,8 @@ import SelectTeamUser from '../components/SelectTeamUser';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import UserManual from '../components/UserManual';
 import LeaderboardConfig from '../components/LeaderboardConfig';
+import ModifyProject from '../components/ModifyProject';
+import ProjectSummary from '../components/ProjectSummary';
 
 const AppRouter: React.FC = () => {
   const { userRole } = useContext(ProjectTeamContext)!;
@@ -119,6 +121,32 @@ const AppRouter: React.FC = () => {
             <PrivateRoute>
               <ManageSites />
             </PrivateRoute>
+          ) : (
+            <Navigate to="/tracking" />
+          )
+        }
+      />
+
+      <Route
+        path="/modificar-proyecto/:nombre_proyecto"
+        element={
+          userRole === 'Líder' ? (
+          <PrivateRoute>
+            <ModifyProject />
+          </PrivateRoute>
+          ) : (
+            <Navigate to="/tracking" />
+          )
+        }
+      />
+
+      <Route
+        path="/resumen-proyecto"
+        element={
+          userRole === 'Líder' ? (
+          <PrivateRoute>
+            <ProjectSummary />
+          </PrivateRoute>
           ) : (
             <Navigate to="/tracking" />
           )

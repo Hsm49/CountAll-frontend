@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './css/Details.css';
 
 interface Proyecto {
@@ -16,6 +16,7 @@ interface Proyecto {
 const ProjectDetails: React.FC = () => {
   const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
   const [proyecto, setProyecto] = useState<Proyecto | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProyecto = async () => {
@@ -46,6 +47,29 @@ const ProjectDetails: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  const handleModifyProject = () => {
+    navigate(`/modificar-proyecto/${nombre_proyecto}`);
+  };
+
+  const handleGenerateSummary = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`http://localhost:4444/api/proyecto/generarResumen/${nombre_proyecto}`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        navigate(`/resumen-proyecto/${nombre_proyecto}`);
+      } else {
+        console.error('Failed to generate project summary');
+      }
+    } catch (error) {
+      console.error('Error generating project summary:', error);
+    }
+  };
+
   return (
     <div className="details-container mt-5">
       <div className="details-card">
@@ -55,6 +79,8 @@ const ProjectDetails: React.FC = () => {
         <p>Fecha de fin: {new Date(proyecto.fecha_fin_proyecto).toLocaleDateString()}</p>
         <p>Metodología: {proyecto.metodologia_proyecto}</p>
         <p>Estado: {proyecto.estado_proyecto}</p>
+        <button onClick={handleModifyProject} className="btn-naranja">Modificar Proyecto</button>
+        <button onClick={handleGenerateSummary} className="btn-naranja">Generar Resumen del Proyecto</button>
       </div>
     </div>
   );
