@@ -1,13 +1,13 @@
 import React from 'react';
-import { Line, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import { Line, Bar, Pie } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler, ArcElement } from 'chart.js';
 import { MaterialReactTable } from 'material-react-table';
-import { Box, Card, CardContent, Select, MenuItem, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
+import { Box, Card, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
 import { FaExclamationCircle } from 'react-icons/fa';
 import { GoGraph } from "react-icons/go";
 import './css/Statistics.css';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler, ArcElement);
 
 const Estadisticas: React.FC = () => {
   const [filter, setFilter] = React.useState('etapa');
@@ -17,64 +17,64 @@ const Estadisticas: React.FC = () => {
   };
 
   const projectProgressData = {
-    labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
+    labels: ['Completadas', 'Pendientes', 'En Proceso'],
     datasets: [
       {
         label: 'Avance del Proyecto',
-        data: [20, 40, 60, 80, 100],
-        fill: false,
-        backgroundColor: '#1b70a6',
-        borderColor: '#1b70a6',
+        data: [30, 20, 50],
+        backgroundColor: ['#4CAF50', '#FFC107', '#1b70a6'],
+        borderColor: ['#4CAF50', '#FFC107', '#1b70a6'],
+        borderWidth: 1,
       },
     ],
   };
 
-const teamPerformanceData = {
+  const teamPerformanceData = {
     labels: ['Rendimiento del equipo'],
     datasets: [
-        {
-            label: 'Miembro 1',
-            data: [12],
-            backgroundColor: '#1b70a6',
-            borderColor: '#1b70a6',
-            borderWidth: 1,
-        },
-        {
-            label: 'Miembro 2',
-            data: [19],
-            backgroundColor: '#F2541B',
-            borderColor: '#F2541B',
-            borderWidth: 1,
-        },
-        {
-            label: 'Miembro 3',
-            data: [3],
-            backgroundColor: '#4CAF50',
-            borderColor: '#4CAF50',
-            borderWidth: 1,
-        },
-        {
-            label: 'Miembro 4',
-            data: [5],
-            backgroundColor: '#FFC107',
-            borderColor: '#FFC107',
-            borderWidth: 1,
-        },
+      {
+        label: 'Miembro 1',
+        data: [12],
+        backgroundColor: '#1b70a6',
+        borderColor: '#1b70a6',
+        borderWidth: 1,
+      },
+      {
+        label: 'Miembro 2',
+        data: [19],
+        backgroundColor: '#F2541B',
+        borderColor: '#F2541B',
+        borderWidth: 1,
+      },
+      {
+        label: 'Miembro 3',
+        data: [3],
+        backgroundColor: '#4CAF50',
+        borderColor: '#4CAF50',
+        borderWidth: 1,
+      },
+      {
+        label: 'Miembro 4',
+        data: [5],
+        backgroundColor: '#FFC107',
+        borderColor: '#FFC107',
+        borderWidth: 1,
+      },
     ],
-};
+  };
 
-const timeSpentData = {
+  const timeSpentData = {
     labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
     datasets: [
-        {
-            label: 'Horas dedicadas',
-            data: [2, 3, 4, 5, 6],
-            fill: true,
-            backgroundColor: 'rgba(242, 84, 27, 0.4)',
-            borderColor: '#F2541B',
-        },
+      {
+        label: 'Horas dedicadas',
+        data: [2, 3, 4, 5, 6],
+        fill: true,
+        backgroundColor: 'rgba(242, 84, 27, 0.4)',
+        borderColor: '#F2541B',
+      },
     ],
-};
+  };
 
   const taskColumns = [
     { accessorKey: 'nombre', header: 'Nombre de Tarea' },
@@ -135,22 +135,13 @@ const timeSpentData = {
             <p className="score">5</p>
           </div>
         </div>
-        <div className="score-card">
-          <FormControl fullWidth>
-            <InputLabel>Filtro</InputLabel>
-            <Select className="mt-2" value={filter} onChange={handleFilterChange}>
-              <MenuItem value="etapa">Etapa del Proyecto</MenuItem>
-              <MenuItem value="tarea">Tipo de Tarea</MenuItem>
-              <MenuItem value="miembro">Miembro del Equipo</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
+
       </div>
 
       <Box className="tables-container">
         <Card className="chart-card">
           <h4>Gráfico de Avance del Proyecto</h4>
-          <Line data={projectProgressData} />
+          <Pie data={projectProgressData} />
         </Card>
 
         <Card className="chart-card">

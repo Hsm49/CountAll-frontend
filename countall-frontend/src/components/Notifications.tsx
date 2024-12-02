@@ -33,7 +33,7 @@ const Notifications: React.FC = () => {
             checked={notifications.activities}
             onChange={() => handleToggle('activities')}
           />
-          Notificaciones de actividades
+          Notificaciones de actividades ( creación de tareas, asignación de tareas, actualizaciones de estado)
         </label>
       </div>
       <div className="notification-item">
@@ -43,17 +43,7 @@ const Notifications: React.FC = () => {
             checked={notifications.reminders}
             onChange={() => handleToggle('reminders')}
           />
-          Notificaciones de recordatorios
-        </label>
-      </div>
-      <div className="notification-item">
-        <label>
-          <input
-            type="checkbox"
-            checked={notifications.achievements}
-            onChange={() => handleToggle('achievements')}
-          />
-          Notificaciones de logros
+          Notificaciones de recordatorios (fechas límite de tareas)
         </label>
       </div>
       <div className="notification-item">
@@ -63,7 +53,7 @@ const Notifications: React.FC = () => {
             checked={notifications.scores}
             onChange={() => handleToggle('scores')}
           />
-          Notificaciones de puntajes
+          Notificaciones de puntajes (posición en la clasificatoria)
         </label>
       </div>
       <button className="btn-blue" onClick={handleSaveChanges}>

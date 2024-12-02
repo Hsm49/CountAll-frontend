@@ -30,3 +30,13 @@
 .notification-item input[type="checkbox"] {
   margin-right: 10px;
 }
+
+.notifications-container button {
+background: #1B70A6;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s; }
