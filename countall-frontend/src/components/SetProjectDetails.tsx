@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import './css/SelectProject.css';
 
 const SetProjectDetails: React.FC = () => {
@@ -8,6 +9,7 @@ const SetProjectDetails: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const proyecto = location.state?.proyecto;
+  const { setSelectedProject, setSelectedTeam } = useContext(ProjectTeamContext)!;
   const [nombreProyecto, setNombreProyecto] = useState(proyecto?.nombre_proyecto || '');
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
@@ -44,7 +46,6 @@ const SetProjectDetails: React.FC = () => {
     }
   }, [projectId, nombreProyecto]);
 
-  // Función para formatear la fecha para el backend
   const formatDateForBackend = (dateString: string): string => {
     return `${dateString} 00:00:00-06`;
   };
@@ -82,6 +83,24 @@ const SetProjectDetails: React.FC = () => {
       );
 
       if (response.data.msg) {
+        const updatedProject = {
+          id_proyecto: parseInt(projectId!),
+          nombre_proyecto: nombreProyecto,
+          descr_proyecto: proyecto?.descr_proyecto || ''
+        };
+        setSelectedProject(updatedProject);
+
+        // Fetch the team associated with the project
+        const teamResponse = await axios.get(`http://localhost:4444/api/equipo/misEquiposProyecto/${nombreProyecto}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (teamResponse.data.equipos_usuario.length > 0) {
+          setSelectedTeam(teamResponse.data.equipos_usuario[0]);
+        }
+
         navigate('/tracking');
       }
     } catch (error: any) {
@@ -97,7 +116,6 @@ const SetProjectDetails: React.FC = () => {
     }
   };
 
-  // Obtener la fecha actual en formato YYYY-MM-DD para el input
   const today = new Date().toISOString().split('T')[0];
 
   return (
