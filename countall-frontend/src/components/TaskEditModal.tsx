@@ -50,6 +50,8 @@ interface TaskEditModalProps {
     comments: number;
     status: string;
     isLocked: boolean;
+    fecha_inicio_tarea: string;
+    fecha_fin_tarea: string;
   }) => Promise<void>;
 }
 
@@ -60,13 +62,17 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [taskDates, setTaskDates] = useState<{ fecha_inicio_tarea: string, fecha_fin_tarea: string } | null>(null);
 
+  const formatDateForBackend = (dateString: string): string => {
+    return `${dateString} 00:00:00-06`;
+  };
+
   const formik = useFormik({
     initialValues: {
       id: 0,
       title: '',
       description: '',
-      priority: 'low',
-      difficulty: 'fácil',
+      priority: 'Baja',
+      difficulty: 'Fácil',
       assignees: [] as { nombre_usuario: string, url_avatar: string }[],
       comments: 0,
       status: 'todo',
@@ -100,7 +106,12 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
         });
 
         if (result.isConfirmed) {
-          await onSave(values);
+          const formattedValues = {
+            ...values,
+            fecha_inicio_tarea: formatDateForBackend(values.fecha_inicio_tarea),
+            fecha_fin_tarea: formatDateForBackend(values.fecha_fin_tarea)
+          };
+          await onSave(formattedValues);
           await Swal.fire({
             icon: 'success',
             title: 'Cambios guardados',
@@ -109,6 +120,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             showConfirmButton: false
           });
           onClose();
+          window.location.reload(); // Recargar la página después de guardar exitosamente
         }
       } catch (error) {
         console.error('Error al guardar los cambios:', error);
@@ -127,8 +139,8 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
         id: task.id,
         title: task.title,
         description: task.description,
-        priority: task.priority,
-        difficulty: task.difficulty,
+        priority: task.priority.charAt(0).toUpperCase() + task.priority.slice(1),
+        difficulty: task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1),
         assignees: task.assignees,
         comments: task.comments,
         status: task.status,
@@ -144,24 +156,34 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
           console.error('No token found');
           return;
         }
-
+  
         try {
           const response = await axios.get(`http://localhost:4444/api/tarea/verTarea/${task.id}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
+  
+          // Procesar la fecha de inicio
+          const startDate = new Date(response.data.tarea.fecha_inicio_tarea);
+          const formattedStartDate = startDate.toISOString().split('T')[0];
+  
+          // Procesar la fecha de fin
+          const endDate = new Date(response.data.tarea.fecha_fin_tarea);
+          const formattedEndDate = endDate.toISOString().split('T')[0];
+  
           setTaskDates({
-            fecha_inicio_tarea: response.data.tarea.fecha_inicio_tarea,
-            fecha_fin_tarea: response.data.tarea.fecha_fin_tarea
+            fecha_inicio_tarea: formattedStartDate,
+            fecha_fin_tarea: formattedEndDate
           });
-          formik.setFieldValue('fecha_inicio_tarea', response.data.tarea.fecha_inicio_tarea);
-          formik.setFieldValue('fecha_fin_tarea', response.data.tarea.fecha_fin_tarea);
+  
+          formik.setFieldValue('fecha_inicio_tarea', formattedStartDate);
+          formik.setFieldValue('fecha_fin_tarea', formattedEndDate);
         } catch (error) {
           console.error('Error fetching task dates:', error);
         }
       };
-
+  
       fetchTaskDates();
     }
   }, [task]);
@@ -193,6 +215,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
   const handleCancelEdit = () => {
     setEditingField(null);
   };
+
+  // Filtrar miembros del equipo que ya están asignados
+  const availableTeamMembers = teamMembers.filter(member => {
+    return !formik.values.assignees.some(assignee => assignee.nombre_usuario === member.nombre_usuario);
+  });
 
   return (
     <Dialog 
@@ -259,11 +286,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                       {...formik.getFieldProps('priority')}
                       label="Prioridad"
                     >
-                      <MenuItem value="baja">Baja</MenuItem>
-                      <MenuItem value="media">Media</MenuItem>
-                      <MenuItem value="alta">Alta</MenuItem>
-                      <MenuItem value="revisión" disabled={formik.values.status !== 'completed'}>En revisión</MenuItem>
-                      <MenuItem value="completada" disabled={formik.values.status !== 'completed'}>Completada</MenuItem>
+                      <MenuItem value="Baja">Baja</MenuItem>
+                      <MenuItem value="Media">Media</MenuItem>
+                      <MenuItem value="Alta">Alta</MenuItem>
+                      <MenuItem value="Revisión" disabled={formik.values.status !== 'completed'}>En revisión</MenuItem>
+                      <MenuItem value="Completada" disabled={formik.values.status !== 'completed'}>Completada</MenuItem>
                     </Select>
                     {formik.touched.priority && formik.errors.priority && (
                       <Typography variant="caption" color="error">{formik.errors.priority}</Typography>
@@ -291,9 +318,9 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                       {...formik.getFieldProps('difficulty')}
                       label="Dificultad"
                     >
-                      <MenuItem value="fácil">Fácil</MenuItem>
-                      <MenuItem value="media">Media</MenuItem>
-                      <MenuItem value="difícil">Difícil</MenuItem>
+                      <MenuItem value="Fácil">Fácil</MenuItem>
+                      <MenuItem value="Media">Media</MenuItem>
+                      <MenuItem value="Difícil">Difícil</MenuItem>
                     </Select>
                     {formik.touched.difficulty && formik.errors.difficulty && (
                       <Typography variant="caption" color="error">{formik.errors.difficulty}</Typography>
@@ -339,45 +366,35 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             {/* Fechas */}
             {taskDates && (
               <Box className="edit-section" mb={3}>
+                <Typography variant="subtitle1">Fecha de inicio:</Typography>
                 <Box display="flex" alignItems="center" gap={1}>
-                  {editingField === 'fecha_inicio_tarea' ? (
-                    <TextField
-                      fullWidth
-                      type="date"
-                      label="Fecha de inicio"
-                      {...formik.getFieldProps('fecha_inicio_tarea')}
-                      error={formik.touched.fecha_inicio_tarea && Boolean(formik.errors.fecha_inicio_tarea)}
-                      helperText={formik.touched.fecha_inicio_tarea && formik.errors.fecha_inicio_tarea}
-                    />
-                  ) : (
-                    <>
-                      <Typography variant="subtitle1">Fecha de inicio:</Typography>
-                      <Typography>{new Date(formik.values.fecha_inicio_tarea).toLocaleDateString()}</Typography>
-                      <IconButton onClick={() => handleEditClick('fecha_inicio_tarea')}>
-                        <FaPen />
-                      </IconButton>
-                    </>
-                  )}
+                  <input
+                    type="date"
+                    className="date-input"
+                    placeholder="Fecha de Inicio"
+                    value={formik.values.fecha_inicio_tarea}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={(e) => {
+                      formik.setFieldValue('fecha_inicio_tarea', e.target.value);
+                      setEditingField('fecha_inicio_tarea');
+                    }}
+                    required
+                  />
                 </Box>
+                <Typography variant="subtitle1">Fecha de fin:</Typography>
                 <Box display="flex" alignItems="center" gap={1}>
-                  {editingField === 'fecha_fin_tarea' ? (
-                    <TextField
-                      fullWidth
-                      type="date"
-                      label="Fecha de fin"
-                      {...formik.getFieldProps('fecha_fin_tarea')}
-                      error={formik.touched.fecha_fin_tarea && Boolean(formik.errors.fecha_fin_tarea)}
-                      helperText={formik.touched.fecha_fin_tarea && formik.errors.fecha_fin_tarea}
-                    />
-                  ) : (
-                    <>
-                      <Typography variant="subtitle1">Fecha de fin:</Typography>
-                      <Typography>{new Date(formik.values.fecha_fin_tarea).toLocaleDateString()}</Typography>
-                      <IconButton onClick={() => handleEditClick('fecha_fin_tarea')}>
-                        <FaPen />
-                      </IconButton>
-                    </>
-                  )}
+                  <input
+                    type="date"
+                    className="date-input"
+                    placeholder="Fecha de Fin"
+                    value={formik.values.fecha_fin_tarea}
+                    min={formik.values.fecha_inicio_tarea || new Date().toISOString().split('T')[0]}
+                    onChange={(e) => {
+                      formik.setFieldValue('fecha_fin_tarea', e.target.value);
+                      setEditingField('fecha_fin_tarea');
+                    }}
+                    required
+                  />
                 </Box>
               </Box>
             )}
@@ -403,12 +420,16 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
                 >
-                  {teamMembers?.map((member: { id_usuario: number, nombre_usuario: string, url_avatar: string }) => (
-                    <MuiMenuItem key={member.id_usuario} onClick={() => handleAddAssignee(member)}>
-                      <Avatar src={member.url_avatar} />
-                      {member.nombre_usuario}
-                    </MuiMenuItem>
-                  ))}
+                  {availableTeamMembers.length > 0 ? (
+                    availableTeamMembers.map((member: { id_usuario: number, nombre_usuario: string, url_avatar: string }) => (
+                      <MuiMenuItem key={member.id_usuario} onClick={() => handleAddAssignee(member)}>
+                        <Avatar src={member.url_avatar} />
+                        {member.nombre_usuario}
+                      </MuiMenuItem>
+                    ))
+                  ) : (
+                    <MuiMenuItem disabled>No hay miembros del equipo</MuiMenuItem>
+                  )}
                 </Menu>
               </Box>
               {formik.touched.assignees && formik.errors.assignees && (

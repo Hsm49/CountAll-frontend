@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import LoadingScreen from './LoadingScreen';
+import { FaTrash } from 'react-icons/fa';
 import './css/SelectProject.css';
 
 interface Equipo {
@@ -126,6 +127,10 @@ const SelectTeam: React.FC = () => {
       setUsuarios([...usuarios, newUser]);
       setNewUser('');
     }
+  };
+
+  const handleRemoveUser = (userToRemove: string) => {
+    setUsuarios(usuarios.filter(user => user !== userToRemove));
   };
 
   const handleCreateTeam = async (e: React.FormEvent) => {
@@ -271,7 +276,12 @@ const SelectTeam: React.FC = () => {
               </div>
               <ul>
                 {usuarios.map((user, index) => (
-                  <li key={index}>{user}</li>
+                  <li key={index}>
+                    {user}
+                    <button type="button" onClick={() => handleRemoveUser(user)}>
+                      <FaTrash />
+                    </button>
+                  </li>
                 ))}
               </ul>
               {createError && <p className="error">{createError}</p>}

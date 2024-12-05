@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { 
   Dialog, 
   DialogTitle, 
@@ -18,10 +18,11 @@ import {
   Menu,
   MenuItem as MuiMenuItem
 } from '@mui/material';
-import { FaPen, FaTrash, FaSave, FaTimes, FaFlag, FaCheck, FaCircle, FaPlus } from 'react-icons/fa';
+import { FaPen, FaTrash, FaSave, FaTimes, FaPlus } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import './css/TaskEditModal.css';
 
 interface TaskAddModalProps {
@@ -32,35 +33,48 @@ interface TaskAddModalProps {
     description: string;
     priority: string;
     difficulty: string;
-    assignees: string[];
+    assignees: { nombre_usuario: string, url_avatar: string }[];
     comments: number;
     status: string;
     isLocked: boolean;
+    fecha_inicio_tarea: string;
+    fecha_fin_tarea: string;
   }) => Promise<void>;
 }
 
 const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) => {
+  const context = useContext(ProjectTeamContext);
+  const teamMembers = context?.teamMembers || [];
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const availableUsers = ['user1.jpg', 'user2.jpg', 'user3.jpg', 'user4.jpg']; // Lista de usuarios disponibles
+  const formatDateForBackend = (dateString: string): string => {
+    return `${dateString} 00:00:00-06`;
+  };
 
   const formik = useFormik({
     initialValues: {
       title: '',
       description: '',
-      priority: 'low',
-      difficulty: 'fácil',
-      assignees: [],
+      priority: 'Baja',
+      difficulty: 'Fácil',
+      assignees: [] as { nombre_usuario: string, url_avatar: string }[],
       comments: 0,
       status: 'todo',
-      isLocked: false
+      isLocked: false,
+      fecha_inicio_tarea: '',
+      fecha_fin_tarea: ''
     },
     validationSchema: Yup.object({
       title: Yup.string().required('El título es requerido'),
       description: Yup.string().required('La descripción es requerida'),
       priority: Yup.string().required('La prioridad es requerida'),
       difficulty: Yup.string().required('La dificultad es requerida'),
-      assignees: Yup.array().min(1, 'Debe asignar al menos un usuario')
+      assignees: Yup.array().min(1, 'Debe asignar al menos un usuario'),
+      fecha_inicio_tarea: Yup.date().required('La fecha de inicio es requerida').nullable(),
+      fecha_fin_tarea: Yup.date().required('La fecha de fin es requerida').nullable().min(
+        Yup.ref('fecha_inicio_tarea'),
+        'La fecha de fin debe ser posterior a la fecha de inicio'
+      )
     }),
     onSubmit: async (values) => {
       try {
@@ -76,7 +90,12 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
         });
 
         if (result.isConfirmed) {
-          await onSave(values);
+          const formattedValues = {
+            ...values,
+            fecha_inicio_tarea: formatDateForBackend(values.fecha_inicio_tarea),
+            fecha_fin_tarea: formatDateForBackend(values.fecha_fin_tarea)
+          };
+          await onSave(formattedValues);
           await Swal.fire({
             icon: 'success',
             title: 'Tarea agregada',
@@ -85,6 +104,7 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
             showConfirmButton: false
           });
           onClose();
+          window.location.reload();
         }
       } catch (error) {
         console.error('Error al agregar la tarea:', error);
@@ -97,9 +117,14 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
     }
   });
 
-  const handleAddAssignee = (assigneeToAdd: string) => {
+  const handleAddAssignee = (assigneeToAdd: { nombre_usuario: string, url_avatar: string }) => {
     formik.setFieldValue('assignees', [...formik.values.assignees, assigneeToAdd]);
     setAnchorEl(null);
+  };
+
+  const handleRemoveAssignee = (index: number) => {
+    const updatedAssignees = formik.values.assignees.filter((_, i) => i !== index);
+    formik.setFieldValue('assignees', updatedAssignees);
   };
 
   const handleAddAssigneeClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -109,6 +134,11 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
+
+  // Filtrar miembros del equipo que ya están asignados
+  const availableTeamMembers = teamMembers.filter(member => {
+    return !formik.values.assignees.some(assignee => assignee.nombre_usuario === member.nombre_usuario);
+  });
 
   return (
     <Dialog 
@@ -161,12 +191,14 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="subtitle1">Prioridad:</Typography>
                 <FormControl size="small" fullWidth error={formik.touched.priority && Boolean(formik.errors.priority)}>
+                  <InputLabel>Prioridad</InputLabel>
                   <Select
                     {...formik.getFieldProps('priority')}
+                    label="Prioridad"
                   >
-                    <MenuItem value="low">Baja</MenuItem>
-                    <MenuItem value="medium">Media</MenuItem>
-                    <MenuItem value="high">Alta</MenuItem>
+                    <MenuItem value="Baja">Baja</MenuItem>
+                    <MenuItem value="Media">Media</MenuItem>
+                    <MenuItem value="Alta">Alta</MenuItem>
                   </Select>
                   {formik.touched.priority && formik.errors.priority && (
                     <Typography variant="caption" color="error">{formik.errors.priority}</Typography>
@@ -180,12 +212,14 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
               <Box display="flex" alignItems="center" gap={1}>
                 <Typography variant="subtitle1">Dificultad:</Typography>
                 <FormControl size="small" fullWidth error={formik.touched.difficulty && Boolean(formik.errors.difficulty)}>
+                  <InputLabel>Dificultad</InputLabel>
                   <Select
                     {...formik.getFieldProps('difficulty')}
+                    label="Dificultad"
                   >
-                    <MenuItem value="fácil">Fácil</MenuItem>
-                    <MenuItem value="media">Media</MenuItem>
-                    <MenuItem value="difícil">Difícil</MenuItem>
+                    <MenuItem value="Fácil">Fácil</MenuItem>
+                    <MenuItem value="Media">Media</MenuItem>
+                    <MenuItem value="Difícil">Difícil</MenuItem>
                   </Select>
                   {formik.touched.difficulty && formik.errors.difficulty && (
                     <Typography variant="caption" color="error">{formik.errors.difficulty}</Typography>
@@ -209,6 +243,38 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
               </Box>
             </Box>
 
+            {/* Fechas */}
+            <Box className="edit-section" mb={3}>
+              <Typography variant="subtitle1">Fecha de inicio:</Typography>
+              <Box display="flex" alignItems="center" gap={1}>
+                <input
+                  type="date"
+                  className="date-input"
+                  placeholder="Fecha de Inicio"
+                  value={formik.values.fecha_inicio_tarea}
+                  min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    formik.setFieldValue('fecha_inicio_tarea', e.target.value);
+                  }}
+                  required
+                />
+              </Box>
+              <Typography variant="subtitle1">Fecha de fin:</Typography>
+              <Box display="flex" alignItems="center" gap={1}>
+                <input
+                  type="date"
+                  className="date-input"
+                  placeholder="Fecha de Fin"
+                  value={formik.values.fecha_fin_tarea}
+                  min={formik.values.fecha_inicio_tarea || new Date().toISOString().split('T')[0]}
+                  onChange={(e) => {
+                    formik.setFieldValue('fecha_fin_tarea', e.target.value);
+                  }}
+                  required
+                />
+              </Box>
+            </Box>
+
             {/* Asignados */}
             <Box className="edit-section" mb={3}>
               <Typography variant="subtitle1">Asignados:</Typography>
@@ -216,9 +282,10 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
                 {formik.values.assignees.map((assignee, index) => (
                   <Chip
                     key={index}
-                    avatar={<Avatar src={`/path/to/${assignee}`} />}
-                    label={`Usuario ${index + 1}`}
-                    onDelete={() => formik.setFieldValue('assignees', formik.values.assignees.filter(a => a !== assignee))}
+                    avatar={<Avatar src={assignee.url_avatar} />}
+                    label={assignee.nombre_usuario}
+                    onDelete={() => handleRemoveAssignee(index)}
+                    deleteIcon={<FaTrash />}
                   />
                 ))}
                 <IconButton size="small" onClick={handleAddAssigneeClick}>
@@ -229,16 +296,20 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
                   open={Boolean(anchorEl)}
                   onClose={handleCloseMenu}
                 >
-                  {availableUsers.map((user, index) => (
-                    <MuiMenuItem key={index} onClick={() => handleAddAssignee(user)}>
-                      <Avatar src={`/path/to/${user}`} />
-                      Usuario {index + 1}
-                    </MuiMenuItem>
-                  ))}
+                  {availableTeamMembers.length > 0 ? (
+                    availableTeamMembers.map((member: { id_usuario: number, nombre_usuario: string, url_avatar: string }) => (
+                      <MuiMenuItem key={member.id_usuario} onClick={() => handleAddAssignee(member)}>
+                        <Avatar src={member.url_avatar} />
+                        {member.nombre_usuario}
+                      </MuiMenuItem>
+                    ))
+                  ) : (
+                    <MuiMenuItem disabled>No hay miembros del equipo</MuiMenuItem>
+                  )}
                 </Menu>
               </Box>
               {formik.touched.assignees && formik.errors.assignees && (
-                <Typography variant="caption" color="error">{formik.errors.assignees}</Typography>
+                <Typography variant="caption" color="error">{typeof formik.errors.assignees === 'string' ? formik.errors.assignees : ''}</Typography>
               )}
             </Box>
 

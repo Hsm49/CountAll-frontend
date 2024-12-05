@@ -97,7 +97,7 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
             }
           });
           setUserRole(response.data.rol_sesion);
-          setTeamMembers(response.data.integrantes);
+          setTeamMembers(response.data.equipo.integrantes_equipo);
         } catch (error) {
           console.error('Error fetching user role and team members:', error);
         }

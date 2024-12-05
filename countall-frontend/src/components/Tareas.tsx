@@ -18,11 +18,14 @@ interface Task {
   comments: number;
   status: string;
   isLocked: boolean;
+  fecha_inicio_tarea: string;
+  fecha_fin_tarea: string;
 }
 
 const Tarea: React.FC = () => {
   const projectTeamContext = useContext(ProjectTeamContext);
   const selectedTeam = projectTeamContext?.selectedTeam;
+  const userRole = projectTeamContext?.userRole;
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedTaskForEdit, setSelectedTaskForEdit] = useState<Task | null>(null);
@@ -32,9 +35,9 @@ const Tarea: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
 
   const statusOptions = [
-    { value: 'todo', label: 'Por hacer' },
-    { value: 'in-progress', label: 'En progreso' },
-    { value: 'completed', label: 'Completada' }
+    { value: 'por-hacer', label: 'Por hacer' },
+    { value: 'en-progreso', label: 'En progreso' },
+    { value: 'completado', label: 'Completado' }
   ];
 
   useEffect(() => {
@@ -62,7 +65,7 @@ const Tarea: React.FC = () => {
           assignees: taskData.asignados,
           comments: taskData.datos_tarea.tarea.comentarios_tarea,
           status: taskData.datos_tarea.tarea.estado_tarea.toLowerCase().replace(' ', '-'),
-          isLocked: false // Assuming tasks are not locked initially
+          isLocked: taskData.datos_tarea.tarea.is_locked
         }));
         setTasks(fetchedTasks);
       } catch (error) {
@@ -82,29 +85,81 @@ const Tarea: React.FC = () => {
 
   const handleTaskUpdate = async (updatedTask: Task) => {
     try {
-      // Aquí irá la llamada al backend
-      // const response = await updateTask(updatedTask);
-      
-      // Actualiza el estado local
-      setTasks(prevTasks =>
-        prevTasks.map(task =>
-          task.id === updatedTask.id ? updatedTask : task
-        )
-      );
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+  
+      const response = await axios.put(`http://localhost:4444/api/tarea/editarTarea/${updatedTask.id}`, {
+        nombre_tarea: updatedTask.title,
+        descr_tarea: updatedTask.description,
+        prioridad_tarea: updatedTask.priority,
+        dificultad_tarea: updatedTask.difficulty,
+        fecha_inicio_tarea: updatedTask.fecha_inicio_tarea,
+        fecha_fin_tarea: updatedTask.fecha_fin_tarea,
+        nombre_equipo: selectedTeam?.nombre_equipo,
+        asignados_tarea: updatedTask.assignees.map(assignee => assignee.nombre_usuario)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.status === 200) {
+        // Actualiza el estado local
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === updatedTask.id ? updatedTask : task
+          )
+        );
+      } else {
+        console.error('Error updating task:', response.data);
+      }
     } catch (error) {
+      console.error('Error updating task:', error);
       throw error; // El modal manejará el error
     }
   };
 
   const handleTaskAdd = async (newTask: Omit<Task, 'id' | 'isLocked'> & { isLocked?: boolean }) => {
     try {
-      // Aquí irá la llamada al backend
-      // const response = await addTask(newTask);
-      
-      // Simula la adición de una nueva tarea con un ID único
-      const newTaskWithId = { ...newTask, id: tasks.length + 1, isLocked: newTask.isLocked ?? false };
-      setTasks(prevTasks => [...prevTasks, newTaskWithId]);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+  
+      const response = await axios.post(`http://localhost:4444/api/tarea/asignarTarea/${selectedTeam?.id_equipo}`, {
+        nombre_tarea: newTask.title,
+        descr_tarea: newTask.description,
+        prioridad_tarea: newTask.priority,
+        dificultad_tarea: newTask.difficulty,
+        fecha_inicio_tarea: newTask.fecha_inicio_tarea,
+        fecha_fin_tarea: newTask.fecha_fin_tarea,
+        amonestacion: false,
+        asignados_tarea: newTask.assignees.map(assignee => assignee.nombre_usuario)
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (response.status === 200 && response.data && response.data.tarea && response.data.tarea.id_tarea) {
+        const addedTask = response.data.tarea;
+        const newTaskWithId = {
+          ...newTask,
+          id: addedTask.id_tarea,
+          isLocked: newTask.isLocked ?? false
+        };
+        setTasks(prevTasks => [...prevTasks, newTaskWithId]);
+      } else {
+        console.error('Error adding task: Invalid response structure', response.data);
+      }
     } catch (error) {
+      console.error('Error adding task:', error);
       throw error; // El modal manejará el error
     }
   };
@@ -123,19 +178,32 @@ const Tarea: React.FC = () => {
       });
 
       if (result.isConfirmed) {
-        // Aquí irá la llamada al backend
-        // const response = await deleteTask(taskId);
-        
-        // Actualiza el estado local
-        setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No token found');
+          return;
+        }
 
-        await Swal.fire({
-          icon: 'success',
-          title: 'Tarea eliminada',
-          text: 'La tarea ha sido eliminada exitosamente',
-          timer: 2000,
-          showConfirmButton: false
+        const response = await axios.delete(`http://localhost:4444/api/tarea/eliminarTarea/${taskId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
+
+        if (response.status === 200) {
+          // Actualiza el estado local
+          setTasks(prevTasks => prevTasks.filter(task => task.id !== taskId));
+
+          await Swal.fire({
+            icon: 'success',
+            title: 'Tarea eliminada',
+            text: 'La tarea ha sido eliminada exitosamente',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        } else {
+          console.error('Error deleting task:', response.data);
+        }
       }
     } catch (error) {
       console.error('Error al eliminar la tarea:', error);
@@ -164,15 +232,45 @@ const Tarea: React.FC = () => {
 
   const handleTaskStatusUpdate = async (taskId: number, newStatus: string) => {
     try {
-      const success = true;
-
-      if (success) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+  
+      // Ensure the status is exactly what the backend expects
+      const statusMap: { [key: string]: string } = {
+        'por-hacer': 'Por hacer',
+        'en-progreso': 'En progreso',
+        'completado': 'Completado'
+      };
+  
+      const backendStatus = statusMap[newStatus];
+  
+      if (!backendStatus) {
+        console.error('Invalid status:', newStatus);
+        return;
+      }
+  
+      const response = await axios.put(`http://localhost:4444/api/tarea/cambiarEstado/${taskId}`, 
+        {
+          estado_tarea: backendStatus
+        }, 
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+  
+      if (response.status === 200) {
         setTasks(prevTasks =>
           prevTasks.map(task =>
-            task.id === taskId ? { ...task, status: newStatus, isLocked: newStatus === 'completed' } : task
+            task.id === taskId ? { ...task, status: newStatus, isLocked: newStatus === 'completado' } : task
           )
         );
-
+  
         await Swal.fire({
           icon: 'success',
           title: 'Estado actualizado',
@@ -180,18 +278,31 @@ const Tarea: React.FC = () => {
           timer: 2000,
           showConfirmButton: false,
           customClass: {
-              popup: 'swal2-popup-custom'
+            popup: 'swal2-popup-custom'
           }
         });
+      } else {
+        console.error('Error updating task status:', response.data);
+        throw new Error('Failed to update task status');
       }
     } catch (error) {
       console.error('Error al actualizar el estado de la tarea:', error);
+      
+      // More detailed error handling
+      if (axios.isAxiosError(error)) {
+        console.error('Axios Error Details:', {
+          response: error.response?.data,
+          status: error.response?.status,
+          headers: error.response?.headers
+        });
+      }
+  
       await Swal.fire({
         icon: 'error',
         title: 'Error',
         text: 'No se pudo actualizar el estado de la tarea',
         customClass: {
-            popup: 'swal2-popup-custom'
+          popup: 'swal2-popup-custom'
         }
       });
     } finally {
@@ -255,10 +366,20 @@ const Tarea: React.FC = () => {
 
   const handleUnlockTask = async (taskId: number) => {
     try {
-      // Simula la llamada al backend para desbloquear la tarea
-      const success = true;
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
 
-      if (success) {
+      const response = await axios.put(`http://localhost:4444/api/tarea/desbloquearTarea/${taskId}`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200) {
         setTasks(prevTasks =>
           prevTasks.map(task =>
             task.id === taskId ? { ...task, isLocked: false } : task
@@ -275,6 +396,8 @@ const Tarea: React.FC = () => {
               popup: 'swal2-popup-custom'
           }
         });
+      } else {
+        console.error('Error unlocking task:', response.data);
       }
     } catch (error) {
       console.error('Error al desbloquear la tarea:', error);
@@ -329,7 +452,7 @@ const Tarea: React.FC = () => {
                   <ListItemText>Cambiar estado</ListItemText>
                 </MenuItem>
                 { /* Botón que solo debe mostrarse para el líder */}
-                {task.isLocked && (
+                {userRole === 'Líder' && task.isLocked && (
                   <MenuItem onClick={() => handleUnlockTask(task.id)}>
                     <ListItemIcon>
                       <FaCheck />
@@ -425,20 +548,20 @@ const Tarea: React.FC = () => {
           <Box className="column-header completed">
             <Typography variant="h6">Completados</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'completada').length}
+              {tasks.filter(task => task.status === 'completado').length}
             </Typography>
             <IconButton onClick={() => setAddModalOpen(true)}>
               <FaPlus />
             </IconButton>
           </Box>
-          {renderTasksList('completada')}
+          {renderTasksList('completado')}
         </Box>
       </Box>
-      {/*<TaskAddModal
+      <TaskAddModal
         open={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         onSave={handleTaskAdd}
-      />*/}
+      />
     </Box>
   );
 };
