@@ -3,6 +3,8 @@ import { CSSTransition } from 'react-transition-group';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 import './css/SelectProject.css';
 
 interface Proyecto {
@@ -17,9 +19,6 @@ const SelectProject: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
-  const [nombreProyecto, setNombreProyecto] = useState('');
-  const [descrProyecto, setDescrProyecto] = useState('');
-  const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   
   const navigate = useNavigate();
@@ -58,34 +57,39 @@ const SelectProject: React.FC = () => {
     }, 300);
   };
 
-  const handleCreateProject = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCreateLoading(true);
-    setCreateError(null);
-    
-    try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:4444/api/proyecto/crearProyecto', {
-        nombre_proyecto: nombreProyecto,
-        descr_proyecto: descrProyecto
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      const newProject = response.data;
-      setProyectos([...proyectos, newProject]);
-      setSelectedProject(newProject);
-      // Recargar la página para seleccionar el proyecto recién creado
-      window.location.reload();
-    } catch (error) {
-      console.error('Error creating project:', error);
-      setCreateError('Error al crear el proyecto');
-    } finally {
-      setCreateLoading(false);
-    }
-  };
+  const formik = useFormik({
+    initialValues: {
+      nombreProyecto: '',
+      descrProyecto: '',
+    },
+    validationSchema: Yup.object({
+      nombreProyecto: Yup.string().required('El nombre del proyecto es requerido'),
+      descrProyecto: Yup.string().required('La descripción del proyecto es requerida'),
+    }),
+    onSubmit: async (values) => {
+      setCreateError(null);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post('http://localhost:4444/api/proyecto/crearProyecto', {
+          nombre_proyecto: values.nombreProyecto,
+          descr_proyecto: values.descrProyecto
+        }, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        const newProject = response.data;
+        setProyectos([...proyectos, newProject]);
+        setSelectedProject(newProject);
+        // Recargar la página para seleccionar el proyecto recién creado
+        window.location.reload();
+      } catch (error) {
+        console.error('Error creating project:', error);
+        setCreateError('Error al crear el proyecto');
+      }
+    },
+  });
 
   const handleSkipToTeams = () => {
     navigate('/select-team-user');
@@ -145,24 +149,28 @@ const SelectProject: React.FC = () => {
         ) : (
           <div className="create-form">
             <h3>Crear Nuevo Proyecto</h3>
-            <form onSubmit={handleCreateProject}>
+            <form onSubmit={formik.handleSubmit}>
               <input
                 type="text"
                 placeholder="Nombre del Proyecto"
-                value={nombreProyecto}
-                onChange={(e) => setNombreProyecto(e.target.value)}
-                required
+                {...formik.getFieldProps('nombreProyecto')}
+                className={`form-control ${formik.touched.nombreProyecto && formik.errors.nombreProyecto ? 'is-invalid' : ''}`}
               />
+              {formik.touched.nombreProyecto && formik.errors.nombreProyecto ? (
+                <div className="invalid-feedback">{formik.errors.nombreProyecto}</div>
+              ) : null}
               <textarea
                 placeholder="Descripción del Proyecto"
-                value={descrProyecto}
-                onChange={(e) => setDescrProyecto(e.target.value)}
-                required
+                {...formik.getFieldProps('descrProyecto')}
+                className={`form-control ${formik.touched.descrProyecto && formik.errors.descrProyecto ? 'is-invalid' : ''}`}
               />
+              {formik.touched.descrProyecto && formik.errors.descrProyecto ? (
+                <div className="invalid-feedback">{formik.errors.descrProyecto}</div>
+              ) : null}
               {createError && <p className="error">{createError}</p>}
               <div className="button-group">
-                <button type="submit" disabled={createLoading}>
-                  {createLoading ? 'Creando...' : 'Crear Proyecto'}
+                <button type="submit" disabled={formik.isSubmitting}>
+                  {formik.isSubmitting ? 'Creando...' : 'Crear Proyecto'}
                 </button>
                 <button 
                   type="button" 

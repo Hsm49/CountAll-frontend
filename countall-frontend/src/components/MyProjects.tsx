@@ -11,17 +11,27 @@ interface Proyecto {
 
 const MyProjects: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [noProjectsMessage, setNoProjectsMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProyectos = async () => {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:4444/api/proyecto/misProyectos', {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:4444/api/proyecto/misProyectos', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.data.proyectos_usuario.length === 0) {
+          setNoProjectsMessage('No se encontraron proyectos.');
+        } else {
+          setProyectos(response.data.proyectos_usuario);
         }
-      });
-      setProyectos(response.data.proyectos_usuario);
+      } catch (error) {
+        setError('Hubo un error al cargar los proyectos. Por favor, inténtalo de nuevo más tarde.');
+      }
     };
 
     fetchProyectos();
@@ -38,6 +48,8 @@ const MyProjects: React.FC = () => {
   return (
     <div className="my-projects-container">
       <button className="btn-naranja" onClick={handleChangeProject}>Cambiar de proyecto</button>
+      {error && <div className="error-message">{error}</div>}
+      {noProjectsMessage && <div className="no-projects-message">{noProjectsMessage}</div>}
       {proyectos.map((proyecto) => (
         <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
           <h3>{proyecto.nombre_proyecto}</h3>

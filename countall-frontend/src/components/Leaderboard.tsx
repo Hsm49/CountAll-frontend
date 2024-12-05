@@ -50,7 +50,7 @@ const Leaderboard: React.FC = () => {
         setUsuarioId(usuario.id_usuario);
       } catch (error) {
         console.error('Error fetching clasificaciones:', error);
-        setError('Error fetching clasificaciones');
+        setError('Error al recuperar la información de las clasificaciones. Por favor, inténtalo de nuevo más tarde.');
       }
     };
 
@@ -102,39 +102,45 @@ const Leaderboard: React.FC = () => {
 
         {/* Podium and Table Section */}
         <div className="podium-and-table">
-        <h2 className="premio-title text-center">Premio: {premio}</h2>
-          <div className="podium">
-            {clasificaciones.length >= 3 && (
-              <>
-                <div key={`second-${clasificaciones[1].id_usuario_fk_UE}`} className="podium-member second">
-                  <div className="avatar">
-                    <img src={clasificaciones[1].usuario.url_avatar} alt="2nd Place" />
-                  </div>
-                  <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
-                  <p>{`${clasificaciones[1].puntuacion_local} pts`}</p>
-                </div>
-                <div key={`first-${clasificaciones[0].id_usuario_fk_UE}`} className="podium-member first">
-                  <div className="avatar">
-                    <img src={clasificaciones[0].usuario.url_avatar} alt="1st Place" />
-                  </div>
-                  <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
-                  <p>{`${clasificaciones[0].puntuacion_local} pts`}</p>
-                </div>
-                <div key={`third-${clasificaciones[2].id_usuario_fk_UE}`} className="podium-member third">
-                  <div className="avatar">
-                    <img src={clasificaciones[2].usuario.url_avatar} alt="3rd Place" />
-                  </div>
-                  <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
-                  <p>{`${clasificaciones[2].puntuacion_local} pts`}</p>
-                </div>
-              </>
-            )}
-          </div>
+          <h2 className="premio-title text-center">Premio: {premio}</h2>
+          {error ? (
+            <div className="error-message">{error}</div>
+          ) : (
+            <>
+              <div className="podium">
+                {clasificaciones.length >= 3 && (
+                  <>
+                    <div key={`second-${clasificaciones[1].id_usuario_fk_UE}`} className="podium-member second">
+                      <div className="avatar">
+                        <img src={clasificaciones[1].usuario.url_avatar} alt="2nd Place" />
+                      </div>
+                      <h4>{`2° ${clasificaciones[1].usuario.nombre_usuario}`}</h4>
+                      <p>{`${clasificaciones[1].puntuacion_local} pts`}</p>
+                    </div>
+                    <div key={`first-${clasificaciones[0].id_usuario_fk_UE}`} className="podium-member first">
+                      <div className="avatar">
+                        <img src={clasificaciones[0].usuario.url_avatar} alt="1st Place" />
+                      </div>
+                      <h4>{`1° ${clasificaciones[0].usuario.nombre_usuario}`}</h4>
+                      <p>{`${clasificaciones[0].puntuacion_local} pts`}</p>
+                    </div>
+                    <div key={`third-${clasificaciones[2].id_usuario_fk_UE}`} className="podium-member third">
+                      <div className="avatar">
+                        <img src={clasificaciones[2].usuario.url_avatar} alt="3rd Place" />
+                      </div>
+                      <h4>{`3° ${clasificaciones[2].usuario.nombre_usuario}`}</h4>
+                      <p>{`${clasificaciones[2].puntuacion_local} pts`}</p>
+                    </div>
+                  </>
+                )}
+              </div>
 
-          {/* Leaderboard Table */}
-          <div className="leaderboard">
-            <LeaderboardTable />
-          </div>
+              {/* Leaderboard Table */}
+              <div className="leaderboard">
+                <LeaderboardTable />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

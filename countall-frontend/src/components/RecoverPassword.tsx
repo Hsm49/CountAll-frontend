@@ -13,7 +13,9 @@ const RecoverPassword: React.FC = () => {
       email: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string().email('Correo inválido').required('El nombre es requerido'),
+      email: Yup.string()
+        .email('Correo inválido')
+        .required('El correo es requerido'),
     }),
     onSubmit: async (values) => {
       try {
@@ -32,7 +34,7 @@ const RecoverPassword: React.FC = () => {
           Swal.fire({
             icon: 'error',
             title: 'Error',
-            text: 'No se encontró ninguna cuenta asociada a la dirección de correo ingresada',
+            text: data.message || 'No se encontró ninguna cuenta asociada a la dirección de correo ingresada',
           });
         }
       } catch (error) {
@@ -56,16 +58,15 @@ const RecoverPassword: React.FC = () => {
             <h2>Recuperar contraseña</h2>
             <p>Escribe el correo asociado a la cuenta que deseas recuperar.</p>
             <form onSubmit={formik.handleSubmit}>
+              <label htmlFor="email">Correo electrónico</label>
               <input
                 type="email"
                 id="email"
-                name="email"
+                className={`form-input ${formik.touched.email && formik.errors.email ? 'is-invalid' : ''}`}
                 placeholder="Correo electrónico"
-                onChange={formik.handleChange}
-                value={formik.values.email}
-                className="form-input"
+                {...formik.getFieldProps('email')}
               />
-              {formik.errors.email && formik.touched.email ? (
+              {formik.touched.email && formik.errors.email ? (
                 <div className="invalid-feedback">{formik.errors.email}</div>
               ) : null}
               <button type="submit" className="btn-azul">

@@ -20,69 +20,78 @@ const Login: React.FC = () => {
       password: Yup.string().required('Campo obligatorio'),
     }),
     onSubmit: async (values) => {
-      const response = await fetch('http://localhost:4444/api/usuario/iniciarSesion', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email_usuario: values.email,
-          password_usuario: values.password,
-        }),
-      });
+      try {
+        const response = await fetch('http://localhost:4444/api/usuario/iniciarSesion', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email_usuario: values.email,
+            password_usuario: values.password,
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        console.log('Login successful:', data);
-        localStorage.setItem('token', data.token); // Store the token in localStorage
-        setIsLoggedIn(true); // Update the context
-        navigate('/select-project'); // Redirect to the tracking screen
-      } else {
-        if (data.errors && data.errors[0].msg === 'El usuario no ha sido confirmado') {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Cuenta no confirmada',
-            text: 'Por favor verifica tu correo',
-            showCancelButton: true,
-            confirmButtonText: 'Reenviar correo',
-            cancelButtonText: 'Aceptar'
-          }).then(async (result) => {
-            if (result.isConfirmed) {
-              const resendResponse = await fetch('http://localhost:4444/api/usuario/reenviarCorreoConfirmacion', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email_usuario: values.email }),
-              });
-
-              const resendData = await resendResponse.json();
-
-              if (resendResponse.ok) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Correo reenviado',
-                  text: 'El correo de confirmación ha sido reenviado',
-                  confirmButtonText: 'Aceptar'
-                });
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Error',
-                  text: resendData.errors[0].msg,
-                });
-              }
-            }
-          });
+        if (response.ok) {
+          console.log('Login successful:', data);
+          localStorage.setItem('token', data.token); // Store the token in localStorage
+          setIsLoggedIn(true); // Update the context
+          navigate('/select-project'); // Redirect to the tracking screen
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'El nombre de usuario o la contraseña son incorrectos.',
-          });
+          if (data.errors && data.errors[0].msg === 'El usuario no ha sido confirmado') {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Cuenta no confirmada',
+              text: 'Por favor verifica tu correo',
+              showCancelButton: true,
+              confirmButtonText: 'Reenviar correo',
+              cancelButtonText: 'Aceptar'
+            }).then(async (result) => {
+              if (result.isConfirmed) {
+                const resendResponse = await fetch('http://localhost:4444/api/usuario/reenviarCorreoConfirmacion', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ email_usuario: values.email }),
+                });
+
+                const resendData = await resendResponse.json();
+
+                if (resendResponse.ok) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Correo reenviado',
+                    text: 'El correo de confirmación ha sido reenviado',
+                    confirmButtonText: 'Aceptar'
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: resendData.errors[0].msg,
+                  });
+                }
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'El nombre de usuario o la contraseña son incorrectos.',
+            });
+          }
+          console.error('Login failed:', data);
         }
-        console.error('Login failed:', data);
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error del servidor',
+          text: 'Hubo un error al intentar iniciar sesión. Por favor, inténtalo de nuevo más tarde.',
+        });
+        console.error('Server error:', error);
       }
     },
   });

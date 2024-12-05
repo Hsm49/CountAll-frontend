@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import * as Yup from 'yup';
+import Swal from 'sweetalert2';
+import axios from 'axios';
 import './css/Notifications.css';
 
 type NotificationType = 'activities' | 'reminders' | 'achievements' | 'scores';
@@ -18,9 +21,41 @@ const Notifications: React.FC = () => {
     });
   };
 
-  const handleSaveChanges = () => {
-    // Agregar la lógica para enviar los cambios al backend
-    alert('Configuraciones de notificaciones guardadas');
+  const handleSaveChanges = async () => {
+    const schema = Yup.object().shape({
+      activities: Yup.boolean().required(),
+      reminders: Yup.boolean().required(),
+      achievements: Yup.boolean().required(),
+      scores: Yup.boolean().required(),
+    });
+
+    try {
+      await schema.validate(notifications);
+
+      const token = localStorage.getItem('token');
+      const response = await axios.post('http://localhost:4444/api/notificaciones', notifications, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Configuraciones guardadas',
+          text: 'Las configuraciones de notificaciones se han guardado exitosamente',
+        });
+      } else {
+        throw new Error('Error al guardar la configuración de notificaciones');
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo guardar la configuración de notificaciones',
+      });
+    }
   };
 
   return (
@@ -33,7 +68,7 @@ const Notifications: React.FC = () => {
             checked={notifications.activities}
             onChange={() => handleToggle('activities')}
           />
-          Notificaciones de actividades ( creación de tareas, asignación de tareas, actualizaciones de estado)
+          Notificaciones de actividades (creación de tareas, asignación de tareas, actualizaciones de estado)
         </label>
       </div>
       <div className="notification-item">

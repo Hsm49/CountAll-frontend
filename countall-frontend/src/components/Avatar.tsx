@@ -86,17 +86,21 @@ const Avatar: React.FC = () => {
       <div className="chart-card"> 
         <h2>Selecciona tu avatar</h2>
         <div className="avatars">
-          {avatars.map((avatar) => (
-            <div key={avatar.id_recompensa} className="avatar-container">
-              <img
-                src={avatar.url_avatar}
-                alt={avatar.nombre_recompensa}
-                className={`avatar ${selectedAvatar === avatar.url_avatar ? 'selected' : ''}`}
-                onClick={() => handleAvatarChange(avatar.id_recompensa)}
-              />
-              <span className="avatar-name">{avatar.nombre_recompensa}</span>
-            </div>
-          ))}
+          {avatars.length === 0 ? (
+            <p>No tienes ningún avatar disponible.</p>
+          ) : (
+            avatars.map((avatar) => (
+              <div key={avatar.id_recompensa} className="avatar-container">
+                <img
+                  src={avatar.url_avatar}
+                  alt={avatar.nombre_recompensa}
+                  className={`avatar ${selectedAvatar === avatar.url_avatar ? 'selected' : ''}`}
+                  onClick={() => handleAvatarChange(avatar.id_recompensa)}
+                />
+                <span className="avatar-name">{avatar.nombre_recompensa}</span>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
