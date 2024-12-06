@@ -33,6 +33,8 @@ const Tarea: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [statusAnchorEl, setStatusAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
+  const [filter, setFilter] = useState<'all' | 'assigned'>('all');
+  const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
 
   const statusOptions = [
     { value: 'por-hacer', label: 'Por hacer' },
@@ -443,14 +445,16 @@ const Tarea: React.FC = () => {
                   <ListItemIcon>
                     <FaEdit />
                   </ListItemIcon>
-                  <ListItemText>Ver y editar tarea</ListItemText>
+                  <ListItemText>Ver tarea</ListItemText>
                 </MenuItem>
-                <MenuItem onClick={handleStatusMenuOpen} disabled={task.isLocked}>
-                  <ListItemIcon>
-                    <FaCheck />
-                  </ListItemIcon>
-                  <ListItemText>Cambiar estado</ListItemText>
-                </MenuItem>
+                {task.status !== 'completado' && (
+                  <MenuItem onClick={handleStatusMenuOpen} disabled={task.isLocked}>
+                    <ListItemIcon>
+                      <FaCheck />
+                    </ListItemIcon>
+                    <ListItemText>Cambiar estado</ListItemText>
+                  </MenuItem>
+                )}
                 { /* Botón que solo debe mostrarse para el líder */}
                 {userRole === 'Líder' && task.isLocked && (
                   <MenuItem onClick={() => handleUnlockTask(task.id)}>
@@ -460,12 +464,14 @@ const Tarea: React.FC = () => {
                     <ListItemText>Desbloquear tarea</ListItemText>
                   </MenuItem>
                 )}
-                <MenuItem onClick={() => handleTaskDelete(task.id)}>
-                  <ListItemIcon>
-                    <FaTrash />
-                  </ListItemIcon>
-                  <ListItemText>Eliminar tarea</ListItemText>
-                </MenuItem>
+                {userRole === 'Líder' && (
+                  <MenuItem onClick={() => handleTaskDelete(task.id)}>
+                    <ListItemIcon>
+                      <FaTrash />
+                    </ListItemIcon>
+                    <ListItemText>Eliminar tarea</ListItemText>
+                  </MenuItem>
+                )}
               </Menu>
               <Menu sx={{ zIndex: 0 }}
                 anchorEl={statusAnchorEl}
@@ -505,6 +511,7 @@ const Tarea: React.FC = () => {
               setSelectedTaskForEdit(null);
             }}
             onSave={handleTaskUpdate}
+            isViewOnly={userRole !== 'Líder' && selectedTaskForEdit?.status === 'completado'}
           />
         </Card>
       ));

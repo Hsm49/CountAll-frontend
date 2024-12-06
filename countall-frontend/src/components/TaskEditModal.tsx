@@ -53,11 +53,13 @@ interface TaskEditModalProps {
     fecha_inicio_tarea: string;
     fecha_fin_tarea: string;
   }) => Promise<void>;
+  isViewOnly?: boolean; // Nueva propiedad
 }
 
-const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSave }) => {
+const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSave, isViewOnly = false }) => {
   const context = useContext(ProjectTeamContext);
   const teamMembers = context?.teamMembers || [];
+  const userRole = context?.userRole;
   const [editingField, setEditingField] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [taskDates, setTaskDates] = useState<{ fecha_inicio_tarea: string, fecha_fin_tarea: string } | null>(null);
@@ -256,7 +258,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             {/* Título */}
             <Box className="edit-section" mb={3}>
               <Box display="flex" alignItems="center" gap={1}>
-                {editingField === 'title' ? (
+                {editingField === 'title' && userRole === 'Líder' ? (
                   <TextField
                     fullWidth
                     label="Título"
@@ -268,9 +270,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                   <>
                     <Typography variant="subtitle1">Título:</Typography>
                     <Typography>{formik.values.title}</Typography>
-                    <IconButton onClick={() => handleEditClick('title')}>
-                      <FaPen />
-                    </IconButton>
+                    {userRole === 'Líder' && (
+                      <IconButton onClick={() => handleEditClick('title')}>
+                        <FaPen />
+                      </IconButton>
+                    )}
                   </>
                 )}
               </Box>
@@ -279,7 +283,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             {/* Prioridad */}
             <Box className="edit-section" mb={3}>
               <Box display="flex" alignItems="center" gap={1}>
-                {editingField === 'priority' ? (
+                {editingField === 'priority' && userRole === 'Líder' ? (
                   <FormControl size="small" fullWidth error={formik.touched.priority && Boolean(formik.errors.priority)}>
                     <InputLabel>Prioridad</InputLabel>
                     <Select
@@ -300,9 +304,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                   <>
                     <Typography variant="subtitle1">Prioridad:</Typography>
                     <Typography>{formik.values.priority}</Typography>
-                    <IconButton onClick={() => handleEditClick('priority')}>
-                      <FaPen />
-                    </IconButton>
+                    {userRole === 'Líder' && (
+                      <IconButton onClick={() => handleEditClick('priority')}>
+                        <FaPen />
+                      </IconButton>
+                    )}
                   </>
                 )}
               </Box>
@@ -311,7 +317,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             {/* Dificultad */}
             <Box className="edit-section" mb={3}>
               <Box display="flex" alignItems="center" gap={1}>
-                {editingField === 'difficulty' ? (
+                {editingField === 'difficulty' && userRole === 'Líder' ? (
                   <FormControl size="small" fullWidth error={formik.touched.difficulty && Boolean(formik.errors.difficulty)}>
                     <InputLabel>Dificultad</InputLabel>
                     <Select
@@ -330,9 +336,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                   <>
                     <Typography variant="subtitle1">Dificultad:</Typography>
                     <Typography>{formik.values.difficulty}</Typography>
-                    <IconButton onClick={() => handleEditClick('difficulty')}>
-                      <FaPen />
-                    </IconButton>
+                    {userRole === 'Líder' && (
+                      <IconButton onClick={() => handleEditClick('difficulty')}>
+                        <FaPen />
+                      </IconButton>
+                    )}
                   </>
                 )}
               </Box>
@@ -341,7 +349,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             {/* Descripción */}
             <Box className="edit-section" mb={3}>
               <Box display="flex" alignItems="start" gap={1}>
-                {editingField === 'description' ? (
+                {editingField === 'description' && userRole === 'Líder' ? (
                   <TextField
                     fullWidth
                     multiline
@@ -355,9 +363,11 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                   <>
                     <Typography variant="subtitle1">Descripción:</Typography>
                     <Typography>{formik.values.description}</Typography>
-                    <IconButton onClick={() => handleEditClick('description')}>
-                      <FaPen />
-                    </IconButton>
+                    {userRole === 'Líder' && (
+                      <IconButton onClick={() => handleEditClick('description')}>
+                        <FaPen />
+                      </IconButton>
+                    )}
                   </>
                 )}
               </Box>
@@ -379,6 +389,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                       setEditingField('fecha_inicio_tarea');
                     }}
                     required
+                    disabled={userRole !== 'Líder'}
                   />
                 </Box>
                 <Typography variant="subtitle1">Fecha de fin:</Typography>
@@ -394,6 +405,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                       setEditingField('fecha_fin_tarea');
                     }}
                     required
+                    disabled={userRole !== 'Líder'}
                   />
                 </Box>
               </Box>
@@ -408,13 +420,15 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                     key={index}
                     avatar={<Avatar src={assignee.url_avatar} />}
                     label={assignee.nombre_usuario}
-                    onDelete={() => handleRemoveAssignee(index)}
+                    onDelete={userRole === 'Líder' ? () => handleRemoveAssignee(index) : undefined}
                     deleteIcon={<FaTrash />}
                   />
                 ))}
-                <IconButton size="small" onClick={handleAddAssigneeClick}>
-                  <FaPlus />
-                </IconButton>
+                {userRole === 'Líder' && (
+                  <IconButton size="small" onClick={handleAddAssigneeClick}>
+                    <FaPlus />
+                  </IconButton>
+                )}
                 <Menu
                   anchorEl={anchorEl}
                   open={Boolean(anchorEl)}
@@ -444,7 +458,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
             </Box>
           </Box>
 
-          {editingField && (
+          {editingField && userRole === 'Líder' && (
             <DialogActions>
               <Button 
                 variant="outlined" 
