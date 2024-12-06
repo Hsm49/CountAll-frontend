@@ -74,3 +74,70 @@
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
+
+/* Añadir estas clases al final del archivo TaskEditModal.css */
+
+.review-task-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin: -16px;
+}
+
+.review-section {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.review-comments-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+}
+
+.comment-box {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.comment-username {
+  font-weight: bold;
+  color: #333;
+}
+
+.comment-content {
+  font-size: 14px;
+  color: #555;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.comment-actions .MuiIconButton-root {
+  padding: 4px;
+}
+
+.add-comment-section {
+  margin-top: 24px;
+}
+
+.add-comment-textfield {
+  margin-bottom: 16px;
+}

@@ -312,12 +312,6 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
                 <Typography variant="caption" color="error">{typeof formik.errors.assignees === 'string' ? formik.errors.assignees : ''}</Typography>
               )}
             </Box>
-
-            {/* Comentarios */}
-            <Box className="comments-section">
-              <Typography variant="subtitle1" mb={2}>Comentarios ({formik.values.comments})</Typography>
-              {/* Aquí irían los comentarios cuando los implementes */}
-            </Box>
           </Box>
 
           <DialogActions>

@@ -63,6 +63,9 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
   const [editingField, setEditingField] = useState<string | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [taskDates, setTaskDates] = useState<{ fecha_inicio_tarea: string, fecha_fin_tarea: string } | null>(null);
+  const [comments, setComments] = useState<{ id_comentario: number, contenido_comentario: string, url_avatar: string, username: string }[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [currentUser, setCurrentUser] = useState<{ nombre_usuario: string } | null>(null);
 
   const formatDateForBackend = (dateString: string): string => {
     return `${dateString} 00:00:00-06`;
@@ -142,7 +145,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
         title: task.title,
         description: task.description,
         priority: task.priority.charAt(0).toUpperCase() + task.priority.slice(1),
-        difficulty: task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1),
+        difficulty: task.difficulty.charAt(0).toUpperCase() + task.priority.slice(1),
         assignees: task.assignees,
         comments: task.comments,
         status: task.status,
@@ -187,6 +190,50 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
       };
   
       fetchTaskDates();
+
+      // Fetch comments
+      const fetchComments = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.error('No token found');
+            return;
+          }
+
+          const response = await axios.get(`http://localhost:4444/api/comentario/verComentarios/${task.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setComments(response.data.comentarios_tarea);
+        } catch (error) {
+          console.error('Error fetching comments:', error);
+        }
+      };
+  
+      fetchComments();
+
+      // Fetch current user
+      const fetchCurrentUser = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.error('No token found');
+            return;
+          }
+  
+          const response = await axios.get('http://localhost:4444/api/usuario/actual', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          setCurrentUser(response.data);
+        } catch (error) {
+          console.error('Error fetching current user:', error);
+        }
+      };
+  
+      fetchCurrentUser();
     }
   }, [task]);
 
@@ -216,6 +263,110 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
 
   const handleCancelEdit = () => {
     setEditingField(null);
+  };
+
+  const handleAddComment = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      if (!task) {
+        console.error('No task found');
+        return;
+      }
+  
+      await axios.post(`http://localhost:4444/api/comentario/escribirComentario/${task.id}`, {
+        contenido_comentario: newComment
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      // Fetch comments again to update the list
+      const response = await axios.get(`http://localhost:4444/api/comentario/verComentarios/${task.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setComments(response.data.comentarios_tarea);
+      setNewComment('');
+
+      // Show confirmation
+      await Swal.fire({
+        icon: 'success',
+        title: 'Comentario agregado',
+        text: 'El comentario ha sido agregado exitosamente',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo agregar el comentario'
+      });
+    }
+  };
+
+  const handleEditComment = async (id_comentario: number, contenido_comentario: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      if (!task) {
+        console.error('No task found');
+        return;
+      }
+  
+      await axios.put(`http://localhost:4444/api/comentario/modificarComentario/${id_comentario}`, {
+        contenido_comentario
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      // Fetch comments again to update the list
+      const response = await axios.get(`http://localhost:4444/api/comentario/verComentarios/${task.id}`);
+      setComments(response.data.comentarios_tarea);
+    } catch (error) {
+      console.error('Error editing comment:', error);
+    }
+  };
+  
+  const handleDeleteComment = async (id_comentario: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      if (!task) {
+        console.error('No task found');
+        return;
+      }
+  
+      await axios.delete(`http://localhost:4444/api/comentario/borrarComentario/${id_comentario}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      // Fetch comments again to update the list
+      const response = await axios.get(`http://localhost:4444/api/comentario/verComentarios/${task.id}`);
+      setComments(response.data.comentarios_tarea);
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+    }
   };
 
   // Filtrar miembros del equipo que ya están asignados
@@ -293,8 +444,6 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
                       <MenuItem value="Baja">Baja</MenuItem>
                       <MenuItem value="Media">Media</MenuItem>
                       <MenuItem value="Alta">Alta</MenuItem>
-                      <MenuItem value="Revisión" disabled={formik.values.status !== 'completed'}>En revisión</MenuItem>
-                      <MenuItem value="Completada" disabled={formik.values.status !== 'completed'}>Completada</MenuItem>
                     </Select>
                     {formik.touched.priority && formik.errors.priority && (
                       <Typography variant="caption" color="error">{formik.errors.priority}</Typography>
@@ -453,8 +602,45 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
 
             {/* Comentarios */}
             <Box className="comments-section">
-              <Typography variant="subtitle1" mb={2}>Comentarios ({formik.values.comments})</Typography>
-              {/* Aquí irían los comentarios cuando los implementes */}
+              <Typography variant="subtitle1" mb={2}>Comentarios ({comments.length})</Typography>
+              {comments.map((comment, index) => (
+                <Box key={index} className="comment-box">
+                  <Box className="comment-header">
+                    <Avatar src={comment.url_avatar} />
+                    <Typography variant="body1" className="comment-username">{comment.username}</Typography>
+                  </Box>
+                  <Typography variant="body2" className="comment-content">{comment.contenido_comentario}</Typography>
+                  {currentUser && comment.username === currentUser.nombre_usuario && (
+                        <Box className="comment-actions">
+                          <IconButton onClick={() => {
+                            const newComment = prompt('Edita tu comentario', comment.contenido_comentario);
+                            if (newComment !== null) {
+                              handleEditComment(comment.id_comentario, newComment);
+                            }
+                          }}>
+                            <FaPen />
+                          </IconButton>
+                          <IconButton onClick={() => handleDeleteComment(comment.id_comentario)}>
+                            <FaTrash />
+                          </IconButton>
+                        </Box>
+                  )}
+                </Box>
+              ))}
+              <Box className="add-comment-section">
+                <TextField
+                  fullWidth
+                  label="Escribe un comentario"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  multiline
+                  rows={2}
+                  className="add-comment-textfield"
+                />
+                <Button onClick={handleAddComment} variant="contained" color="primary" startIcon={<FaPlus />}>
+                  Añadir comentario
+                </Button>
+              </Box>
             </Box>
           </Box>
 

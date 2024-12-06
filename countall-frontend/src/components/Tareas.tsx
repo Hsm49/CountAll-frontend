@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import './css/Tareas.css';
 import TaskEditModal from './TaskEditModal';
 import TaskAddModal from './TaskAddModal';
+import ReviewTaskModal from './ReviewTaskModal';
 import axios from 'axios';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 
@@ -33,8 +34,32 @@ const Tarea: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [statusAnchorEl, setStatusAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedTask, setSelectedTask] = useState<number | null>(null);
-  const [filter, setFilter] = useState<'all' | 'assigned'>('all');
   const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(null);
+  const [filter, setFilter] = useState<'all' | 'assigned'>('all');
+  const [priorityAnchorEl, setPriorityAnchorEl] = useState<null | HTMLElement>(null);
+  const [priorityFilter, setPriorityFilter] = useState<'baja' | 'media' | 'alta' | 'all'>('all');
+  const [currentUser, setCurrentUser] = useState<{ nombre_usuario: string } | null>(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedTaskForReview, setSelectedTaskForReview] = useState<Task | null>(null);
+  const [reviewModifiers, setReviewModifiers] = useState({
+    nox_creatividad: false,
+    nox_calidad: false,
+    nox_colaboración: false,
+    nox_eficiencia: false,
+    nox_doc_completa: false,
+    nox_mala_implem: false,
+    nox_doc_incompleta: false,
+    nox_baja_calidad: false,
+    nox_no_comunicacion: false,
+    nox_no_especificacion: false
+  });
+
+  const handleReviewChange = (modifier: keyof typeof reviewModifiers) => {
+    setReviewModifiers(prevState => ({
+      ...prevState,
+      [modifier]: !prevState[modifier]
+    }));
+  };
 
   const statusOptions = [
     { value: 'por-hacer', label: 'Por hacer' },
@@ -78,10 +103,66 @@ const Tarea: React.FC = () => {
     fetchTasks();
   }, [selectedTeam]);
 
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+  
+      try {
+        const response = await axios.get('http://localhost:4444/api/usuario/actual', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+  
+    fetchCurrentUser();
+  }, []);
+
+  const handleFilterMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setFilterAnchorEl(event.currentTarget);
+  };
+  
+  const handleFilterMenuClose = () => {
+    setFilterAnchorEl(null);
+  };
+  
+  const handleFilterChange = (filterOption: 'all' | 'assigned') => {
+    setFilter(filterOption);
+    handleFilterMenuClose();
+  };
+
+  const handlePriorityMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setPriorityAnchorEl(event.currentTarget);
+  };
+  
+  const handlePriorityMenuClose = () => {
+    setPriorityAnchorEl(null);
+  };
+  
+  const handlePriorityChange = (priority: 'baja' | 'media' | 'alta' | 'all') => {
+    setPriorityFilter(priority);
+    handlePriorityMenuClose();
+  };
+
   const handleEditTask = (taskId: number) => {
     const taskToEdit = tasks.find(task => task.id === taskId);
     setSelectedTaskForEdit(taskToEdit || null);
     setEditModalOpen(true);
+    handleClose(); // Cierra el menú de opciones
+  };
+
+  const handleReviewTask = (taskId: number) => {
+    const taskToReview = tasks.find(task => task.id === taskId);
+    setSelectedTaskForReview(taskToReview || null);
+    setReviewModalOpen(true);
     handleClose(); // Cierra el menú de opciones
   };
 
@@ -414,27 +495,82 @@ const Tarea: React.FC = () => {
     }
   };
 
+  const handleReviewSubmit = async () => {
+    if (!selectedTaskForReview) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No token found');
+        return;
+      }
+
+      const response = await axios.put(`http://localhost:4444/api/tarea/revisarTarea/${selectedTaskForReview.id}`, reviewModifiers, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200) {
+        await Swal.fire({
+          icon: 'success',
+          title: 'Revisión exitosa',
+          text: 'La tarea ha sido revisada exitosamente',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        setReviewModalOpen(false);
+        setSelectedTaskForReview(null);
+      } else {
+        console.error('Error reviewing task:', response.data);
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo revisar la tarea'
+        });
+      }
+    } catch (error) {
+      console.error('Error reviewing task:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo revisar la tarea'
+      });
+    }
+  };
+
+  const getFilteredTasksCount = (status: string) => {
+    return tasks
+      .filter(task => task.status === status)
+      .filter(task => filter === 'all' || task.assignees.some(assignee => assignee.nombre_usuario === currentUser?.nombre_usuario))
+      .filter(task => priorityFilter === 'all' || task.priority === priorityFilter)
+      .length;
+  };
+
   const renderTasksList = (status: string) => {
     return tasks
       .filter(task => task.status === status)
+      .filter(task => filter === 'all' || task.assignees.some(assignee => assignee.nombre_usuario === currentUser?.nombre_usuario))
+      .filter(task => priorityFilter === 'all' || task.priority === priorityFilter)
       .map(task => (
         <Card key={task.id} className="task-card">
           <CardContent>
-              <Box className="priority-label-container">
-                <Box className="priority-label">
-                  {task.priority === 'baja' && <FaFlag className="urgency-icon green" />}
-                  {task.priority === 'media' && <FaFlag className="urgency-icon yellow" />}
-                  {task.priority === 'alta' && <FaFlag className="urgency-icon red" />}
-                  {task.priority === 'completada' && <FaCheck className="urgency-icon green" />}
-                  {task.priority === 'revisión' && <FaCircle className="urgency-icon yellow" />}
-                </Box>
-                <Box className={`difficulty-label difficulty-${task.difficulty}`}>
-                  {task.difficulty === 'fácil' ? 'Fácil' : task.difficulty === 'media' ? 'Media' : 'Difícil'}
-                </Box>
-                <Box className="options-menu">
-                  <IconButton onClick={(e) => handleOptionClick(e, task.id)}>
-                    <FaEllipsisH />
-                  </IconButton>
+            <Box className="priority-label-container">
+              <Box className="priority-label">
+                {task.priority === 'baja' && <FaFlag className="urgency-icon green" />}
+                {task.priority === 'media' && <FaFlag className="urgency-icon yellow" />}
+                {task.priority === 'alta' && <FaFlag className="urgency-icon red" />}
+                {task.priority === 'completada' && <FaCheck className="urgency-icon green" />}
+                {task.priority === 'revisión' && <FaCircle className="urgency-icon yellow" />}
+              </Box>
+              <Box className={`difficulty-label difficulty-${task.difficulty}`}>
+                {task.difficulty === 'fácil' ? 'Fácil' : task.difficulty === 'media' ? 'Media' : 'Difícil'}
+              </Box>
+              <Box className="options-menu">
+                <IconButton onClick={(e) => handleOptionClick(e, task.id)}>
+                  <FaEllipsisH />
+                </IconButton>
               </Box>
               <Menu sx={{ zIndex: 0 }}
                 anchorEl={anchorEl}
@@ -448,20 +584,30 @@ const Tarea: React.FC = () => {
                   <ListItemText>Ver tarea</ListItemText>
                 </MenuItem>
                 {task.status !== 'completado' && (
-                  <MenuItem onClick={handleStatusMenuOpen} disabled={task.isLocked}>
+                  <MenuItem
+                    onClick={handleStatusMenuOpen}
+                    disabled={task.isLocked || !task.assignees.some(assignee => assignee.nombre_usuario === currentUser?.nombre_usuario) && userRole !== 'Líder'}
+                  >
                     <ListItemIcon>
                       <FaCheck />
                     </ListItemIcon>
                     <ListItemText>Cambiar estado</ListItemText>
                   </MenuItem>
                 )}
-                { /* Botón que solo debe mostrarse para el líder */}
                 {userRole === 'Líder' && task.isLocked && (
                   <MenuItem onClick={() => handleUnlockTask(task.id)}>
                     <ListItemIcon>
                       <FaCheck />
                     </ListItemIcon>
                     <ListItemText>Desbloquear tarea</ListItemText>
+                  </MenuItem>
+                )}
+                {userRole === 'Líder' && task.status === 'completado' && (
+                  <MenuItem onClick={() => handleReviewTask(task.id)}>
+                    <ListItemIcon>
+                      <FaCheck />
+                    </ListItemIcon>
+                    <ListItemText>Revisar tarea</ListItemText>
                   </MenuItem>
                 )}
                 {userRole === 'Líder' && (
@@ -513,6 +659,17 @@ const Tarea: React.FC = () => {
             onSave={handleTaskUpdate}
             isViewOnly={userRole !== 'Líder' && selectedTaskForEdit?.status === 'completado'}
           />
+          <ReviewTaskModal
+            open={reviewModalOpen}
+            onClose={() => {
+              setReviewModalOpen(false);
+              setSelectedTaskForReview(null);
+            }}
+            onSubmit={handleReviewSubmit}
+            reviewModifiers={reviewModifiers}
+            handleReviewChange={handleReviewChange}
+            selectedTaskForReview={selectedTaskForReview}
+          />
         </Card>
       ));
   };
@@ -520,8 +677,26 @@ const Tarea: React.FC = () => {
   return (
     <Box className="task-board">
       <Box className="filters">
-        <Button variant="outlined">Filtrar</Button>
-        <Button variant="outlined">Hoy</Button>
+        <Button variant="outlined" onClick={handleFilterMenuOpen}>Filtrar</Button>
+        <Menu
+          anchorEl={filterAnchorEl}
+          open={Boolean(filterAnchorEl)}
+          onClose={handleFilterMenuClose}
+        >
+          <MenuItem onClick={() => handleFilterChange('all')}>Todas las tareas</MenuItem>
+          <MenuItem onClick={() => handleFilterChange('assigned')}>Mis tareas</MenuItem>
+        </Menu>
+        <Button variant="outlined" onClick={handlePriorityMenuOpen}>Prioridad</Button>
+        <Menu
+          anchorEl={priorityAnchorEl}
+          open={Boolean(priorityAnchorEl)}
+          onClose={handlePriorityMenuClose}
+        >
+          <MenuItem onClick={() => handlePriorityChange('all')}>Todas</MenuItem>
+          <MenuItem onClick={() => handlePriorityChange('baja')}>Baja</MenuItem>
+          <MenuItem onClick={() => handlePriorityChange('media')}>Media</MenuItem>
+          <MenuItem onClick={() => handlePriorityChange('alta')}>Alta</MenuItem>
+        </Menu>
       </Box>
 
       <Box className="columns mt-3">
@@ -529,11 +704,13 @@ const Tarea: React.FC = () => {
           <Box className="column-header to-do">
             <Typography variant="h6">Por hacer</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'por-hacer').length}
+              {getFilteredTasksCount('por-hacer')}
             </Typography>
-            <IconButton onClick={() => setAddModalOpen(true)}>
-              <FaPlus />
-            </IconButton>
+            {userRole === 'Líder' && (
+              <IconButton onClick={() => setAddModalOpen(true)}>
+                <FaPlus />
+              </IconButton>
+            )}
           </Box>
           {renderTasksList('por-hacer')}
         </Box>
@@ -542,11 +719,8 @@ const Tarea: React.FC = () => {
           <Box className="column-header in-progress">
             <Typography variant="h6">En progreso</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'en-progreso').length}
+              {getFilteredTasksCount('en-progreso')}
             </Typography>
-            <IconButton onClick={() => setAddModalOpen(true)}>
-              <FaPlus />
-            </IconButton>
           </Box>
           {renderTasksList('en-progreso')}
         </Box>
@@ -555,11 +729,8 @@ const Tarea: React.FC = () => {
           <Box className="column-header completed">
             <Typography variant="h6">Completados</Typography>
             <Typography variant="subtitle1">
-              {tasks.filter(task => task.status === 'completado').length}
+              {getFilteredTasksCount('completado')}
             </Typography>
-            <IconButton onClick={() => setAddModalOpen(true)}>
-              <FaPlus />
-            </IconButton>
           </Box>
           {renderTasksList('completado')}
         </Box>
