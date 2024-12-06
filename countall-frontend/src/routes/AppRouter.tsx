@@ -47,9 +47,9 @@ const AppRouter: React.FC = () => {
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/confirm-sign-up" element={<ConfirmSignUp />} />
       <Route path="/recover-password" element={<RecoverPassword />} />
-      <Route path="/new-password" element={<NewPassword />} />
+      <Route path="/new-password/:token" element={<NewPassword />} />
       <Route path="/password-saved" element={<PasswordSaved />} />
-      <Route path="/account-verified" element={<AccountVerified />} />
+      <Route path="/account-verified/:token" element={<AccountVerified />} />
       <Route path="/recover-sent" element={<RecoverSent />} />
       <Route path="/" element={<LandingPage />} />
 
