@@ -3,6 +3,14 @@ import axios from 'axios';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import './css/SelectProject.css';
+import { InputLabel } from '@mui/material';
+
+interface Usuario {
+  url_avatar: string;
+  nombre_usuario: string;
+  name_usuario: string;
+  surname_usuario: string;
+}
 
 const SetProjectDetails: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -18,6 +26,7 @@ const SetProjectDetails: React.FC = () => {
   const [numeroEtapas, setNumeroEtapas] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   useEffect(() => {
     if (!nombreProyecto) {
@@ -44,6 +53,29 @@ const SetProjectDetails: React.FC = () => {
 
       fetchProyecto();
     }
+
+    const fetchUsuario = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const response = await axios.get('http://localhost:4444/api/usuario/actual', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 200) {
+          setUsuario(response.data);
+        } else {
+          console.error('Failed to fetch user data');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUsuario();
   }, [projectId, nombreProyecto]);
 
   const formatDateForBackend = (dateString: string): string => {
@@ -121,7 +153,22 @@ const SetProjectDetails: React.FC = () => {
   return (
     <div className="page-container">
       <button className="back-button" onClick={() => navigate(-1)}>Regresar</button>
+      
+      <div className="user-info-container">
+        <div className="user-info">
+          <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>
+          <span>{usuario ? usuario.nombre_usuario : 'User Role'}</span>
+        </div>
+        <div className="avatar-circle">
+          <img 
+            src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
+            alt="User Avatar" 
+          />
+        </div>
+      </div>
+
       <div className="create-form">
+        <InputLabel>Fecha de inicio</InputLabel>
         <input
           type="date"
           placeholder="Fecha de Inicio"
@@ -130,6 +177,7 @@ const SetProjectDetails: React.FC = () => {
           onChange={(e) => setFechaInicio(e.target.value)}
           required
         />
+        <InputLabel>Fecha de fin</InputLabel>
         <input
           type="date"
           placeholder="Fecha de Fin"
@@ -138,6 +186,7 @@ const SetProjectDetails: React.FC = () => {
           onChange={(e) => setFechaFin(e.target.value)}
           required
         />
+        <InputLabel>Estado del proyecto</InputLabel>
         <input
           type="text"
           placeholder="Estado del Proyecto"
@@ -146,12 +195,14 @@ const SetProjectDetails: React.FC = () => {
           required
           disabled
         />
+        <InputLabel>Metodología</InputLabel>
         <select
           value={metodologia}
           onChange={(e) => setMetodologia(e.target.value)}
         >
           <option value="Scrum">Scrum</option>
         </select>
+        <InputLabel>Número de etapas</InputLabel>
         <select
           value={numeroEtapas}
           onChange={(e) => setNumeroEtapas(Number(e.target.value))}

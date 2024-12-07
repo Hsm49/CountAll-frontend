@@ -7,6 +7,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import './css/SelectProject.css';
 
+interface Usuario {
+  url_avatar: string;
+  nombre_usuario: string;
+  name_usuario: string;
+  surname_usuario: string;
+}
+
 interface Proyecto {
   id_proyecto: number;
   nombre_proyecto: string;
@@ -23,6 +30,7 @@ const SelectProject: React.FC = () => {
   
   const navigate = useNavigate();
   const { setSelectedProject } = useContext(ProjectTeamContext)!;
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   useEffect(() => {
     const fetchProyectos = async () => {
@@ -46,7 +54,29 @@ const SelectProject: React.FC = () => {
       }
     };
 
+    const fetchUsuario = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const response = await axios.get('http://localhost:4444/api/usuario/actual', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 200) {
+          setUsuario(response.data);
+        } else {
+          console.error('Failed to fetch user data');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
     fetchProyectos();
+    fetchUsuario();
   }, []);
 
   const handleProjectClick = (proyecto: Proyecto) => {
@@ -110,6 +140,19 @@ const SelectProject: React.FC = () => {
         <h2>Bienvenido a CountAll</h2>
         <p className="skip-link" onClick={handleSkipToTeams}>¿Ya perteneces a un equipo? Haz clic aquí</p>
         
+        <div className="user-info-container">
+          <div className="user-info">
+            <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>
+            <span>{usuario ? usuario.nombre_usuario : 'User Role'}</span>
+          </div>
+          <div className="avatar-circle">
+            <img 
+              src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
+              alt="User Avatar" 
+            />
+          </div>
+        </div>
+
         {!isCreating ? (
           <>
             {proyectos.length === 0 ? (

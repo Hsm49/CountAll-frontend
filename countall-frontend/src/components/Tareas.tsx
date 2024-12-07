@@ -599,7 +599,7 @@ const Tarea: React.FC = () => {
                     <ListItemIcon>
                       <FaCheck />
                     </ListItemIcon>
-                    <ListItemText>Desbloquear tarea</ListItemText>
+                    <ListItemText>Devolver tarea</ListItemText>
                   </MenuItem>
                 )}
                 {userRole === 'Líder' && task.status === 'completado' && (

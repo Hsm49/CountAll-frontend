@@ -6,6 +6,13 @@ import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import LoadingScreen from './LoadingScreen';
 import './css/SelectProject.css';
 
+interface Usuario {
+  url_avatar: string;
+  nombre_usuario: string;
+  name_usuario: string;
+  surname_usuario: string;
+}
+
 interface Equipo {
   id_equipo: number;
   nombre_equipo: string;
@@ -18,9 +25,10 @@ const SelectTeamUser: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
 
   const navigate = useNavigate();
-  const { setSelectedTeam, userRole, setUserRole } = useContext(ProjectTeamContext)!;
+  const { setSelectedTeam, setUserRole } = useContext(ProjectTeamContext)!;
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -34,6 +42,7 @@ const SelectTeamUser: React.FC = () => {
           }
         });
         setCurrentUser(response.data.nombre_usuario);
+        setUsuario(response.data);
       } catch (error) {
         console.error('Error fetching current user:', error);
       }
@@ -104,6 +113,19 @@ const SelectTeamUser: React.FC = () => {
         <button className="back-button" onClick={() => navigate(-1)}>Regresar</button>
         <h2>Mis Equipos</h2>
         
+        <div className="user-info-container">
+          <div className="user-info">
+            <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>
+            <span>{usuario ? usuario.nombre_usuario : 'User Role'}</span>
+          </div>
+          <div className="avatar-circle">
+            <img 
+              src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
+              alt="User Avatar" 
+            />
+          </div>
+        </div>
+
         {equipos.length === 0 ? (
           <div className="empty-state">
             <h3>No tienes equipos disponibles.</h3>

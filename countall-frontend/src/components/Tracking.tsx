@@ -14,17 +14,6 @@ const Tracking: React.FC = () => {
         <div className="tracking-container">
             {/* Recuadros de información */}
             <div>
-                {/* Selector para el periodo de tiempo */}
-                <select 
-                    className="time-frame-select mb-3"
-                    value={timeFrame}
-                    onChange={(e) => setTimeFrame(e.target.value)}
-                    >
-                    <option value="semana">Semana</option>
-                    <option value="mes">Mes</option>
-                    <option value="dia">Día</option>
-                </select>
-
                 <div className="info-cards">
                     <div className="score-card">
                         <div className="score-icon">
@@ -42,24 +31,9 @@ const Tracking: React.FC = () => {
                         <div className="score-content">
                             <h3>Tareas Completadas</h3>
                             <p className="score">10 / 15</p>
-                        </div>
-                    </div>
-                    <div className="score-card">
-                        <div className="score-icon">
-                            <FaClock />
-                        </div>
-                        <div className="score-content">
-                            <h3>Tiempo Trabajado</h3>
-                            <p className="score">5 horas</p>
-                        </div>
-                    </div>
-                    <div className="score-card">
-                        <div className="score-icon">
-                            <FaGlobe />
-                        </div>
-                        <div className="score-content">
-                            <h3>Tiempo en la Web</h3>
-                            <p className="score">3 horas</p>
+                            <div className="completion-bar">
+                                <div className="completion-progress" style={{ width: '66.67%' }}></div>
+                            </div>
                         </div>
                     </div>
                 </div>
