@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import './css/Details.css';
 
 interface Proyecto {
@@ -16,6 +17,7 @@ interface Proyecto {
 const ProjectDetails: React.FC = () => {
   const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
   const [proyecto, setProyecto] = useState<Proyecto | null>(null);
+  const { userRole } = useContext(ProjectTeamContext)!;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,8 +81,12 @@ const ProjectDetails: React.FC = () => {
         <p>Fecha de fin: {new Date(proyecto.fecha_fin_proyecto).toLocaleDateString()}</p>
         <p>Metodología: {proyecto.metodologia_proyecto}</p>
         <p>Estado: {proyecto.estado_proyecto}</p>
-        <button onClick={handleModifyProject} className="btn-naranja">Modificar Proyecto</button>
-        <button onClick={handleGenerateSummary} className="btn-naranja">Generar Resumen del Proyecto</button>
+        {userRole === 'Líder' && (
+        <div className="button-group">
+          <button onClick={handleModifyProject} className="btn-naranja">Modificar Proyecto</button>
+          <button onClick={handleGenerateSummary} className="btn-naranja">Generar Resumen del Proyecto</button>
+        </div>
+      )}
       </div>
     </div>
   );

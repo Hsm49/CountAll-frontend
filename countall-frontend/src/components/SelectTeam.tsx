@@ -346,9 +346,8 @@ const SelectTeam: React.FC = () => {
                 <button 
                   type="button" 
                   onClick={() => setIsCreating(false)}
-                  className="cancel-btn"
-                >
-                  Cancelar
+                  className="cancel-btn" disabled={createLoading}>
+                  {createLoading ? 'Creando...' : 'Cancelar'}
                 </button>
               </div>
             </form>

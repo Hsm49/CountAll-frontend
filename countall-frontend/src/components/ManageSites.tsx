@@ -296,13 +296,13 @@ const ManageSites = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <SiteList 
-        title="Sitios del Equipo" 
+        title="Sitios bloqueados para el equipo" 
         sites={teamSites}
         isTeamSite={true}
       />
       
       <SiteList 
-        title="Sitios Personales" 
+        title="Sitios bloqueados de forma personal" 
         sites={personalSites}
         isTeamSite={false}
       />
