@@ -28,7 +28,8 @@ const SelectProject: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
-  
+  const [searchTerm, setSearchTerm] = useState('');
+
   const navigate = useNavigate();
   const { setSelectedProject } = useContext(ProjectTeamContext)!;
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -126,6 +127,10 @@ const SelectProject: React.FC = () => {
     navigate('/select-team-user');
   };
 
+  const filteredProyectos = proyectos.filter(proyecto =>
+    proyecto.nombre_proyecto.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>{error}</div>;
 
@@ -154,9 +159,19 @@ const SelectProject: React.FC = () => {
           </div>
         </div>
 
+        {filteredProyectos.length > 0 && (
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Buscar proyecto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        )}
+
         {!isCreating ? (
           <>
-            {proyectos.length === 0 ? (
+            {filteredProyectos.length === 0 ? (
               <div className="empty-state">
                 <h3>Para empezar, crea un nuevo proyecto:</h3>
                 <button 
@@ -170,7 +185,7 @@ const SelectProject: React.FC = () => {
               <>
                 <h3>Selecciona un proyecto:</h3>
                 <div className="project-cards-grid">
-                  {proyectos.map((proyecto) => (
+                  {filteredProyectos.map((proyecto) => (
                     <div 
                       key={proyecto.id_proyecto} 
                       className="project-card" 

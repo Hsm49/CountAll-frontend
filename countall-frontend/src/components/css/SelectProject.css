@@ -348,6 +348,24 @@
     transform: translateY(20px);
     transition: opacity 300ms, transform 300ms;
   }
+
+  .search-bar {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .search-bar:focus {
+    outline: none;
+    border-color: #1b70a6;
+    box-shadow: 0 0 0 2px rgba(27, 112, 166, 0.1);
+  }
   
   /* Responsive */
   @media (max-width: 768px) {

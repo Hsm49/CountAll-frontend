@@ -36,6 +36,7 @@ const SelectTeam: React.FC = () => {
   const [emailError, setEmailError] = useState('');
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
   const { setSelectedTeam, selectedProject, setUserRole } = useContext(ProjectTeamContext)!;
@@ -237,6 +238,10 @@ const SelectTeam: React.FC = () => {
     }
   };
 
+  const filteredEquipos = equipos.filter(equipo =>
+    equipo.nombre_equipo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) return <LoadingScreen />;
   if (error) return <div>{error}</div>;
 
@@ -265,9 +270,19 @@ const SelectTeam: React.FC = () => {
           </div>
         </div>
 
+        {filteredEquipos.length > 0 && (
+        <input
+          type="text"
+          className="search-bar"
+          placeholder="Buscar equipo..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        )}
+
         {!isCreating ? (
           <>
-            {equipos.length === 0 ? (
+            {filteredEquipos.length === 0 ? (
               <div className="empty-state">
                 <h3>Para continuar, crea un nuevo equipo:</h3>
                 <button 
@@ -281,7 +296,7 @@ const SelectTeam: React.FC = () => {
               <>
                 <h3>Selecciona un equipo:</h3>
                 <div className="team-cards-grid">
-                  {equipos.map((equipo) => (
+                  {filteredEquipos.map((equipo) => (
                     <div 
                       key={equipo.id_equipo} 
                       className="team-card" 

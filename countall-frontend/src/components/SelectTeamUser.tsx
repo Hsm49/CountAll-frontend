@@ -26,6 +26,7 @@ const SelectTeamUser: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
   const { setSelectedTeam, setUserRole } = useContext(ProjectTeamContext)!;
@@ -98,6 +99,10 @@ const SelectTeamUser: React.FC = () => {
     }, 300);
   };
 
+  const filteredEquipos = equipos.filter(equipo =>
+    equipo.nombre_equipo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   if (loading) return <LoadingScreen />;
   if (error) return <div>{error}</div>;
 
@@ -126,7 +131,17 @@ const SelectTeamUser: React.FC = () => {
           </div>
         </div>
 
-        {equipos.length === 0 ? (
+        {filteredEquipos.length > 0 && (
+        <input
+          type="text"
+          className="search-bar"
+          placeholder="Buscar equipo..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      )}
+
+        {filteredEquipos.length === 0 ? (
           <div className="empty-state">
             <h3>No tienes equipos disponibles.</h3>
           </div>
@@ -134,7 +149,7 @@ const SelectTeamUser: React.FC = () => {
           <>
             <h3>Selecciona un equipo:</h3>
             <div className="team-cards-grid">
-              {equipos.map((equipo) => (
+              {filteredEquipos.map((equipo) => (
                 <div 
                   key={equipo.id_equipo} 
                   className="team-card" 
