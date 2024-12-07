@@ -1,35 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './css/RecoverPassword.css';
 
 const NewPassword: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { token } = useParams<{ token: string }>();
+  const [isTokenValid, setIsTokenValid] = useState<boolean | null>(null);
 
-    const formik = useFormik({
-      initialValues: {
-        newPassword: '',
-        confirmPassword: '',
-      },
-      validationSchema: Yup.object({
-        newPassword: Yup.string()
-          .min(6, 'La contraseña debe tener al menos 6 caracteres')
-          .required('Ingresa una nueva contraseña'),
-        confirmPassword: Yup.string()
-          .oneOf([Yup.ref('newPassword')], 'Las contraseñas deben coincidir')
-          .required('Confirma la contraseña'),
-      }),
-      onSubmit: (values) => {
-        // Lógica para crear la nueva contraseña
-        console.log(values);
-        alert('Contraseña cambiada exitosamente');
-        navigate('/password-saved'); 
-      },
-    });
+  // Verificar la validez del token al cargar la página
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const response = await fetch(`http://localhost:4444/api/usuario/comprobarToken/${token}`);
+        if (response.ok) {
+          setIsTokenValid(true);
+        } else {
+          setIsTokenValid(false);
+        }
+      } catch (error) {
+        console.error('Error verificando el token:', error);
+        setIsTokenValid(false);
+      }
+    };
+
+    if (token) {
+      checkToken();
+    }
+  }, [token]);
+
+  // Configuración de Formik para manejar el formulario
+  const formik = useFormik({
+    initialValues: {
+      newPassword: '',
+      confirmPassword: '',
+    },
+    validationSchema: Yup.object({
+      newPassword: Yup.string()
+        .min(6, 'La contraseña debe tener al menos 6 caracteres')
+        .required('Ingresa una nueva contraseña'),
+      confirmPassword: Yup.string()
+        .oneOf([Yup.ref('newPassword')], 'Las contraseñas deben coincidir')
+        .required('Confirma la contraseña'),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const response = await fetch(`http://localhost:4444/api/usuario/reestablecerPassword/${token}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nuevo_password: values.newPassword }),
+        });
+
+        if (response.ok) {
+          alert('Contraseña cambiada exitosamente');
+          navigate('/password-saved');
+        } else {
+          const data = await response.json();
+          alert(data.message || 'Hubo un error al restablecer la contraseña.');
+        }
+      } catch (error) {
+        console.error('Error al restablecer la contraseña:', error);
+        alert('Ocurrió un error inesperado. Inténtalo nuevamente.');
+      }
+    },
+  });
+
+  // Si el token no es válido, mostrar un mensaje de error
+  if (isTokenValid === false) {
+    return (
+      <div className="main-content">
+        <div className="recover-container">
+          <h2>Enlace inválido o expirado</h2>
+          <p>El enlace para restablecer la contraseña no es válido o ya ha expirado.</p>
+          <button className="btn-azul" onClick={() => navigate('/')}>
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar un indicador de carga mientras se verifica el token
+  if (isTokenValid === null) {
+    return (
+      <div className="main-content">
+        <div className="recover-container">
+          <p>Verificando el enlace...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <>
     <div className="main-content">
       <div className="recover-container">
         <div className="pass-container">
@@ -70,7 +135,6 @@ const NewPassword: React.FC = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 
