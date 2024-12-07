@@ -145,7 +145,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
         title: task.title,
         description: task.description,
         priority: task.priority.charAt(0).toUpperCase() + task.priority.slice(1),
-        difficulty: task.difficulty.charAt(0).toUpperCase() + task.priority.slice(1),
+        difficulty: task.difficulty.charAt(0).toUpperCase() + task.difficulty.slice(1), // Corregido aquí
         assignees: task.assignees,
         comments: task.comments,
         status: task.status,
