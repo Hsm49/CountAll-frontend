@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './css/ConfirmSignUp.css';
+import authenticationImage from '../assets/svg/authentication.svg'; // Importa la imagen
 
 const AccountVerified: React.FC = () => {
   const navigate = useNavigate();
@@ -21,9 +22,7 @@ const AccountVerified: React.FC = () => {
         const response = await fetch(`http://localhost:4444/api/usuario/confirmarUsuario/${token}`);
         if (response.ok) {
           setVerificationStatus('success');
-        } else {
-          setVerificationStatus('error');
-        }
+        } 
       } catch (error) {
         setVerificationStatus('error');
       }
@@ -42,7 +41,7 @@ const AccountVerified: React.FC = () => {
             <h1 className="text-center mb-4">Cuenta verificada</h1>
             <p className="text-center mb-4">Se ha verificado la cuenta correctamente.</p>
             <div className="text-center mb-4">
-              <img src="src/assets/svg/authentication.svg" alt="Correo verificado" className="email-img" />
+              <img src={authenticationImage} alt="Correo verificado" className="email-img" /> {/* Usa la imagen importada */}
             </div>
             <div className="buttons-container">
               <button className="btn-naranja" onClick={handleLogin}>

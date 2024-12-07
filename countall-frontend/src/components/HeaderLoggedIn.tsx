@@ -7,6 +7,9 @@ import './css/HeaderLoggedIn.css';
 import axios from 'axios';
 import LoadingScreen from './LoadingScreen';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
+import logoCountAll from '../assets/img/logos/CA2.png';
+import logoCountAll2 from '../assets/img/logos/CA3.png';
+import defaultAvatar from '../assets/img/avatars/A1.jpg';
 
 type Theme = 'light' | 'dark';
 
@@ -82,7 +85,10 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
         });
 
         if (response.status === 200) {
-          setUsuario(response.data);
+          const userData = response.data;
+          const avatarFileName = userData.url_avatar.split('/').pop();
+          const fullAvatarPath = `/src/assets/img/avatars/${avatarFileName}`;
+          setUsuario({ ...userData, url_avatar: fullAvatarPath });
         } else {
           console.error('Failed to fetch user data');
         }
@@ -157,7 +163,7 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
       >
         <div className="sidebar-header">
           <img 
-            src={collapsed ? "src/assets/img/logos/CA3.png" : "src/assets/img/logos/CA2.png"} 
+            src={collapsed ? logoCountAll2 : logoCountAll} 
             alt="Logo" 
             className={`logo ${collapsed ? 'collapsed' : ''}`} 
           />
@@ -212,7 +218,7 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
                 </div>
                 <div className="avatar-circle">
                     <img 
-                        src={usuario ? usuario.url_avatar : 'src/assets/img/avatars/A1.jpg'} 
+                        src={usuario ? usuario.url_avatar : defaultAvatar} 
                         alt="User Avatar" 
                     />
                 </div>

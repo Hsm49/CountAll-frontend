@@ -1,6 +1,7 @@
 import React from 'react';
 import './css/HeaderLg.css';
 import { useNavigate } from 'react-router-dom';
+import logoCountAll from '../assets/img/logos/CA2.png';
 
 const HeaderLg: React.FC = () => {
   const navigate = useNavigate(); 
@@ -10,7 +11,7 @@ const HeaderLg: React.FC = () => {
       <div className="container">
         <div className="logo">
           <img
-            src="src/assets/img/logos/CA2.png"
+            src={logoCountAll}
             alt="Logo"
             className="logo-img"
             onClick={() => navigate('/')} 
