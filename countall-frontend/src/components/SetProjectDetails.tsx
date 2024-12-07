@@ -66,7 +66,10 @@ const SetProjectDetails: React.FC = () => {
         });
 
         if (response.status === 200) {
-          setUsuario(response.data);
+          const userData = response.data;
+          const avatarFileName = userData.url_avatar.split('/').pop();
+          const fullAvatarPath = `/src/assets/img/avatars/${avatarFileName}`;
+          setUsuario({ ...userData, url_avatar: fullAvatarPath });
         } else {
           console.error('Failed to fetch user data');
         }
@@ -154,6 +157,9 @@ const SetProjectDetails: React.FC = () => {
     <div className="page-container">
       <button className="back-button" onClick={() => navigate(-1)}>Regresar</button>
       
+      <h2>Proyecto: {nombreProyecto}</h2>
+      <h4>Ingresa los detalles del proyecto</h4>
+
       <div className="user-info-container">
         <div className="user-info">
           <strong>{usuario ? `${usuario.name_usuario} ${usuario.surname_usuario}` : 'John Doe'}</strong>

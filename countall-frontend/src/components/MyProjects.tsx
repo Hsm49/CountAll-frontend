@@ -7,6 +7,7 @@ interface Proyecto {
   id_proyecto: number;
   nombre_proyecto: string;
   descr_proyecto: string;
+  estado_proyecto: string; 
 }
 
 const MyProjects: React.FC = () => {
@@ -54,6 +55,7 @@ const MyProjects: React.FC = () => {
         <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
           <h3>{proyecto.nombre_proyecto}</h3>
           <p>{proyecto.descr_proyecto}</p>
+          <p><strong>Estado:</strong> {proyecto.estado_proyecto}</p>
         </div>
       ))}
     </div>

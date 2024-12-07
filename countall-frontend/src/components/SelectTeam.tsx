@@ -5,6 +5,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import LoadingScreen from './LoadingScreen';
 import { FaTrash } from 'react-icons/fa';
+import Swal from 'sweetalert2';
 import './css/SelectProject.css';
 
 interface Usuario {
@@ -28,10 +29,11 @@ const SelectTeam: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [nombreEquipo, setNombreEquipo] = useState('');
   const [descrEquipo, setDescrEquipo] = useState('');
-  const [usuarios, setUsuarios] = useState<string[]>([]);
-  const [newUser, setNewUser] = useState('');
+  const [usuarios, setUsuarios] = useState<{ email: string; role: 'Lider' | 'Miembro' | 'Invitado' }[]>([]);
+  const [newEmails, setNewEmails] = useState<string>('');
   const [createLoading, setCreateLoading] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState('');
   const [currentUser, setCurrentUser] = useState<string | null>(null);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
 
@@ -57,8 +59,11 @@ const SelectTeam: React.FC = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        setCurrentUser(response.data.nombre_usuario);
-        setUsuario(response.data);
+        const userData = response.data;
+        const avatarFileName = userData.url_avatar.split('/').pop();
+        const fullAvatarPath = `/src/assets/img/avatars/${avatarFileName}`;
+        setCurrentUser(userData.nombre_usuario);
+        setUsuario({ ...userData, url_avatar: fullAvatarPath });
       } catch (error) {
         console.error('Error fetching current user:', error);
       }
@@ -131,15 +136,41 @@ const SelectTeam: React.FC = () => {
     }, 300);
   };
 
-  const handleAddUser = () => {
-    if (newUser && !usuarios.includes(newUser)) {
-      setUsuarios([...usuarios, newUser]);
-      setNewUser('');
+  const validateEmails = (emailString: string) => {
+    const emailArray = emailString.split(',').map(email => email.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    for (const email of emailArray) {
+      if (!emailRegex.test(email)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleEmailsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const emailString = event.target.value;
+    setNewEmails(emailString);
+    if (validateEmails(emailString)) {
+      setEmailError('');
+    } else {
+      setEmailError('Por favor agrega direcciones de correo válidas separadas por comas.');
     }
   };
 
-  const handleRemoveUser = (userToRemove: string) => {
-    setUsuarios(usuarios.filter(user => user !== userToRemove));
+  const handleAddEmails = () => {
+    if (!validateEmails(newEmails)) {
+      setEmailError('Por favor agrega direcciones de correo válidas separadas por comas.');
+      return;
+    }
+
+    const emails = newEmails.split(',').map(email => email.trim()).filter(email => email);
+    const newEmailList = emails.map(email => ({ email, role: 'Miembro' as 'Lider' | 'Miembro' | 'Invitado' }));
+    setUsuarios(newEmailList);
+  };
+
+  const handleRemoveEmail = (emailToRemove: string) => {
+    const updatedEmailList = usuarios.filter(({ email }) => email !== emailToRemove);
+    setUsuarios(updatedEmailList);
   };
 
   const handleCreateTeam = async (e: React.FormEvent) => {
@@ -149,7 +180,7 @@ const SelectTeam: React.FC = () => {
 
     // If no users are added, add the current user by default
     if (usuarios.length === 0 && currentUser) {
-      setUsuarios([currentUser]);
+      setUsuarios([{ email: currentUser, role: 'Miembro' }]);
     }
 
     try {
@@ -157,7 +188,7 @@ const SelectTeam: React.FC = () => {
       const response = await axios.post('http://localhost:4444/api/equipo/crearEquipo', {
         nombre_equipo: nombreEquipo,
         descr_equipo: descrEquipo,
-        usuarios,
+        usuarios: usuarios.map(user => user.email),
         proyecto: nombre_proyecto
       }, {
         headers: {
@@ -290,17 +321,18 @@ const SelectTeam: React.FC = () => {
               <div className="user-input">
                 <input
                   type="text"
-                  placeholder="Agregar Usuario"
-                  value={newUser}
-                  onChange={(e) => setNewUser(e.target.value)}
+                  placeholder="Agregar Usuarios por Correo (separados por comas)"
+                  value={newEmails}
+                  onChange={handleEmailsChange}
                 />
-                <button type="button" onClick={handleAddUser}>Agregar</button>
+                <button type="button" onClick={handleAddEmails}>Agregar</button>
               </div>
+              {emailError && <p className="error">{emailError}</p>}
               <ul>
                 {usuarios.map((user, index) => (
                   <li key={index}>
-                    {user}
-                    <button type="button" onClick={() => handleRemoveUser(user)}>
+                    {user.email}
+                    <button type="button" onClick={() => handleRemoveEmail(user.email)}>
                       <FaTrash />
                     </button>
                   </li>
