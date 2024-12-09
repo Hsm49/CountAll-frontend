@@ -7,6 +7,7 @@ interface Equipo {
   id_equipo: number;
   nombre_equipo: string;
   descr_equipo: string;
+  nombre_proyecto: string; // Añadido para almacenar el nombre del proyecto
 }
 
 const MyTeams: React.FC = () => {
@@ -46,6 +47,7 @@ const MyTeams: React.FC = () => {
         <div key={equipo.id_equipo} className="project-card" onClick={() => handleTeamClick(equipo.id_equipo)}>
           <h3>{equipo.nombre_equipo}</h3>
           <p>{equipo.descr_equipo}</p>
+          <p><strong>Proyecto:</strong> {equipo.nombre_proyecto}</p>
         </div>
       ))}
     </div>

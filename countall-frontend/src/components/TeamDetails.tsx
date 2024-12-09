@@ -14,6 +14,7 @@ interface Equipo {
   id_equipo: number;
   nombre_equipo: string;
   descr_equipo: string;
+  nombre_proyecto: string; // Añadido para almacenar el nombre del proyecto
   integrantes_equipo: Integrante[];
 }
 
@@ -57,6 +58,7 @@ const TeamDetails: React.FC = () => {
       <div className="details-card">
         <h2>{equipo.nombre_equipo}</h2>
         <p>{equipo.descr_equipo}</p>
+        <p><strong>Proyecto:</strong> {equipo.nombre_proyecto}</p> {/* Añadido para mostrar el nombre del proyecto */}
         <p>Rol en la sesión: {rolSesion}</p>
         <h3>Integrantes del equipo:</h3>
         <ul>

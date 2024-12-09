@@ -17,6 +17,7 @@ interface Equipo {
   id_equipo: number;
   nombre_equipo: string;
   descr_equipo: string;
+  nombre_proyecto: string;
 }
 
 const SelectTeamUser: React.FC = () => {
@@ -162,6 +163,7 @@ const SelectTeamUser: React.FC = () => {
                   >
                     <h3>{equipo.nombre_equipo}</h3>
                     <p>{equipo.descr_equipo}</p>
+                    <p><strong>Proyecto:</strong> {equipo.nombre_proyecto}</p>
                   </div>
                 ))}
               </div>
