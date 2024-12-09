@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { FaTrophy, FaCheck, FaArrowUp, FaCog } from 'react-icons/fa';
+import { FaTrophy, FaCheck, FaCog } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import './css/Leaderboard.css';
 import LeaderboardTable from './LeaderboardTable';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
+import axios from 'axios';
 
 interface Clasificacion {
   id_usuario_fk_UE: number;
@@ -23,6 +24,27 @@ const Leaderboard: React.FC = () => {
   const { selectedTeam, userRole } = useContext(ProjectTeamContext)!;
   const navigate = useNavigate();
   const [premio, setPremio] = useState<string>('Avatar de rareza alta');
+  const [totalPoints, setTotalPoints] = useState<number>(0);
+  const [completedTasks, setCompletedTasks] = useState<number>(0);
+  const [totalTasks, setTotalTasks] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchUsuarioActual = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:4444/api/usuario/actual', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUsuarioId(response.data.id_usuario);
+      } catch (error) {
+        console.error('Error fetching usuario actual:', error);
+      }
+    };
+
+    fetchUsuarioActual();
+  }, []);
 
   useEffect(() => {
     const fetchClasificaciones = async () => {
@@ -46,16 +68,40 @@ const Leaderboard: React.FC = () => {
         const data = await response.json();
         setClasificaciones(data);
 
-        const usuario = JSON.parse(localStorage.getItem('usuario') || '{}');
-        setUsuarioId(usuario.id_usuario);
+        const currentUser = data.find((member: any) => member.id_usuario_fk_UE === usuarioId);
+        if (currentUser) {
+          setTotalPoints(currentUser.puntuacion_local);
+        }
       } catch (error) {
         console.error('Error fetching clasificaciones:', error);
         setError('Error al recuperar la información de las clasificaciones. Por favor, inténtalo de nuevo más tarde.');
       }
     };
 
+    const fetchTasks = async () => {
+      if (!selectedTeam) return;
+
+      const token = localStorage.getItem('token');
+      try {
+        const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${selectedTeam.id_equipo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const teamMembers = response.data.equipo.integrantes_equipo;
+        const currentUser = teamMembers.find((member: any) => member.id_usuario === usuarioId);
+        if (currentUser) {
+          setCompletedTasks(currentUser.tareas_completadas);
+          setTotalTasks(currentUser.tareas_asignadas);
+        }
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
     fetchClasificaciones();
-  }, [selectedTeam]);
+    fetchTasks();
+  }, [selectedTeam, usuarioId]);
 
   const handleConfigClick = () => {
     navigate('/leaderboard-config');
@@ -65,10 +111,10 @@ const Leaderboard: React.FC = () => {
     <div className="content-wrapper">
       {/* Config Button */}
       {userRole === 'Líder' && (
-          <button className="config-button mb-4 btn-naranja" onClick={handleConfigClick}>
-            <FaCog /> Configurar clasificatorias
-          </button>
-        )}
+        <button className="config-button mb-4 btn-naranja" onClick={handleConfigClick}>
+          <FaCog /> Configurar clasificatorias
+        </button>
+      )}
       <div className="ranking-container">
         {/* User Scores Section */}
         <div className="user-scores">
@@ -78,11 +124,7 @@ const Leaderboard: React.FC = () => {
             </div>
             <div className="score-content">
               <h3>Puntos totales</h3>
-              <p className="score">1250</p>
-              <div className="score-trend positive">
-                <FaArrowUp />
-                <small>Aumento del 5% desde el último mes</small>
-              </div>
+              <p className="score">{totalPoints}</p>
             </div>
           </div>
           
@@ -92,9 +134,9 @@ const Leaderboard: React.FC = () => {
             </div>
             <div className="score-content">
               <h3>Tareas completadas</h3>
-              <p className="score">10 / 15</p>
+              <p className="score">{completedTasks} / {totalTasks}</p>
               <div className="completion-bar">
-                <div className="completion-progress" style={{ width: '66.67%' }}></div>
+                <div className="completion-progress" style={{ width: `${(completedTasks / totalTasks) * 100}%` }}></div>
               </div>
             </div>
           </div>

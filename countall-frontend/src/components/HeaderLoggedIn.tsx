@@ -198,18 +198,7 @@ const HeaderLoggedIn: React.FC<HeaderLoggedInProps> = ({ title, children }) => {
           </div>
 
           <div className="right-side">
-            <button 
-              className="icon-button notification-button"
-              onClick={() => navigate('/notifications')}
-            >
-              <FaBell style={{ color: iconColor }} />
-            </button>
-            <button 
-              className="icon-button config-button"
-              onClick={() => navigate('/config')}
-            >
-              <FaCog style={{ color: iconColor }} />
-            </button>
+            
             <div className="profile-button-container">
               <div className="profile-button">
                 <div className="user-info">
