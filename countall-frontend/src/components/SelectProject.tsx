@@ -159,7 +159,7 @@ const SelectProject: React.FC = () => {
           </div>
         </div>
 
-        {filteredProyectos.length > 0 && (
+        {proyectos.length > 0 && (
           <input
             type="text"
             className="search-bar"
@@ -171,7 +171,7 @@ const SelectProject: React.FC = () => {
 
         {!isCreating ? (
           <>
-            {filteredProyectos.length === 0 ? (
+            {proyectos.length === 0 ? (
               <div className="empty-state">
                 <h3>Para empezar, crea un nuevo proyecto:</h3>
                 <button 
@@ -184,19 +184,25 @@ const SelectProject: React.FC = () => {
             ) : (
               <>
                 <h3>Selecciona un proyecto:</h3>
-                <div className="project-cards-grid">
-                  {filteredProyectos.map((proyecto) => (
-                    <div 
-                      key={proyecto.id_proyecto} 
-                      className="project-card" 
-                      onClick={() => handleProjectClick(proyecto)}
-                    >
-                      <h3>{proyecto.nombre_proyecto}</h3>
-                      <p>{proyecto.descr_proyecto}</p>
-                      <p><strong>Estado:</strong> {proyecto.estado_proyecto}</p>
-                    </div>
-                  ))}
-                </div>
+                {filteredProyectos.length === 0 ? (
+                  <div className="empty-state">
+                    <h3>No se encontraron proyectos con ese nombre.</h3>
+                  </div>
+                ) : (
+                  <div className="project-cards-grid">
+                    {filteredProyectos.map((proyecto) => (
+                      <div 
+                        key={proyecto.id_proyecto} 
+                        className="project-card" 
+                        onClick={() => handleProjectClick(proyecto)}
+                      >
+                        <h3>{proyecto.nombre_proyecto}</h3>
+                        <p>{proyecto.descr_proyecto}</p>
+                        <p><strong>Estado:</strong> {proyecto.estado_proyecto}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <button 
                   className="create-project-btn" 
                   onClick={() => setIsCreating(true)}

@@ -270,19 +270,19 @@ const SelectTeam: React.FC = () => {
           </div>
         </div>
 
-        {filteredEquipos.length > 0 && (
-        <input
-          type="text"
-          className="search-bar"
-          placeholder="Buscar equipo..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        {equipos.length > 0 && (
+          <input
+            type="text"
+            className="search-bar"
+            placeholder="Buscar equipo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         )}
 
         {!isCreating ? (
           <>
-            {filteredEquipos.length === 0 ? (
+            {equipos.length === 0 ? (
               <div className="empty-state">
                 <h3>Para continuar, crea un nuevo equipo:</h3>
                 <button 
@@ -295,18 +295,24 @@ const SelectTeam: React.FC = () => {
             ) : (
               <>
                 <h3>Selecciona un equipo:</h3>
-                <div className="team-cards-grid">
-                  {filteredEquipos.map((equipo) => (
-                    <div 
-                      key={equipo.id_equipo} 
-                      className="team-card" 
-                      onClick={() => handleTeamClick(equipo)}
-                    >
-                      <h3>{equipo.nombre_equipo}</h3>
-                      <p>{equipo.descr_equipo}</p>
-                    </div>
-                  ))}
-                </div>
+                {filteredEquipos.length === 0 ? (
+                  <div className="empty-state">
+                    <h3>No se encontraron equipos con ese nombre.</h3>
+                  </div>
+                ) : (
+                  <div className="team-cards-grid">
+                    {filteredEquipos.map((equipo) => (
+                      <div 
+                        key={equipo.id_equipo} 
+                        className="team-card" 
+                        onClick={() => handleTeamClick(equipo)}
+                      >
+                        <h3>{equipo.nombre_equipo}</h3>
+                        <p>{equipo.descr_equipo}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <button 
                   className="create-team-btn" 
                   onClick={() => setIsCreating(true)}
