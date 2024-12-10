@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Box, CircularProgress } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
+import Swal from 'sweetalert2';
 import './css/Details.css';
 
 interface Proyecto {
@@ -78,6 +79,14 @@ const ProjectDetails: React.FC = () => {
     }
   };
 
+  const handleRealizarCOCOMO = () => {
+    navigate(`/realizar-cocomo/${nombre_proyecto}`);
+  };
+
+  const handleVerCOCOMO = () => {
+    navigate(`/mis-estimaciones/${nombre_proyecto}`);
+  };
+
   return (
     <div className="details-container mt-5">
       <div className="details-card">
@@ -91,6 +100,8 @@ const ProjectDetails: React.FC = () => {
         <div className="button-group">
           <button onClick={handleModifyProject} className="btn-naranja">Modificar Proyecto</button>
           <button onClick={handleGenerateSummary} className="btn-naranja">Generar Resumen del Proyecto</button>
+          <button onClick={handleRealizarCOCOMO} className="btn-naranja">Realizar COCOMO</button>
+          <button onClick={handleVerCOCOMO} className="btn-naranja">Ver COCOMOs</button>
         </div>
       )}
       </div>

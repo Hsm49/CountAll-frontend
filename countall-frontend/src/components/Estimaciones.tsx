@@ -3,9 +3,13 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useParams, useNavigate } from 'react-router-dom';
 import './css/Estimaciones.css';
 
 const Estimaciones: React.FC = () => {
+  const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       entradas_externas: { cantidad: '', parametro: '' },
@@ -60,7 +64,7 @@ const Estimaciones: React.FC = () => {
     onSubmit: async (values) => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.post('http://localhost:4444/api/estimacion/realizarCOCOMO/:nombre_proyecto', values, {
+        const response = await axios.post(`http://localhost:4444/api/estimacion/realizarCOCOMO/${nombre_proyecto}`, values, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -69,6 +73,8 @@ const Estimaciones: React.FC = () => {
           icon: 'success',
           title: 'Estimación realizada',
           text: 'La estimación COCOMO se ha realizado exitosamente',
+        }).then(() => {
+          navigate(`/mis-estimaciones/${nombre_proyecto}`);
         });
       } catch (error) {
         Swal.fire({
@@ -86,62 +92,154 @@ const Estimaciones: React.FC = () => {
 
   return (
     <div className="estimaciones-container">
-    <div className="chart-card">
-      <h2>Realizar Estimación COCOMO</h2>
-      <form onSubmit={formik.handleSubmit}>
-        {/* Campos del formulario */}
-        <div className="form-group">
-          <label htmlFor="entradas_externas.cantidad">Entradas Externas - Cantidad</label>
-          <input
-            type="number"
-            id="entradas_externas.cantidad"
-            {...formik.getFieldProps('entradas_externas.cantidad')}
-          />
-          {formik.touched.entradas_externas?.cantidad && formik.errors.entradas_externas?.cantidad ? (
-            <div className="error">{formik.errors.entradas_externas.cantidad}</div>
-          ) : null}
-        </div>
-        <div className="form-group">
-          <label htmlFor="entradas_externas.parametro">Entradas Externas - Parámetro</label>
-          <select id="entradas_externas.parametro" {...formik.getFieldProps('entradas_externas.parametro')}>
-            <option value="">Seleccione</option>
-            <option value="Simple">Simple</option>
-            <option value="Medio">Medio</option>
-            <option value="Complejo">Complejo</option>
-          </select>
-          {formik.touched.entradas_externas?.parametro && formik.errors.entradas_externas?.parametro ? (
-            <div className="error">{formik.errors.entradas_externas.parametro}</div>
-          ) : null}
-        </div>
-        {/* Repite los campos anteriores para salidas_externas, peticiones, archivos_logicos, archivos_interfaz */}
-        {/* Campos para respuestas */}
-        {Array.from({ length: 14 }, (_, i) => (
-          <div className="form-group" key={i}>
-            <label htmlFor={`respuestas.r${i + 1}`}>Respuesta {i + 1}</label>
+      <div className="chart-card">
+        <h2>Realizar Estimación COCOMO</h2>
+        <form onSubmit={formik.handleSubmit}>
+          {/* Campos del formulario */}
+          <div className="form-group">
+            <label htmlFor="entradas_externas.cantidad">Entradas Externas - Cantidad</label>
             <input
               type="number"
-              id={`respuestas.r${i + 1}`}
-              {...formik.getFieldProps(`respuestas.r${i + 1}`)}
+              id="entradas_externas.cantidad"
+              {...formik.getFieldProps('entradas_externas.cantidad')}
             />
-            {formik.touched.respuestas?.[`r${i + 1}` as keyof typeof formik.touched.respuestas] && formik.errors.respuestas?.[`r${i + 1}` as keyof typeof formik.errors.respuestas] ? (
-              <div className="error">{formik.errors.respuestas[`r${i + 1}` as keyof typeof formik.errors.respuestas]}</div>
+            {formik.touched.entradas_externas?.cantidad && formik.errors.entradas_externas?.cantidad ? (
+              <div className="error">{formik.errors.entradas_externas.cantidad}</div>
             ) : null}
           </div>
-        ))}
-        <div className="form-group">
-          <label htmlFor="lenguaje">Lenguaje Predominante</label>
-          <select id="lenguaje" {...formik.getFieldProps('lenguaje')}>
-            <option value="">Seleccione</option>
-            {lenguajes.map((lenguaje) => (
-              <option key={lenguaje} value={lenguaje}>{lenguaje}</option>
-            ))}
-          </select>
-          {formik.touched.lenguaje && formik.errors.lenguaje ? (
-            <div className="error">{formik.errors.lenguaje}</div>
-          ) : null}
-        </div>
-        <button type="submit" className="btn-azul">Realizar Estimación</button>
-      </form>
+          <div className="form-group">
+            <label htmlFor="entradas_externas.parametro">Entradas Externas - Parámetro</label>
+            <select id="entradas_externas.parametro" {...formik.getFieldProps('entradas_externas.parametro')}>
+              <option value="">Seleccione</option>
+              <option value="Simple">Simple</option>
+              <option value="Medio">Medio</option>
+              <option value="Complejo">Complejo</option>
+            </select>
+            {formik.touched.entradas_externas?.parametro && formik.errors.entradas_externas?.parametro ? (
+              <div className="error">{formik.errors.entradas_externas.parametro}</div>
+            ) : null}
+          </div>
+          {/* Repite los campos anteriores para salidas_externas, peticiones, archivos_logicos, archivos_interfaz */}
+          <div className="form-group">
+            <label htmlFor="salidas_externas.cantidad">Salidas Externas - Cantidad</label>
+            <input
+              type="number"
+              id="salidas_externas.cantidad"
+              {...formik.getFieldProps('salidas_externas.cantidad')}
+            />
+            {formik.touched.salidas_externas?.cantidad && formik.errors.salidas_externas?.cantidad ? (
+              <div className="error">{formik.errors.salidas_externas.cantidad}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="salidas_externas.parametro">Salidas Externas - Parámetro</label>
+            <select id="salidas_externas.parametro" {...formik.getFieldProps('salidas_externas.parametro')}>
+              <option value="">Seleccione</option>
+              <option value="Simple">Simple</option>
+              <option value="Medio">Medio</option>
+              <option value="Complejo">Complejo</option>
+            </select>
+            {formik.touched.salidas_externas?.parametro && formik.errors.salidas_externas?.parametro ? (
+              <div className="error">{formik.errors.salidas_externas.parametro}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="peticiones.cantidad">Peticiones - Cantidad</label>
+            <input
+              type="number"
+              id="peticiones.cantidad"
+              {...formik.getFieldProps('peticiones.cantidad')}
+            />
+            {formik.touched.peticiones?.cantidad && formik.errors.peticiones?.cantidad ? (
+              <div className="error">{formik.errors.peticiones.cantidad}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="peticiones.parametro">Peticiones - Parámetro</label>
+            <select id="peticiones.parametro" {...formik.getFieldProps('peticiones.parametro')}>
+              <option value="">Seleccione</option>
+              <option value="Simple">Simple</option>
+              <option value="Medio">Medio</option>
+              <option value="Complejo">Complejo</option>
+            </select>
+            {formik.touched.peticiones?.parametro && formik.errors.peticiones?.parametro ? (
+              <div className="error">{formik.errors.peticiones.parametro}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="archivos_logicos.cantidad">Archivos Lógicos - Cantidad</label>
+            <input
+              type="number"
+              id="archivos_logicos.cantidad"
+              {...formik.getFieldProps('archivos_logicos.cantidad')}
+            />
+            {formik.touched.archivos_logicos?.cantidad && formik.errors.archivos_logicos?.cantidad ? (
+              <div className="error">{formik.errors.archivos_logicos.cantidad}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="archivos_logicos.parametro">Archivos Lógicos - Parámetro</label>
+            <select id="archivos_logicos.parametro" {...formik.getFieldProps('archivos_logicos.parametro')}>
+              <option value="">Seleccione</option>
+              <option value="Simple">Simple</option>
+              <option value="Medio">Medio</option>
+              <option value="Complejo">Complejo</option>
+            </select>
+            {formik.touched.archivos_logicos?.parametro && formik.errors.archivos_logicos?.parametro ? (
+              <div className="error">{formik.errors.archivos_logicos.parametro}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="archivos_interfaz.cantidad">Archivos de Interfaz - Cantidad</label>
+            <input
+              type="number"
+              id="archivos_interfaz.cantidad"
+              {...formik.getFieldProps('archivos_interfaz.cantidad')}
+            />
+            {formik.touched.archivos_interfaz?.cantidad && formik.errors.archivos_interfaz?.cantidad ? (
+              <div className="error">{formik.errors.archivos_interfaz.cantidad}</div>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="archivos_interfaz.parametro">Archivos de Interfaz - Parámetro</label>
+            <select id="archivos_interfaz.parametro" {...formik.getFieldProps('archivos_interfaz.parametro')}>
+              <option value="">Seleccione</option>
+              <option value="Simple">Simple</option>
+              <option value="Medio">Medio</option>
+              <option value="Complejo">Complejo</option>
+            </select>
+            {formik.touched.archivos_interfaz?.parametro && formik.errors.archivos_interfaz?.parametro ? (
+              <div className="error">{formik.errors.archivos_interfaz.parametro}</div>
+            ) : null}
+          </div>
+          {/* Campos para respuestas */}
+          {Array.from({ length: 14 }, (_, i) => (
+            <div className="form-group" key={i}>
+              <label htmlFor={`respuestas.r${i + 1}`}>Respuesta {i + 1}</label>
+              <input
+                type="number"
+                id={`respuestas.r${i + 1}`}
+                {...formik.getFieldProps(`respuestas.r${i + 1}`)}
+              />
+              {formik.touched.respuestas?.[`r${i + 1}` as keyof typeof formik.touched.respuestas] && formik.errors.respuestas?.[`r${i + 1}` as keyof typeof formik.errors.respuestas] ? (
+                <div className="error">{formik.errors.respuestas[`r${i + 1}` as keyof typeof formik.errors.respuestas]}</div>
+              ) : null}
+            </div>
+          ))}
+          <div className="form-group">
+            <label htmlFor="lenguaje">Lenguaje Predominante</label>
+            <select id="lenguaje" {...formik.getFieldProps('lenguaje')}>
+              <option value="">Seleccione</option>
+              {lenguajes.map((lenguaje) => (
+                <option key={lenguaje} value={lenguaje}>{lenguaje}</option>
+              ))}
+            </select>
+            {formik.touched.lenguaje && formik.errors.lenguaje ? (
+              <div className="error">{formik.errors.lenguaje}</div>
+            ) : null}
+          </div>
+          <button type="submit" className="btn-azul">Realizar Estimación</button>
+        </form>
       </div>
     </div>
   );

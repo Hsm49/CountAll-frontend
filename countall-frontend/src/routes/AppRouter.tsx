@@ -13,7 +13,7 @@ import LandingPage from '../components/LandingPage';
 import Leaderboard from '../components/Leaderboard';
 import Tracking from '../components/Tracking';
 import PrivateRoute from '../components/PrivateRoute';
-import Estadisticas from '../components/Statistics'
+import Estadisticas from '../components/Statistics';
 import ManageSites from '../components/ManageSites';
 import Notifications from '../components/Notifications';
 import ManageTeam from '../components/ManageTeam';
@@ -258,7 +258,7 @@ const AppRouter: React.FC = () => {
       />
       
       <Route
-        path="/mis-estimaciones"
+        path="/mis-estimaciones/:id_estimacion"
         element={
           <PrivateRoute>
             <MisEstimaciones />
@@ -289,6 +289,15 @@ const AppRouter: React.FC = () => {
         element={
           <PrivateRoute>
             <UserManual />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/realizar-cocomo/:nombre_proyecto"
+        element={
+          <PrivateRoute>
+            <Estimaciones />
           </PrivateRoute>
         }
       />

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
 import './css/MisEstimaciones.css';
 
 interface Estimacion {
@@ -19,26 +20,32 @@ interface Estimacion {
 }
 
 const MisEstimaciones: React.FC = () => {
+  const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
   const [estimaciones, setEstimaciones] = useState<Estimacion[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEstimaciones = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:4444/api/estimacion/verCOCOMO/:id_estimacion', {
+        const response = await axios.get(`http://localhost:4444/api/estimacion/verCOCOMO/${nombre_proyecto}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-        setEstimaciones(response.data.estimacion);
+        setEstimaciones(response.data.estimaciones);
       } catch (error) {
         setError('Error al obtener las estimaciones');
       }
     };
 
     fetchEstimaciones();
-  }, []);
+  }, [nombre_proyecto]);
+
+  const handleVerDetalle = (id_estimacion: number) => {
+    navigate(`/ver-cocomo/${id_estimacion}`);
+  };
 
   return (
     <div className="mis-estimaciones-container">
@@ -59,6 +66,7 @@ const MisEstimaciones: React.FC = () => {
           <p>Personas Estimadas: {estimacion.personas_estimacion}</p>
           <p>Tiempo Estimado: {estimacion.tiempo_estimacion} meses</p>
           <p>Precio Estimado: ${estimacion.precio_estimacion}</p>
+          <button onClick={() => handleVerDetalle(estimacion.id_estimacion)} className="btn-naranja">Ver Detalle</button>
         </div>
       ))}
     </div>
