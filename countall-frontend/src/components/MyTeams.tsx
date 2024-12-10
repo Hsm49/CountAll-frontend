@@ -12,6 +12,7 @@ interface Equipo {
 
 const MyTeams: React.FC = () => {
   const [equipos, setEquipos] = useState<Equipo[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,10 +41,21 @@ const MyTeams: React.FC = () => {
     navigate('/select-team-user');
   };
 
+  const filteredEquipos = equipos.filter(equipo =>
+    equipo.nombre_equipo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="my-projects-container">
+    <div className="my-projects-container d-flex justify-content-center">
       <button className="btn-naranja" onClick={handleChangeTeam}>Cambiar de equipo</button>
-      {equipos.map((equipo) => (
+      <input
+        type="text"
+        className="search-bar"
+        placeholder="Buscar equipo..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      {filteredEquipos.map((equipo) => (
         <div key={equipo.id_equipo} className="project-card" onClick={() => handleTeamClick(equipo.id_equipo)}>
           <h3>{equipo.nombre_equipo}</h3>
           <p>{equipo.descr_equipo}</p>

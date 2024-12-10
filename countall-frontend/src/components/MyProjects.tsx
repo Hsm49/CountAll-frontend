@@ -14,6 +14,7 @@ const MyProjects: React.FC = () => {
   const [proyectos, setProyectos] = useState<Proyecto[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [noProjectsMessage, setNoProjectsMessage] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,12 +47,23 @@ const MyProjects: React.FC = () => {
     navigate('/select-project');
   };
 
+  const filteredProyectos = proyectos.filter(proyecto =>
+    proyecto.nombre_proyecto.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="my-projects-container">
+    <div className="my-projects-container d-flex justify-content-center">
       <button className="btn-naranja" onClick={handleChangeProject}>Cambiar de proyecto</button>
+      <input
+        type="text"
+        className="search-bar"
+        placeholder="Buscar proyecto..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       {error && <div className="error-message">{error}</div>}
       {noProjectsMessage && <div className="no-projects-message">{noProjectsMessage}</div>}
-      {proyectos.map((proyecto) => (
+      {filteredProyectos.map((proyecto) => (
         <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
           <h3>{proyecto.nombre_proyecto}</h3>
           <p>{proyecto.descr_proyecto}</p>
