@@ -35,6 +35,7 @@ import UserManual from '../components/UserManual';
 import LeaderboardConfig from '../components/LeaderboardConfig';
 import ModifyProject from '../components/ModifyProject';
 import ProjectSummary from '../components/ProjectSummary';
+import InvitationAccepted from '../components/InvitationAccepted';
 
 const AppRouter: React.FC = () => {
   const { userRole } = useContext(ProjectTeamContext)!;
@@ -50,6 +51,7 @@ const AppRouter: React.FC = () => {
       <Route path="/new-password/:token" element={<NewPassword />} />
       <Route path="/password-saved" element={<PasswordSaved />} />
       <Route path="/account-verified/:token" element={<AccountVerified />} />
+      <Route path="/invitation-accepted/:token" element={<InvitationAccepted />} />
       <Route path="/recover-sent" element={<RecoverSent />} />
       <Route path="/" element={<LandingPage />} />
 
