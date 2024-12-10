@@ -8,7 +8,7 @@ interface Task {
   id: number;
   nombre_tarea: string;
   encargado: string;
-  fecha_entrega: string;
+  fecha_fin_tarea: string;
   estado: string;
   prioridad: string;
 }
@@ -37,7 +37,12 @@ const TaskTable: React.FC = () => {
           id: taskData.datos_tarea.tarea.id_tarea,
           nombre_tarea: taskData.datos_tarea.tarea.nombre_tarea,
           encargado: taskData.asignados.map((assignee: any) => assignee.nombre_usuario).join(', '),
-          fecha_entrega: taskData.datos_tarea.tarea.fecha_entrega,
+          fecha_fin_tarea: new Date(taskData.datos_tarea.tarea.fecha_fin_tarea).toLocaleDateString('es-MX', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            timeZone: 'America/Mexico_City',
+          }),
           estado: taskData.datos_tarea.tarea.estado_tarea,
           prioridad: taskData.datos_tarea.tarea.prioridad_tarea.toLowerCase(),
         }));
@@ -59,7 +64,7 @@ const TaskTable: React.FC = () => {
             <tr>
               <th>Nombre</th>
               <th>Encargado</th>
-              <th>Fecha entrega</th>
+              <th>Fecha fin</th>
               <th>Estado</th>
               <th>Prioridad</th>
             </tr>
@@ -69,7 +74,7 @@ const TaskTable: React.FC = () => {
               <tr key={task.id}>
                 <td>{task.nombre_tarea}</td>
                 <td>{task.encargado}</td>
-                <td>{task.fecha_entrega}</td>
+                <td>{task.fecha_fin_tarea}</td>
                 <td>{task.estado}</td>
                 <td className="priority-label">
                   {task.prioridad === 'baja' && <FaFlag className="urgency-icon green" />}
