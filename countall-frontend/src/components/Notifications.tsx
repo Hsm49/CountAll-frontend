@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as Yup from 'yup';
 import Swal from 'sweetalert2';
 import axios from 'axios';
@@ -13,6 +13,40 @@ const Notifications: React.FC = () => {
     achievements: true,
     scores: true,
   });
+
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:4444/api/usuario/preferencias', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.status === 200) {
+          const { preferencias } = response.data;
+          setNotifications({
+            activities: preferencias.pref_actividades,
+            reminders: preferencias.pref_recordatorio,
+            achievements: true, // Assuming achievements is not part of the response
+            scores: preferencias.pref_puntajes,
+          });
+        } else {
+          throw new Error('Error al obtener las preferencias de notificaciones');
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudieron obtener las preferencias de notificaciones',
+        });
+      }
+    };
+
+    fetchPreferences();
+  }, []);
 
   const handleToggle = (type: NotificationType) => {
     setNotifications({
@@ -33,7 +67,11 @@ const Notifications: React.FC = () => {
       await schema.validate(notifications);
 
       const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:4444/api/notificaciones', notifications, {
+      const response = await axios.put('http://localhost:4444/api/usuario/modificarPreferencias', {
+        pref_actividades: notifications.activities,
+        pref_recordatorio: notifications.reminders,
+        pref_puntajes: notifications.scores,
+      }, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
