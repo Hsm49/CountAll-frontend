@@ -565,7 +565,7 @@ const Tarea: React.FC = () => {
                 {task.priority === 'revisión' && <FaCircle className="urgency-icon yellow" />}
               </Box>
               <Box className={`difficulty-label difficulty-${task.difficulty}`}>
-                {task.difficulty === 'fácil' ? 'Fácil' : task.difficulty === 'media' ? 'Media' : 'Difícil'}
+                {task.difficulty === 'fácil' ? 'Fácil' : task.difficulty === 'media' ? 'Media' : task.difficulty === 'difícil' ? 'Difícil' : 'Revisada'}
               </Box>
               <Box className="options-menu">
                 <IconButton onClick={(e) => handleOptionClick(e, task.id)}>
