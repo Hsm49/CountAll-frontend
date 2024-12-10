@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import './css/SelectProject.css';
 import { InputLabel } from '@mui/material';
+import Swal from 'sweetalert2';
 
 interface Proyecto {
   id_proyecto: number;
@@ -59,18 +60,37 @@ const ModifyProject: React.FC = () => {
 
   // Función para formatear la fecha para el backend
   const formatDateForBackend = (dateString: string): string => {
-    return `${dateString}T00:00:00Z`;
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0] + 'T00:00:00-06:00'; // Ajusta la zona horaria según sea necesario
   };
 
   const handleSaveChanges = async () => {
     if (!proyecto) return;
-  
+
     setLoading(true);
     setError(null);
-  
+
     const fechaInicioFormatted = formatDateForBackend(proyecto.fecha_inicio_proyecto);
     const fechaFinFormatted = formatDateForBackend(proyecto.fecha_fin_proyecto);
-  
+
+    if (new Date(fechaInicioFormatted) < new Date(today)) {
+      setError('La fecha de inicio debe ser hoy o en el futuro');
+      setLoading(false);
+      return;
+    }
+
+    if (new Date(fechaFinFormatted) <= new Date(fechaInicioFormatted)) {
+      setError('La fecha de fin debe ser después de la fecha de inicio');
+      setLoading(false);
+      return;
+    }
+
+    if (!proyecto.numero_etapas) {
+      setError('El número de etapas no puede estar vacío');
+      setLoading(false);
+      return;
+    }
+
     const updatedProject = {
       fecha_inicio_proyecto: fechaInicioFormatted,
       fecha_fin_proyecto: fechaFinFormatted,
@@ -78,7 +98,7 @@ const ModifyProject: React.FC = () => {
       metodologia_proyecto: proyecto.metodologia_proyecto,
       numero_etapas_proyecto: proyecto.numero_etapas,
     };
-  
+
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(`http://localhost:4444/api/proyecto/modificarProyecto/${nombre_proyecto}`, updatedProject, {
@@ -86,10 +106,17 @@ const ModifyProject: React.FC = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
-  
+
       if (response.status === 200) {
         setSelectedProject(proyecto);
-        navigate(`/proyecto/${nombre_proyecto}`);
+        await Swal.fire({
+          icon: 'success',
+          title: 'Cambios guardados',
+          text: 'El proyecto ha sido actualizado exitosamente',
+          timer: 2000,
+          showConfirmButton: false
+        });
+        window.location.reload();
       } else {
         setError('Failed to save changes');
       }
@@ -97,7 +124,7 @@ const ModifyProject: React.FC = () => {
       if (axios.isAxiosError(error) && error.response) {
         // The request was made and the server responded with a status code
         console.error('Error response:', error.response.data);
-        setError(error.response.data.message || 'Error saving changes');
+        setError(error.response.data.errors.map((err: any) => err.msg).join(', ') || 'Error saving changes');
       } else {
         console.error('Error saving changes:', error);
         setError('Error saving changes');
@@ -107,7 +134,12 @@ const ModifyProject: React.FC = () => {
     }
   };
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('es-MX', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'America/Mexico_City',
+  }).split('/').reverse().join('-');
 
   if (!proyecto) {
     return <div>Loading...</div>;

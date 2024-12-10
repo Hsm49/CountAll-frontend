@@ -156,6 +156,19 @@ const AppRouter: React.FC = () => {
       />
 
       <Route
+        path="/resumen-proyecto/:nombre_proyecto"
+        element={
+          userRole === 'Líder' ? (
+            <PrivateRoute>
+              <ProjectSummary />
+            </PrivateRoute>
+          ) : (
+            <Navigate to="/tracking" />
+          )
+        }
+      />
+
+      <Route
         path="/notificaciones"
         element={
           <PrivateRoute>

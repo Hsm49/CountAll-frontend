@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { Box, CircularProgress } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ProjectTeamContext } from '../context/ProjectTeamContext';
 import './css/Details.css';
@@ -46,7 +47,12 @@ const ProjectDetails: React.FC = () => {
   }, [nombre_proyecto]);
 
   if (!proyecto) {
-    return <div>Loading...</div>;
+    return (
+      <Box className="loading-container">
+        <CircularProgress />
+        <p>Cargando datos...</p>
+      </Box>
+    );
   }
 
   const handleModifyProject = () => {
@@ -56,14 +62,14 @@ const ProjectDetails: React.FC = () => {
   const handleGenerateSummary = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(`http://localhost:4444/api/proyecto/generarResumen/${nombre_proyecto}`, {}, {
+      const response = await axios.get(`http://localhost:4444/api/proyecto/verResumen/${nombre_proyecto}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
       if (response.status === 200) {
-        navigate(`/resumen-proyecto/${nombre_proyecto}`);
+        navigate(`/resumen-proyecto/${nombre_proyecto}`, { state: { resumen: response.data.resumen_proyecto } });
       } else {
         console.error('Failed to generate project summary');
       }

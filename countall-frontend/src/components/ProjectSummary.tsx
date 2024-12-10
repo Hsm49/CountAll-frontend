@@ -1,50 +1,73 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import './css/Details.css';
 
 interface ResumenProyecto {
-  fecha_inicio_proyecto: string;
-  fecha_fin_proyecto: string;
+  fecha_inicio: string;
+  fecha_fin: string;
   progreso_general: number;
-  estado_proyecto: string;
+  estado: string;
   total_tareas: number;
   tareas_completadas: number;
   tareas_pendientes: number;
-  estadisticas_generales: string;
 }
 
 const ProjectSummary: React.FC = () => {
   const { nombre_proyecto } = useParams<{ nombre_proyecto: string }>();
   const [resumen, setResumen] = useState<ResumenProyecto | null>(null);
-  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // Simulación de datos estáticos para el proyecto "CountAll"
-    const simulatedResumen: ResumenProyecto = {
-      fecha_inicio_proyecto: '2023-01-01',
-      fecha_fin_proyecto: '2023-12-31',
-      progreso_general: 75,
-      estado_proyecto: 'En progreso',
-      total_tareas: 100,
-      tareas_completadas: 75,
-      tareas_pendientes: 25,
+    const fetchResumen = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      try {
+        const response = await axios.get(`http://localhost:4444/api/proyecto/verResumen/${nombre_proyecto}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 200) {
+          setResumen(response.data.resumen_proyecto);
+        } else {
+          console.error('Failed to fetch project summary');
+        }
+      } catch (error) {
+        console.error('Error fetching project summary:', error);
+      }
     };
 
-    setResumen(simulatedResumen);
-  }, [nombre_proyecto]);
+    if (location.state && location.state.resumen) {
+      setResumen(location.state.resumen);
+    } else {
+      fetchResumen();
+    }
+  }, [nombre_proyecto, location.state]);
 
   if (!resumen) {
     return <div>Loading...</div>;
   }
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'America/Mexico_City',
+    });
+  };
+
   return (
     <div className="details-container mt-5">
       <div className="details-card">
         <h2>Resumen del Proyecto: {nombre_proyecto}</h2>
-        <p>Fecha de inicio: {new Date(resumen.fecha_inicio_proyecto).toLocaleDateString()}</p>
-        <p>Fecha de fin: {new Date(resumen.fecha_fin_proyecto).toLocaleDateString()}</p>
+        <p>Fecha de inicio: {formatDate(resumen.fecha_inicio)}</p>
+        <p>Fecha de fin: {formatDate(resumen.fecha_fin)}</p>
         <p>Progreso general: {resumen.progreso_general}%</p>
-        <p>Estado: {resumen.estado_proyecto}</p>
+        <p>Estado: {resumen.estado}</p>
         <p>Total de tareas: {resumen.total_tareas}</p>
         <p>Tareas completadas: {resumen.tareas_completadas}</p>
         <p>Tareas pendientes: {resumen.tareas_pendientes}</p>

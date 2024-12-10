@@ -48,6 +48,12 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
   const teamMembers = context?.teamMembers || [];
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [loading, setLoading] = useState(false);
+  const today = new Date().toLocaleDateString('es-MX', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'America/Mexico_City',
+  }).split('/').reverse().join('-');
 
   const formatDateForBackend = (dateString: string): string => {
     return `${dateString} 00:00:00-06`;
@@ -262,7 +268,7 @@ const TaskAddModal: React.FC<TaskAddModalProps> = ({ open, onClose, onSave }) =>
                     className="date-input"
                     placeholder="Fecha de Inicio"
                     value={formik.values.fecha_inicio_tarea}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={today}
                     onChange={(e) => {
                       formik.setFieldValue('fecha_inicio_tarea', e.target.value);
                     }}

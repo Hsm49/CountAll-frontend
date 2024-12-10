@@ -65,6 +65,11 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     currentTitle = `Proyecto`;
   }
 
+  if (location.pathname.startsWith('/resumen-proyecto/')) {
+    const projectName = location.pathname.split('/proyecto/')[1];
+    currentTitle = `Proyecto`;
+  }
+
   if (location.pathname.startsWith('/equipo/')) {
     const teamName = location.pathname.split('/equipo/')[1];
     currentTitle = `Equipo`;
