@@ -30,7 +30,7 @@ const SelectTeamUser: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
-  const { setSelectedTeam, setUserRole } = useContext(ProjectTeamContext)!;
+  const { setSelectedTeam, setUserRole, setTeamProjectName } = useContext(ProjectTeamContext)!;
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -82,6 +82,7 @@ const SelectTeamUser: React.FC = () => {
     setIsVisible(false);
     setTimeout(async () => {
       setSelectedTeam(equipo);
+      setTeamProjectName(equipo.nombre_proyecto); // Guarda el nombre del proyecto asociado al equipo
 
       // Fetch user role
       const token = localStorage.getItem('token');

@@ -16,7 +16,8 @@ import {
   FormControl,
   InputLabel,
   Menu,
-  MenuItem as MuiMenuItem
+  MenuItem as MuiMenuItem,
+  CircularProgress
 } from '@mui/material';
 import { FaPen, FaTimes, FaPlus, FaSave, FaTrash } from 'react-icons/fa';
 import Swal from 'sweetalert2';
@@ -66,6 +67,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
   const [comments, setComments] = useState<{ id_comentario: number, contenido_comentario: string, url_avatar: string, username: string }[]>([]);
   const [newComment, setNewComment] = useState('');
   const [currentUser, setCurrentUser] = useState<{ nombre_usuario: string } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const formatDateForBackend = (dateString: string): string => {
     return `${dateString} 00:00:00-06`;
@@ -98,6 +100,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
       )
     }),
     onSubmit: async (values) => {
+      setLoading(true); // Inicia el estado de carga
       try {
         const result = await Swal.fire({
           title: '¿Guardar cambios?',
@@ -134,6 +137,8 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
           title: 'Error',
           text: 'No se pudieron guardar los cambios'
         });
+      } finally {
+        setLoading(false); // Finaliza el estado de carga
       }
     }
   });
@@ -266,6 +271,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
   };
 
   const handleAddComment = async () => {
+    setLoading(true); // Inicia el estado de carga
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -310,10 +316,13 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
         title: 'Error',
         text: 'No se pudo agregar el comentario'
       });
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
     }
   };
 
   const handleEditComment = async (id_comentario: number, contenido_comentario: string) => {
+    setLoading(true); // Inicia el estado de carga
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -339,10 +348,13 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
       setComments(response.data.comentarios_tarea);
     } catch (error) {
       console.error('Error editing comment:', error);
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
     }
   };
   
   const handleDeleteComment = async (id_comentario: number) => {
+    setLoading(true); // Inicia el estado de carga
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -366,6 +378,8 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
       setComments(response.data.comentarios_tarea);
     } catch (error) {
       console.error('Error deleting comment:', error);
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
     }
   };
 
@@ -397,274 +411,280 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ open, task, onClose, onSa
       <DialogTitle>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h5">Detalles de la tarea</Typography>
-          <IconButton onClick={onClose}>
+          <IconButton onClick={onClose} disabled={loading}>
             <FaTimes />
           </IconButton>
         </Box>
       </DialogTitle>
 
       <DialogContent>
-        <form onSubmit={formik.handleSubmit}>
-          <Box className="task-edit-content">
-            {/* Título */}
-            <Box className="edit-section" mb={3}>
-              <Box display="flex" alignItems="center" gap={1}>
-                {editingField === 'title' && userRole === 'Líder' ? (
-                  <TextField
-                    fullWidth
-                    label="Título"
-                    {...formik.getFieldProps('title')}
-                    error={formik.touched.title && Boolean(formik.errors.title)}
-                    helperText={formik.touched.title && formik.errors.title}
-                  />
-                ) : (
-                  <>
-                    <Typography variant="subtitle1">Título:</Typography>
-                    <Typography>{formik.values.title}</Typography>
-                    {userRole === 'Líder' && (
-                      <IconButton onClick={() => handleEditClick('title')}>
-                        <FaPen />
-                      </IconButton>
-                    )}
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            {/* Prioridad */}
-            <Box className="edit-section" mb={3}>
-              <Box display="flex" alignItems="center" gap={1}>
-                {editingField === 'priority' && userRole === 'Líder' ? (
-                  <FormControl size="small" fullWidth error={formik.touched.priority && Boolean(formik.errors.priority)}>
-                    <InputLabel>Prioridad</InputLabel>
-                    <Select
-                      {...formik.getFieldProps('priority')}
-                      label="Prioridad"
-                    >
-                      <MenuItem value="Baja">Baja</MenuItem>
-                      <MenuItem value="Media">Media</MenuItem>
-                      <MenuItem value="Alta">Alta</MenuItem>
-                    </Select>
-                    {formik.touched.priority && formik.errors.priority && (
-                      <Typography variant="caption" color="error">{formik.errors.priority}</Typography>
-                    )}
-                  </FormControl>
-                ) : (
-                  <>
-                    <Typography variant="subtitle1">Prioridad:</Typography>
-                    <Typography>{formik.values.priority}</Typography>
-                    {userRole === 'Líder' && (
-                      <IconButton onClick={() => handleEditClick('priority')}>
-                        <FaPen />
-                      </IconButton>
-                    )}
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            {/* Dificultad */}
-            <Box className="edit-section" mb={3}>
-              <Box display="flex" alignItems="center" gap={1}>
-                {editingField === 'difficulty' && userRole === 'Líder' ? (
-                  <FormControl size="small" fullWidth error={formik.touched.difficulty && Boolean(formik.errors.difficulty)}>
-                    <InputLabel>Dificultad</InputLabel>
-                    <Select
-                      {...formik.getFieldProps('difficulty')}
-                      label="Dificultad"
-                    >
-                      <MenuItem value="Fácil">Fácil</MenuItem>
-                      <MenuItem value="Media">Media</MenuItem>
-                      <MenuItem value="Difícil">Difícil</MenuItem>
-                    </Select>
-                    {formik.touched.difficulty && formik.errors.difficulty && (
-                      <Typography variant="caption" color="error">{formik.errors.difficulty}</Typography>
-                    )}
-                  </FormControl>
-                ) : (
-                  <>
-                    <Typography variant="subtitle1">Dificultad:</Typography>
-                    <Typography>{formik.values.difficulty}</Typography>
-                    {userRole === 'Líder' && (
-                      <IconButton onClick={() => handleEditClick('difficulty')}>
-                        <FaPen />
-                      </IconButton>
-                    )}
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            {/* Descripción */}
-            <Box className="edit-section" mb={3}>
-              <Box display="flex" alignItems="start" gap={1}>
-                {editingField === 'description' && userRole === 'Líder' ? (
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Descripción"
-                    {...formik.getFieldProps('description')}
-                    error={formik.touched.description && Boolean(formik.errors.description)}
-                    helperText={formik.touched.description && formik.errors.description}
-                  />
-                ) : (
-                  <>
-                    <Typography variant="subtitle1">Descripción:</Typography>
-                    <Typography>{formik.values.description}</Typography>
-                    {userRole === 'Líder' && (
-                      <IconButton onClick={() => handleEditClick('description')}>
-                        <FaPen />
-                      </IconButton>
-                    )}
-                  </>
-                )}
-              </Box>
-            </Box>
-
-            {/* Fechas */}
-            {taskDates && (
-              <Box className="edit-section" mb={3}>
-                <Typography variant="subtitle1">Fecha de inicio:</Typography>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <input
-                    type="date"
-                    className="date-input"
-                    placeholder="Fecha de Inicio"
-                    value={formik.values.fecha_inicio_tarea}
-                    min={new Date().toISOString().split('T')[0]}
-                    onChange={(e) => {
-                      formik.setFieldValue('fecha_inicio_tarea', e.target.value);
-                      setEditingField('fecha_inicio_tarea');
-                    }}
-                    required
-                    disabled={userRole !== 'Líder'}
-                  />
-                </Box>
-                <Typography variant="subtitle1">Fecha de fin:</Typography>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <input
-                    type="date"
-                    className="date-input"
-                    placeholder="Fecha de Fin"
-                    value={formik.values.fecha_fin_tarea}
-                    min={formik.values.fecha_inicio_tarea || new Date().toISOString().split('T')[0]}
-                    onChange={(e) => {
-                      formik.setFieldValue('fecha_fin_tarea', e.target.value);
-                      setEditingField('fecha_fin_tarea');
-                    }}
-                    required
-                    disabled={userRole !== 'Líder'}
-                  />
-                </Box>
-              </Box>
-            )}
-
-            {/* Asignados */}
-            <Box className="edit-section" mb={3}>
-              <Typography variant="subtitle1">Asignados:</Typography>
-              <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                {formik.values.assignees.map((assignee, index) => (
-                  <Chip
-                    key={index}
-                    avatar={<Avatar src={assignee.url_avatar} />}
-                    label={assignee.nombre_usuario}
-                    onDelete={userRole === 'Líder' ? () => handleRemoveAssignee(index) : undefined}
-                    deleteIcon={<FaTrash />}
-                  />
-                ))}
-                {userRole === 'Líder' && (
-                  <IconButton size="small" onClick={handleAddAssigneeClick}>
-                    <FaPlus />
-                  </IconButton>
-                )}
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleCloseMenu}
-                >
-                  {availableTeamMembers.length > 0 ? (
-                    availableTeamMembers.map((member: { id_usuario: number, nombre_usuario: string, url_avatar: string }) => (
-                      <MuiMenuItem key={member.id_usuario} onClick={() => handleAddAssignee(member)}>
-                        <Avatar src={member.url_avatar} />
-                        {member.nombre_usuario}
-                      </MuiMenuItem>
-                    ))
-                  ) : (
-                    <MuiMenuItem disabled>No hay miembros del equipo</MuiMenuItem>
-                  )}
-                </Menu>
-              </Box>
-              {formik.touched.assignees && formik.errors.assignees && (
-                <Typography variant="caption" color="error">{typeof formik.errors.assignees === 'string' ? formik.errors.assignees : ''}</Typography>
-              )}
-            </Box>
-
-            {/* Comentarios */}
-            <Box className="comments-section">
-              <Typography variant="subtitle1" mb={2}>Comentarios ({comments.length})</Typography>
-              {comments.map((comment, index) => (
-                <Box key={index} className="comment-box">
-                  <Box className="comment-header">
-                    <Avatar src={comment.url_avatar} />
-                    <Typography variant="body1" className="comment-username">{comment.username}</Typography>
-                  </Box>
-                  <Typography variant="body2" className="comment-content">{comment.contenido_comentario}</Typography>
-                  {currentUser && comment.username === currentUser.nombre_usuario && (
-                        <Box className="comment-actions">
-                          <IconButton onClick={() => {
-                            const newComment = prompt('Edita tu comentario', comment.contenido_comentario);
-                            if (newComment !== null) {
-                              handleEditComment(comment.id_comentario, newComment);
-                            }
-                          }}>
-                            <FaPen />
-                          </IconButton>
-                          <IconButton onClick={() => handleDeleteComment(comment.id_comentario)}>
-                            <FaTrash />
-                          </IconButton>
-                        </Box>
-                  )}
-                </Box>
-              ))}
-              <Box className="add-comment-section">
-                <TextField
-                  fullWidth
-                  label="Escribe un comentario"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  multiline
-                  rows={2}
-                  className="add-comment-textfield"
-                />
-                <Button onClick={handleAddComment} variant="contained" color="primary" startIcon={<FaPlus />}>
-                  Añadir comentario
-                </Button>
-              </Box>
-            </Box>
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+            <CircularProgress />
           </Box>
+        ) : (
+          <form onSubmit={formik.handleSubmit}>
+            <Box className="task-edit-content">
+              {/* Título */}
+              <Box className="edit-section" mb={3}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  {editingField === 'title' && userRole === 'Líder' ? (
+                    <TextField
+                      fullWidth
+                      label="Título"
+                      {...formik.getFieldProps('title')}
+                      error={formik.touched.title && Boolean(formik.errors.title)}
+                      helperText={formik.touched.title && formik.errors.title}
+                    />
+                  ) : (
+                    <>
+                      <Typography variant="subtitle1">Título:</Typography>
+                      <Typography>{formik.values.title}</Typography>
+                      {userRole === 'Líder' && (
+                        <IconButton onClick={() => handleEditClick('title')}>
+                          <FaPen />
+                        </IconButton>
+                      )}
+                    </>
+                  )}
+                </Box>
+              </Box>
 
-          {editingField && userRole === 'Líder' && (
-            <DialogActions>
-              <Button 
-                variant="outlined" 
-                color="error" 
-                onClick={handleCancelEdit}
-                startIcon={<FaTimes />}
-              >
-                Cancelar
-              </Button>
-              <Button 
-                variant="contained" 
-                color="primary" 
-                type="submit"
-                startIcon={<FaSave />}
-              >
-                Guardar cambios
-              </Button>
-            </DialogActions>
-          )}
-        </form>
+              {/* Prioridad */}
+              <Box className="edit-section" mb={3}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  {editingField === 'priority' && userRole === 'Líder' ? (
+                    <FormControl size="small" fullWidth error={formik.touched.priority && Boolean(formik.errors.priority)}>
+                      <InputLabel>Prioridad</InputLabel>
+                      <Select
+                        {...formik.getFieldProps('priority')}
+                        label="Prioridad"
+                      >
+                        <MenuItem value="Baja">Baja</MenuItem>
+                        <MenuItem value="Media">Media</MenuItem>
+                        <MenuItem value="Alta">Alta</MenuItem>
+                      </Select>
+                      {formik.touched.priority && formik.errors.priority && (
+                        <Typography variant="caption" color="error">{formik.errors.priority}</Typography>
+                      )}
+                    </FormControl>
+                  ) : (
+                    <>
+                      <Typography variant="subtitle1">Prioridad:</Typography>
+                      <Typography>{formik.values.priority}</Typography>
+                      {userRole === 'Líder' && (
+                        <IconButton onClick={() => handleEditClick('priority')}>
+                          <FaPen />
+                        </IconButton>
+                      )}
+                    </>
+                  )}
+                </Box>
+              </Box>
+
+              {/* Dificultad */}
+              <Box className="edit-section" mb={3}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  {editingField === 'difficulty' && userRole === 'Líder' ? (
+                    <FormControl size="small" fullWidth error={formik.touched.difficulty && Boolean(formik.errors.difficulty)}>
+                      <InputLabel>Dificultad</InputLabel>
+                      <Select
+                        {...formik.getFieldProps('difficulty')}
+                        label="Dificultad"
+                      >
+                        <MenuItem value="Fácil">Fácil</MenuItem>
+                        <MenuItem value="Media">Media</MenuItem>
+                        <MenuItem value="Difícil">Difícil</MenuItem>
+                      </Select>
+                      {formik.touched.difficulty && formik.errors.difficulty && (
+                        <Typography variant="caption" color="error">{formik.errors.difficulty}</Typography>
+                      )}
+                    </FormControl>
+                  ) : (
+                    <>
+                      <Typography variant="subtitle1">Dificultad:</Typography>
+                      <Typography>{formik.values.difficulty}</Typography>
+                      {userRole === 'Líder' && (
+                        <IconButton onClick={() => handleEditClick('difficulty')}>
+                          <FaPen />
+                        </IconButton>
+                      )}
+                    </>
+                  )}
+                </Box>
+              </Box>
+
+              {/* Descripción */}
+              <Box className="edit-section" mb={3}>
+                <Box display="flex" alignItems="start" gap={1}>
+                  {editingField === 'description' && userRole === 'Líder' ? (
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={4}
+                      label="Descripción"
+                      {...formik.getFieldProps('description')}
+                      error={formik.touched.description && Boolean(formik.errors.description)}
+                      helperText={formik.touched.description && formik.errors.description}
+                    />
+                  ) : (
+                    <>
+                      <Typography variant="subtitle1">Descripción:</Typography>
+                      <Typography>{formik.values.description}</Typography>
+                      {userRole === 'Líder' && (
+                        <IconButton onClick={() => handleEditClick('description')}>
+                          <FaPen />
+                        </IconButton>
+                      )}
+                    </>
+                  )}
+                </Box>
+              </Box>
+
+              {/* Fechas */}
+              {taskDates && (
+                <Box className="edit-section" mb={3}>
+                  <Typography variant="subtitle1">Fecha de inicio:</Typography>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <input
+                      type="date"
+                      className="date-input"
+                      placeholder="Fecha de Inicio"
+                      value={formik.values.fecha_inicio_tarea}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => {
+                        formik.setFieldValue('fecha_inicio_tarea', e.target.value);
+                        setEditingField('fecha_inicio_tarea');
+                      }}
+                      required
+                      disabled={userRole !== 'Líder'}
+                    />
+                  </Box>
+                  <Typography variant="subtitle1">Fecha de fin:</Typography>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <input
+                      type="date"
+                      className="date-input"
+                      placeholder="Fecha de Fin"
+                      value={formik.values.fecha_fin_tarea}
+                      min={formik.values.fecha_inicio_tarea || new Date().toISOString().split('T')[0]}
+                      onChange={(e) => {
+                        formik.setFieldValue('fecha_fin_tarea', e.target.value);
+                        setEditingField('fecha_fin_tarea');
+                      }}
+                      required
+                      disabled={userRole !== 'Líder'}
+                    />
+                  </Box>
+                </Box>
+              )}
+
+              {/* Asignados */}
+              <Box className="edit-section" mb={3}>
+                <Typography variant="subtitle1">Asignados:</Typography>
+                <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+                  {formik.values.assignees.map((assignee, index) => (
+                    <Chip
+                      key={index}
+                      avatar={<Avatar src={assignee.url_avatar} />}
+                      label={assignee.nombre_usuario}
+                      onDelete={userRole === 'Líder' ? () => handleRemoveAssignee(index) : undefined}
+                      deleteIcon={<FaTrash />}
+                    />
+                  ))}
+                  {userRole === 'Líder' && (
+                    <IconButton size="small" onClick={handleAddAssigneeClick}>
+                      <FaPlus />
+                    </IconButton>
+                  )}
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleCloseMenu}
+                  >
+                    {availableTeamMembers.length > 0 ? (
+                      availableTeamMembers.map((member: { id_usuario: number, nombre_usuario: string, url_avatar: string }) => (
+                        <MuiMenuItem key={member.id_usuario} onClick={() => handleAddAssignee(member)}>
+                          <Avatar src={member.url_avatar} />
+                          {member.nombre_usuario}
+                        </MuiMenuItem>
+                      ))
+                    ) : (
+                      <MuiMenuItem disabled>No hay miembros del equipo</MuiMenuItem>
+                    )}
+                  </Menu>
+                </Box>
+                {formik.touched.assignees && formik.errors.assignees && (
+                  <Typography variant="caption" color="error">{typeof formik.errors.assignees === 'string' ? formik.errors.assignees : ''}</Typography>
+                )}
+              </Box>
+
+              {/* Comentarios */}
+              <Box className="comments-section">
+                <Typography variant="subtitle1" mb={2}>Comentarios ({comments.length})</Typography>
+                {comments.map((comment, index) => (
+                  <Box key={index} className="comment-box">
+                    <Box className="comment-header">
+                      <Avatar src={comment.url_avatar} />
+                      <Typography variant="body1" className="comment-username">{comment.username}</Typography>
+                    </Box>
+                    <Typography variant="body2" className="comment-content">{comment.contenido_comentario}</Typography>
+                    {currentUser && comment.username === currentUser.nombre_usuario && (
+                          <Box className="comment-actions">
+                            <IconButton onClick={() => {
+                              const newComment = prompt('Edita tu comentario', comment.contenido_comentario);
+                              if (newComment !== null) {
+                                handleEditComment(comment.id_comentario, newComment);
+                              }
+                            }}>
+                              <FaPen />
+                            </IconButton>
+                            <IconButton onClick={() => handleDeleteComment(comment.id_comentario)}>
+                              <FaTrash />
+                            </IconButton>
+                          </Box>
+                    )}
+                  </Box>
+                ))}
+                <Box className="add-comment-section">
+                  <TextField
+                    fullWidth
+                    label="Escribe un comentario"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    multiline
+                    rows={2}
+                    className="add-comment-textfield"
+                  />
+                  <Button onClick={handleAddComment} variant="contained" color="primary" startIcon={<FaPlus />}>
+                    Añadir comentario
+                  </Button>
+                </Box>
+              </Box>
+            </Box>
+
+            {editingField && userRole === 'Líder' && (
+              <DialogActions>
+                <Button 
+                  variant="outlined" 
+                  color="error" 
+                  onClick={handleCancelEdit}
+                  startIcon={<FaTimes />}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  variant="contained" 
+                  color="primary" 
+                  type="submit"
+                  startIcon={<FaSave />}
+                >
+                  Guardar cambios
+                </Button>
+              </DialogActions>
+            )}
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );

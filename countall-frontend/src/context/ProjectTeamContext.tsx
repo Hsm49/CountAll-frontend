@@ -29,6 +29,8 @@ interface ProjectTeamContextProps {
   setUserRole: (role: string | null) => void;
   teamMembers: TeamMember[] | null;
   setTeamMembers: (members: TeamMember[] | null) => void;
+  teamProjectName: string | null;
+  setTeamProjectName: (projectName: string | null) => void;
 }
 
 export const ProjectTeamContext = createContext<ProjectTeamContextProps | undefined>(undefined);
@@ -52,6 +54,11 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [teamMembers, setTeamMembers] = useState<TeamMember[] | null>(() => {
     const savedMembers = localStorage.getItem('teamMembers');
     return savedMembers ? JSON.parse(savedMembers) : null;
+  });
+
+  const [teamProjectName, setTeamProjectName] = useState<string | null>(() => {
+    const savedProjectName = localStorage.getItem('teamProjectName');
+    return savedProjectName ? savedProjectName : null;
   });
 
   useEffect(() => {
@@ -87,6 +94,14 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
   }, [teamMembers]);
 
   useEffect(() => {
+    if (teamProjectName) {
+      localStorage.setItem('teamProjectName', teamProjectName);
+    } else {
+      localStorage.removeItem('teamProjectName');
+    }
+  }, [teamProjectName]);
+
+  useEffect(() => {
     const fetchUserRoleAndMembers = async () => {
       if (selectedTeam) {
         const token = localStorage.getItem('token');
@@ -98,6 +113,7 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
           });
           setUserRole(response.data.rol_sesion);
           setTeamMembers(response.data.equipo.integrantes_equipo);
+          setTeamProjectName(response.data.equipo.nombre_proyecto); // Actualiza el nombre del proyecto del equipo
         } catch (error) {
           console.error('Error fetching user role and team members:', error);
         }
@@ -108,7 +124,7 @@ export const ProjectTeamProvider: React.FC<{ children: ReactNode }> = ({ childre
   }, [selectedTeam]);
 
   return (
-    <ProjectTeamContext.Provider value={{ selectedProject, setSelectedProject, selectedTeam, setSelectedTeam, userRole, setUserRole, teamMembers, setTeamMembers }}>
+    <ProjectTeamContext.Provider value={{ selectedProject, setSelectedProject, selectedTeam, setSelectedTeam, userRole, setUserRole, teamMembers, setTeamMembers, teamProjectName, setTeamProjectName }}>
       {children}
     </ProjectTeamContext.Provider>
   );

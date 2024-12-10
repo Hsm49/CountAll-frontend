@@ -149,10 +149,24 @@
     color: #d32f2f;
 }
 
-.difficulty-Revisada {
-    background-color: #ffebee;
-    color: #004c99;
+.difficulty-revisada {
+    background-color: #1b70a6;
+    color: #ffffff;
 }
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
 
 @media (max-width: 768px) {
     .columns {

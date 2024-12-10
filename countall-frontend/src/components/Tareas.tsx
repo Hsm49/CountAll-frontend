@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { FaPlus, FaComment, FaEllipsisH, FaCheck, FaEdit, FaFlag, FaCircle, FaTrash } from 'react-icons/fa';
-import { Avatar, Button, Card, CardContent, Typography, Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
+import { Avatar, Button, Card, CardContent, Typography, Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, CircularProgress } from '@mui/material';
 import Swal from 'sweetalert2';
 import './css/Tareas.css';
 import TaskEditModal from './TaskEditModal';
@@ -41,6 +41,8 @@ const Tarea: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<{ nombre_usuario: string } | null>(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedTaskForReview, setSelectedTaskForReview] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [comment, setComment] = useState('');
   const [reviewModifiers, setReviewModifiers] = useState({
     nox_creatividad: false,
     nox_calidad: false,
@@ -67,39 +69,39 @@ const Tarea: React.FC = () => {
     { value: 'completado', label: 'Completado' }
   ];
 
+  const fetchTasks = async () => {
+    if (!selectedTeam) return;
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:4444/api/tarea/verTareas/${selectedTeam.id_equipo}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const fetchedTasks = response.data.tareas_equipo.map((taskData: any) => ({
+        id: taskData.datos_tarea.tarea.id_tarea,
+        title: taskData.datos_tarea.tarea.nombre_tarea,
+        description: taskData.datos_tarea.tarea.descr_tarea,
+        priority: taskData.datos_tarea.tarea.prioridad_tarea.toLowerCase(),
+        difficulty: taskData.datos_tarea.tarea.dificultad_tarea.toLowerCase(),
+        assignees: taskData.asignados,
+        comments: taskData.datos_tarea.tarea.comentarios_tarea,
+        status: taskData.datos_tarea.tarea.estado_tarea.toLowerCase().replace(' ', '-'),
+        isLocked: taskData.datos_tarea.tarea.is_locked
+      }));
+      setTasks(fetchedTasks);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchTasks = async () => {
-      if (!selectedTeam) return;
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
-
-      try {
-        const response = await axios.get(`http://localhost:4444/api/tarea/verTareas/${selectedTeam.id_equipo}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const fetchedTasks = response.data.tareas_equipo.map((taskData: any) => ({
-          id: taskData.datos_tarea.tarea.id_tarea,
-          title: taskData.datos_tarea.tarea.nombre_tarea,
-          description: taskData.datos_tarea.tarea.descr_tarea,
-          priority: taskData.datos_tarea.tarea.prioridad_tarea.toLowerCase(),
-          difficulty: taskData.datos_tarea.tarea.dificultad_tarea.toLowerCase(),
-          assignees: taskData.asignados,
-          comments: taskData.datos_tarea.tarea.comentarios_tarea,
-          status: taskData.datos_tarea.tarea.estado_tarea.toLowerCase().replace(' ', '-'),
-          isLocked: taskData.datos_tarea.tarea.is_locked
-        }));
-        setTasks(fetchedTasks);
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
-
     fetchTasks();
   }, [selectedTeam]);
 
@@ -248,6 +250,7 @@ const Tarea: React.FC = () => {
   };
 
   const handleTaskDelete = async (taskId: number) => {
+    setLoading(true); // Inicia el estado de carga
     try {
       const result = await Swal.fire({
         title: '¿Eliminar tarea?',
@@ -295,6 +298,8 @@ const Tarea: React.FC = () => {
         title: 'Error',
         text: 'No se pudo eliminar la tarea'
       });
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
     }
   };
 
@@ -314,6 +319,7 @@ const Tarea: React.FC = () => {
   };
 
   const handleTaskStatusUpdate = async (taskId: number, newStatus: string) => {
+    setLoading(true); // Inicia el estado de carga
     try {
       const token = localStorage.getItem('token');
       if (!token) {
@@ -389,6 +395,7 @@ const Tarea: React.FC = () => {
         }
       });
     } finally {
+      setLoading(false); // Finaliza el estado de carga
       handleClose();
     }
   };
@@ -448,70 +455,114 @@ const Tarea: React.FC = () => {
   };
 
   const handleUnlockTask = async (taskId: number) => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        console.error('No token found');
-        return;
+  handleClose();
+
+  const { value: comment } = await Swal.fire({
+    title: 'Devolver tarea',
+    input: 'textarea',
+    inputLabel: 'Comentario',
+    inputPlaceholder: 'Escribe el motivo de la devolución...',
+    inputAttributes: {
+      'aria-label': 'Escribe el motivo de la devolución'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Enviar',
+    cancelButtonText: 'Cancelar',
+    customClass: {
+      popup: 'swal2-popup-custom'
+    },
+    didOpen: () => {
+      const input = Swal.getInput();
+      if (input) {
+        input.focus();
       }
-
-      const response = await axios.put(`http://localhost:4444/api/tarea/desbloquearTarea/${taskId}`, {}, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.status === 200) {
-        setTasks(prevTasks =>
-          prevTasks.map(task =>
-            task.id === taskId ? { ...task, isLocked: false } : task
-          )
-        );
-
-        await Swal.fire({
-          icon: 'success',
-          title: 'Tarea desbloqueada',
-          text: 'La tarea ha sido desbloqueada para cambiar su estado',
-          timer: 2000,
-          showConfirmButton: false,
-          customClass: {
-              popup: 'swal2-popup-custom'
-          }
-        });
-      } else {
-        console.error('Error unlocking task:', response.data);
+    },
+    preConfirm: (comment) => {
+      if (!comment) {
+        Swal.showValidationMessage('El comentario es obligatorio');
       }
-    } catch (error) {
-      console.error('Error al desbloquear la tarea:', error);
-      await Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudo desbloquear la tarea',
-        customClass: {
-            popup: 'swal2-popup-custom'
-        }
-      });
+      return comment;
     }
-  };
+  });
+
+  if (!comment) return;
+
+  setLoading(true); // Inicia el estado de carga
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      return;
+    }
+
+    // Enviar el comentario al servidor
+    await axios.post(`http://localhost:4444/api/comentario/escribirComentario/${taskId}`, {
+      contenido_comentario: comment // Asegúrate de que el nombre del campo sea correcto
+    }, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Desbloquear la tarea
+    const response = await axios.put(`http://localhost:4444/api/tarea/desbloquearTarea/${taskId}`, {}, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.status === 200) {
+      await Swal.fire({
+        icon: 'success',
+        title: 'Tarea devuelta',
+        text: 'La tarea ha sido devuelta para su corrección',
+        timer: 2000,
+        showConfirmButton: false,
+        customClass: {
+          popup: 'swal2-popup-custom'
+        }
+      });
+
+      // Actualiza la lista de tareas
+      await fetchTasks();
+    } else {
+      console.error('Error unlocking task:', response.data);
+    }
+  } catch (error) {
+    console.error('Error al desbloquear la tarea:', error);
+    await Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'No se pudo desbloquear la tarea',
+      customClass: {
+        popup: 'swal2-popup-custom'
+      }
+    });
+  } finally {
+    setLoading(false); // Finaliza el estado de carga
+  }
+};
 
   const handleReviewSubmit = async () => {
     if (!selectedTaskForReview) return;
-
+  
+    setLoading(true); // Inicia el estado de carga
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         console.error('No token found');
         return;
       }
-
+  
       const response = await axios.put(`http://localhost:4444/api/tarea/revisarTarea/${selectedTaskForReview.id}`, reviewModifiers, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-
+  
       if (response.status === 200) {
         await Swal.fire({
           icon: 'success',
@@ -520,6 +571,14 @@ const Tarea: React.FC = () => {
           timer: 2000,
           showConfirmButton: false
         });
+  
+        // Actualiza la lista de tareas
+        setTasks(prevTasks =>
+          prevTasks.map(task =>
+            task.id === selectedTaskForReview.id ? { ...task, difficulty: 'revisada' } : task
+          )
+        );
+  
         setReviewModalOpen(false);
         setSelectedTaskForReview(null);
       } else {
@@ -537,6 +596,8 @@ const Tarea: React.FC = () => {
         title: 'Error',
         text: 'No se pudo revisar la tarea'
       });
+    } finally {
+      setLoading(false); // Finaliza el estado de carga
     }
   };
 
@@ -594,7 +655,7 @@ const Tarea: React.FC = () => {
                     <ListItemText>Cambiar estado</ListItemText>
                   </MenuItem>
                 )}
-                {userRole === 'Líder' && task.isLocked && (
+                {userRole === 'Líder' && task.isLocked && task.difficulty !== 'revisada' && (
                   <MenuItem onClick={() => handleUnlockTask(task.id)}>
                     <ListItemIcon>
                       <FaCheck />
@@ -602,7 +663,7 @@ const Tarea: React.FC = () => {
                     <ListItemText>Devolver tarea</ListItemText>
                   </MenuItem>
                 )}
-                {userRole === 'Líder' && task.status === 'completado' && (
+                {userRole === 'Líder' && task.status === 'completado' && task.difficulty !== 'revisada' && (
                   <MenuItem onClick={() => handleReviewTask(task.id)}>
                     <ListItemIcon>
                       <FaCheck />
@@ -676,8 +737,14 @@ const Tarea: React.FC = () => {
 
   return (
     <Box className="task-board">
-      <Box className="filters">
-        <Button variant="outlined" onClick={handleFilterMenuOpen}>Filtrar</Button>
+      {loading && (
+        <Box className="loading-overlay">
+          <CircularProgress />
+          <p>Cargando...</p>
+        </Box>
+      )}
+      <Box className="filters" style={{ pointerEvents: loading ? 'none' : 'auto', opacity: loading ? 0.5 : 1 }}>
+        <Button variant="outlined" onClick={handleFilterMenuOpen} disabled={loading}>Filtrar</Button>
         <Menu
           anchorEl={filterAnchorEl}
           open={Boolean(filterAnchorEl)}
@@ -686,7 +753,7 @@ const Tarea: React.FC = () => {
           <MenuItem onClick={() => handleFilterChange('all')}>Todas las tareas</MenuItem>
           <MenuItem onClick={() => handleFilterChange('assigned')}>Mis tareas</MenuItem>
         </Menu>
-        <Button variant="outlined" onClick={handlePriorityMenuOpen}>Prioridad</Button>
+        <Button variant="outlined" onClick={handlePriorityMenuOpen} disabled={loading}>Prioridad</Button>
         <Menu
           anchorEl={priorityAnchorEl}
           open={Boolean(priorityAnchorEl)}
@@ -699,7 +766,7 @@ const Tarea: React.FC = () => {
         </Menu>
       </Box>
 
-      <Box className="columns mt-3">
+      <Box className="columns mt-3" style={{ pointerEvents: loading ? 'none' : 'auto', opacity: loading ? 0.5 : 1 }}>
         <Box className="column">
           <Box className="column-header to-do">
             <Typography variant="h6">Por hacer</Typography>
@@ -707,7 +774,7 @@ const Tarea: React.FC = () => {
               {getFilteredTasksCount('por-hacer')}
             </Typography>
             {userRole === 'Líder' && (
-              <IconButton onClick={() => setAddModalOpen(true)}>
+              <IconButton onClick={() => setAddModalOpen(true)} disabled={loading}>
                 <FaPlus />
               </IconButton>
             )}
