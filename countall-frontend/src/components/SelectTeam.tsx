@@ -201,35 +201,8 @@ const SelectTeam: React.FC = () => {
       setEquipos([...equipos, newTeam]);
       setSelectedTeam(newTeam);
 
-      // Fetch user role
-      try {
-        const response = await axios.get(`http://localhost:4444/api/equipo/misEquipos/${newTeam.id_equipo}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setUserRole(response.data.rol_sesion);
-      } catch (error) {
-        console.error('Error fetching user role:', error);
-      }
-
-      // Verificar si los detalles del proyecto ya han sido proporcionados
-      try {
-        const response = await axios.get(`http://localhost:4444/api/proyecto/misProyectos/${selectedProject?.nombre_proyecto}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.data.proyecto.estado_proyecto) {
-          navigate('/tracking');
-        } else {
-          navigate(`/set-project-details/${selectedProject?.id_proyecto}`, { state: { proyecto: selectedProject } });
-        }
-      } catch (error) {
-        console.error('Error verifying project details:', error);
-        navigate('/tracking');
-      }
+      // Recargar la pantalla y seleccionar el equipo recién creado
+      window.location.reload();
     } catch (error) {
       console.error('Error creating team:', error);
       setCreateError('Error al crear el equipo');
