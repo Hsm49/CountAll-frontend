@@ -270,7 +270,7 @@ const SelectTeam: React.FC = () => {
           </div>
         </div>
 
-        {equipos.length > 0 && (
+        {!isCreating && equipos.length > 0 && (
           <input
             type="text"
             className="search-bar"

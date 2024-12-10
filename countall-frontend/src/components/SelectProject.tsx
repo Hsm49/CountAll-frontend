@@ -159,7 +159,7 @@ const SelectProject: React.FC = () => {
           </div>
         </div>
 
-        {proyectos.length > 0 && (
+        {!isCreating && proyectos.length > 0 && (
           <input
             type="text"
             className="search-bar"
