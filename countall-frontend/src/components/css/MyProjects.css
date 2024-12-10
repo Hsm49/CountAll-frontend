@@ -1,29 +1,60 @@
 .my-projects-container {
     display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    padding: 16px;
-  }
-  
-  .project-card {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.project-card,
+.team-card {
     background-color: #ffffff;
     border: 1px solid #d3d3d3;
     border-radius: 8px;
-    padding: 16px;
-    width: calc(50% - 16px);
+    padding: 20px;
+    width: calc(100% - 40px); /* Ajusta el ancho para que sea más grande */
+    max-width: 600px; /* Ajusta el ancho máximo */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: transform 0.2s;
-  }
-  
-  .project-card:hover {
+}
+
+.project-card:hover,
+.team-card:hover {
     transform: scale(1.05);
-  }
-  
-  .project-card h3 {
+}
+
+.project-card h3,
+.team-card h3 {
     margin-top: 0;
-  }
-  
-  .project-card p {
+}
+
+.project-card p,
+.team-card p {
     margin-bottom: 0;
-  }
+}
+
+.search-bar {
+    width: 100%;
+    max-width: 500px;
+    padding: 12px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.search-bar:focus {
+    outline: none;
+    border-color: #1b70a6;
+    box-shadow: 0 0 0 2px rgba(27, 112, 166, 0.1);
+}
+
+.team-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr); /* Ajusta para una columna */
+    gap: 20px;
+    max-width: 1000px;
+    width: 100%;
+}

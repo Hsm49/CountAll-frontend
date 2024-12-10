@@ -52,7 +52,7 @@ const MyProjects: React.FC = () => {
   );
 
   return (
-    <div className="my-projects-container d-flex justify-content-center">
+    <div className="my-projects-container">
       <button className="btn-naranja" onClick={handleChangeProject}>Cambiar de proyecto</button>
       <input
         type="text"
@@ -63,13 +63,15 @@ const MyProjects: React.FC = () => {
       />
       {error && <div className="error-message">{error}</div>}
       {noProjectsMessage && <div className="no-projects-message">{noProjectsMessage}</div>}
-      {filteredProyectos.map((proyecto) => (
-        <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
-          <h3>{proyecto.nombre_proyecto}</h3>
-          <p>{proyecto.descr_proyecto}</p>
-          <p><strong>Estado:</strong> {proyecto.estado_proyecto}</p>
-        </div>
-      ))}
+      <div className="project-cards-grid">
+        {filteredProyectos.map((proyecto) => (
+          <div key={proyecto.id_proyecto} className="project-card" onClick={() => handleProjectClick(proyecto.nombre_proyecto)}>
+            <h3>{proyecto.nombre_proyecto}</h3>
+            <p>{proyecto.descr_proyecto}</p>
+            <p><strong>Estado:</strong> {proyecto.estado_proyecto}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

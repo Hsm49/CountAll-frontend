@@ -46,7 +46,7 @@ const MyTeams: React.FC = () => {
   );
 
   return (
-    <div className="my-projects-container d-flex justify-content-center">
+    <div className="my-projects-container">
       <button className="btn-naranja" onClick={handleChangeTeam}>Cambiar de equipo</button>
       <input
         type="text"
@@ -55,13 +55,15 @@ const MyTeams: React.FC = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      {filteredEquipos.map((equipo) => (
-        <div key={equipo.id_equipo} className="project-card" onClick={() => handleTeamClick(equipo.id_equipo)}>
-          <h3>{equipo.nombre_equipo}</h3>
-          <p>{equipo.descr_equipo}</p>
-          <p><strong>Proyecto:</strong> {equipo.nombre_proyecto}</p>
-        </div>
-      ))}
+      <div className="team-cards-grid">
+        {filteredEquipos.map((equipo) => (
+          <div key={equipo.id_equipo} className="team-card" onClick={() => handleTeamClick(equipo.id_equipo)}>
+            <h3>{equipo.nombre_equipo}</h3>
+            <p>{equipo.descr_equipo}</p>
+            <p><strong>Proyecto:</strong> {equipo.nombre_proyecto}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
