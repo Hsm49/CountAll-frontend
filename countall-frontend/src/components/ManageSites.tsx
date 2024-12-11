@@ -1,394 +1,213 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardContent,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  Paper,
-  Snackbar,
-  Box,
-  Container,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Switch,
-  FormControlLabel
-} from '@mui/material';
-import { 
-  FaPlus, 
-  FaTrash, 
-  FaEdit, 
-  FaSave,
-  FaLock,
-  FaLockOpen 
-} from 'react-icons/fa';
+import React, { useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { ProjectTeamContext } from '../context/ProjectTeamContext';
+import './css/ManageSites.css';
 
-interface Site {
-  nombre_pagina: string;
-  descr_pagina: string;
-  url_pagina: string;
-  blocked?: boolean;
-  teamBlocked?: boolean;
-}
+const ManageSites: React.FC = () => {
+  const { userRole, selectedTeam } = useContext(ProjectTeamContext)!;
+  interface Site {
+    id_pagina: number;
+    nombre_pagina: string;
+    descr_pagina: string;
+    url_pagina: string;
+    nivel_bloqueo: number;
+  }
 
-const ManageSites = () => {
-  const [teamSites, setTeamSites] = useState<Site[]>([
-    { nombre_pagina: 'YouTube', descr_pagina: 'Sitio de visualización de videos', url_pagina: 'www.youtube.com', blocked: false, teamBlocked: false }
-  ]);
-  const [personalSites, setPersonalSites] = useState<Site[]>([
-    { nombre_pagina: 'Facebook', descr_pagina: 'Red social', url_pagina: 'www.facebook.com', blocked: true, teamBlocked: false }
-  ]);
-  
-  const [newSite, setNewSite] = useState<Site>({
-    nombre_pagina: '',
-    descr_pagina: '',
-    url_pagina: ''
-  });
-  
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingSite, setEditingSite] = useState<{site: Site, isTeamSite: boolean} | null>(null);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [personalSites, setPersonalSites] = useState<Site[]>([]);
+  const [teamSites, setTeamSites] = useState<Site[]>([]);
+  const [newPersonalSite, setNewPersonalSite] = useState({ nombre_pagina: '', descr_pagina: '', url_pagina: '' });
+  const [newTeamSite, setNewTeamSite] = useState({ nombre_pagina: '', descr_pagina: '', url_pagina: '' });
 
   useEffect(() => {
     fetchBlockedSites();
   }, []);
 
-  // Handlers para las llamadas a la API
   const fetchBlockedSites = async () => {
     try {
-      // TODO: Implementar llamada al endpoint
-      console.log('Fetching blocked sites...');
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:4444/api/paginaWeb/verPaginasBloqueadas', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setPersonalSites(response.data.paginas_bloqueadas.filter((site: Site) => site.nivel_bloqueo === 0));
+      setTeamSites(response.data.paginas_bloqueadas.filter((site: Site) => site.nivel_bloqueo === 1));
     } catch (error) {
-      handleError('Error al cargar las páginas bloqueadas');
+      console.error('Error fetching blocked sites:', error);
     }
   };
 
-  const handleBlockSite = async (site: Site, isTeamSite: boolean) => {
+  const normalizeUrl = (url: string) => {
     try {
-      // TODO: Implementar llamada al endpoint
-      console.log(`Blocking site: ${site.url_pagina}`);
-      updateSiteState(site, isTeamSite, { blocked: true });
-      showSnackbarMessage('Sitio bloqueado exitosamente');
-    } catch (error) {
-      handleError('Error al bloquear el sitio');
+      const parsedUrl = new URL(url);
+      return parsedUrl.hostname.replace('www.', '');
+    } catch (e) {
+      return url.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "").split('/')[0];
     }
   };
 
-  const handleUnblockSite = async (site: Site, isTeamSite: boolean) => {
+  const handleBlockSite = async (site: Site, isTeam: boolean) => {
     try {
-      // TODO: Implementar llamada al endpoint
-      console.log(`Unblocking site: ${site.url_pagina}`);
-      updateSiteState(site, isTeamSite, { blocked: false });
-      showSnackbarMessage('Sitio desbloqueado exitosamente');
+      const token = localStorage.getItem('token');
+      const endpoint = isTeam
+        ? `http://localhost:4444/api/paginaWeb/bloquearPaginaEquipo/${selectedTeam?.id_equipo}`
+        : 'http://localhost:4444/api/paginaWeb/bloquearPagina';
+      await axios.post(endpoint, site, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      Swal.fire({
+        icon: 'success',
+        title: 'Sitio bloqueado',
+        text: 'El sitio ha sido bloqueado exitosamente',
+      });
+      fetchBlockedSites();
     } catch (error) {
-      handleError('Error al desbloquear el sitio');
+      console.error('Error blocking site:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al bloquear el sitio',
+      });
     }
   };
 
-  const handleTeamBlock = async (site: Site, isTeamSite: boolean) => {
+  const handleUnblockSite = async (url_pagina: string, isTeam: boolean) => {
     try {
-      // TODO: Implementar llamada al endpoint
-      console.log(`Team blocking site: ${site.url_pagina}`);
-      updateSiteState(site, isTeamSite, { teamBlocked: true });
-      showSnackbarMessage('Sitio bloqueado para el equipo');
-    } catch (error) {
-      handleError('Error al bloquear el sitio para el equipo');
-    }
-  };
-
-  const handleTeamUnblock = async (site: Site, isTeamSite: boolean) => {
-    try {
-      // TODO: Implementar llamada al endpoint
-      console.log(`Team unblocking site: ${site.url_pagina}`);
-      updateSiteState(site, isTeamSite, { teamBlocked: false });
-      showSnackbarMessage('Sitio desbloqueado para el equipo');
-    } catch (error) {
-      handleError('Error al desbloquear el sitio para el equipo');
-    }
-  };
-
-  // Helpers
-  const updateSiteState = (site: Site, isTeamSite: boolean, updates: Partial<Site>) => {
-    const siteList = isTeamSite ? teamSites : personalSites;
-    const setSiteList = isTeamSite ? setTeamSites : setPersonalSites;
-    
-    const updatedList = siteList.map(s => 
-      s.url_pagina === site.url_pagina ? { ...s, ...updates } : s
-    );
-    setSiteList(updatedList);
-  };
-
-  const showSnackbarMessage = (message: string) => {
-    setSnackbarMessage(message);
-    setOpenSnackbar(true);
-  };
-
-  const handleError = (errorMessage: string) => {
-    setSnackbarMessage(errorMessage);
-    setOpenSnackbar(true);
-  };
-
-  // Handlers para la UI
-  const handleAddSite = (isTeamSite: boolean) => {
-    if (newSite.nombre_pagina && newSite.url_pagina) {
-      const siteList = isTeamSite ? teamSites : personalSites;
-      const setSiteList = isTeamSite ? setTeamSites : setPersonalSites;
-      
-      if (!siteList.some(site => site.url_pagina === newSite.url_pagina)) {
-        setSiteList([...siteList, { ...newSite, blocked: false, teamBlocked: false }]);
-        setNewSite({ nombre_pagina: '', descr_pagina: '', url_pagina: '' });
-        showSnackbarMessage('Sitio añadido exitosamente');
+      const token = localStorage.getItem('token');
+      const normalizedSite = normalizeUrl(url_pagina);
+      let endpoint;
+      if (isTeam && selectedTeam) {
+        endpoint = `http://localhost:4444/api/paginaWeb/desbloquearPaginaEquipo/${selectedTeam.id_equipo}/${normalizedSite}`;
       } else {
-        showSnackbarMessage('Esta URL ya existe en la lista');
+        endpoint = `http://localhost:4444/api/paginaWeb/desbloquearPagina/${normalizedSite}`;
       }
+      await axios.delete(endpoint, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      Swal.fire({
+        icon: 'success',
+        title: 'Sitio desbloqueado',
+        text: 'El sitio ha sido desbloqueado exitosamente',
+      });
+      fetchBlockedSites();
+    } catch (error) {
+      console.error('Error unblocking site:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al desbloquear el sitio',
+      });
     }
   };
 
-  const handleRemoveSite = (site: Site, isTeamSite: boolean) => {
-    const siteList = isTeamSite ? teamSites : personalSites;
-    const setSiteList = isTeamSite ? setTeamSites : setPersonalSites;
-    setSiteList(siteList.filter(s => s.url_pagina !== site.url_pagina));
-    showSnackbarMessage('Sitio eliminado exitosamente');
-  };
-
-  const handleEditClick = (site: Site, isTeamSite: boolean) => {
-    setEditingSite({ site, isTeamSite });
-    setOpenDialog(true);
-  };
-
-  const handleEditSave = () => {
-    if (editingSite) {
-      const { site, isTeamSite } = editingSite;
-      const siteList = isTeamSite ? teamSites : personalSites;
-      const setSiteList = isTeamSite ? setTeamSites : setPersonalSites;
-      
-      const updatedList = siteList.map(s => 
-        s.url_pagina === site.url_pagina ? site : s
-      );
-      setSiteList(updatedList);
-      
-      setOpenDialog(false);
-      showSnackbarMessage('Sitio actualizado exitosamente');
-    }
-  };
-
-  const handleSaveChanges = () => {
-    // TODO: Implementar guardado global
-    showSnackbarMessage('Todos los cambios han sido guardados');
-  };
-
-  const SiteList = ({ 
-    title, 
-    sites, 
-    isTeamSite
-  }: { 
-    title: string;
-    sites: Site[];
-    isTeamSite: boolean;
-  }) => (
-    <Card sx={{ mb: 3, boxShadow: 2 }}>
-      <CardContent>
-        <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 3 }}>
-          {title}
-        </Typography>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-          <TextField
-            size="small"
-            value={newSite.nombre_pagina}
-            onChange={(e) => setNewSite({...newSite, nombre_pagina: e.target.value})}
-            placeholder="Nombre de la página"
-            variant="outlined"
-          />
-          <TextField
-            size="small"
-            value={newSite.descr_pagina}
-            onChange={(e) => setNewSite({...newSite, descr_pagina: e.target.value})}
-            placeholder="Descripción"
-            variant="outlined"
-          />
-          <TextField
-            size="small"
-            value={newSite.url_pagina}
-            onChange={(e) => setNewSite({...newSite, url_pagina: e.target.value})}
-            placeholder="URL"
-            variant="outlined"
-          />
-          <Button
-            variant="contained"
-            onClick={() => handleAddSite(isTeamSite)}
-            startIcon={<FaPlus />}
-            sx={{ 
-              bgcolor: 'primary.main',
-              '&:hover': { bgcolor: 'primary.dark' }
-            }}
-          >
-            Añadir Sitio
-          </Button>
-        </Box>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {sites.map(site => (
-            <Paper 
-              key={site.url_pagina}
-              elevation={0}
-              sx={{
-                p: 2,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                bgcolor: 'grey.50',
-                '&:hover': { bgcolor: 'grey.100' }
-              }}
-            >
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle1">{site.nombre_pagina}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {site.url_pagina}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {site.descr_pagina}
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                <IconButton
-                  size="small"
-                  onClick={() => site.blocked ? handleUnblockSite(site, isTeamSite) : handleBlockSite(site, isTeamSite)}
-                  sx={{ color: site.blocked ? 'error.main' : 'success.main' }}
-                >
-                  {site.blocked ? <FaLock /> : <FaLockOpen />}
-                </IconButton>
-                {isTeamSite && (
-                  <IconButton
-                    size="small"
-                    onClick={() => site.teamBlocked ? handleTeamUnblock(site, isTeamSite) : handleTeamBlock(site, isTeamSite)}
-                    sx={{ color: site.teamBlocked ? 'error.main' : 'success.main' }}
-                  >
-                    {site.teamBlocked ? <FaLock /> : <FaLockOpen />}
-                  </IconButton>
-                )}
-                <IconButton
-                  size="small"
-                  onClick={() => handleEditClick(site, isTeamSite)}
-                  sx={{ color: 'primary.main' }}
-                >
-                  <FaEdit />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => handleRemoveSite(site, isTeamSite)}
-                  sx={{ color: 'error.main' }}
-                >
-                  <FaTrash />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
-        </Box>
-      </CardContent>
-    </Card>
-  );
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>, isTeam: boolean) => {
+      e.preventDefault();
+      const site = {
+        ...isTeam ? newTeamSite : newPersonalSite,
+        id_pagina: Date.now(), // or any unique identifier
+        nivel_bloqueo: isTeam ? 1 : 0
+      };
+      if (!site.nombre_pagina || !site.descr_pagina || !site.url_pagina) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Campos incompletos',
+          text: 'Por favor, completa todos los campos',
+        });
+        return;
+      }
+      handleBlockSite(site, isTeam);
+      if (isTeam) {
+        setNewTeamSite({ nombre_pagina: '', descr_pagina: '', url_pagina: '' });
+      } else {
+        setNewPersonalSite({ nombre_pagina: '', descr_pagina: '', url_pagina: '' });
+      }
+    };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <SiteList 
-        title="Sitios bloqueados para el equipo" 
-        sites={teamSites}
-        isTeamSite={true}
-      />
-      
-      <SiteList 
-        title="Sitios bloqueados de forma personal" 
-        sites={personalSites}
-        isTeamSite={false}
-      />
-
-      <Button
-        fullWidth
-        variant="contained"
-        onClick={handleSaveChanges}
-        startIcon={<FaSave />}
-        sx={{ 
-          mt: 2,
-          bgcolor: 'primary.main',
-          '&:hover': { bgcolor: 'primary.dark' }
-        }}
-      >
-        Guardar Cambios
-      </Button>
-
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Editar Sitio</DialogTitle>
-        <DialogContent>
-          <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              fullWidth
-              label="Nombre de la página"
-              value={editingSite?.site.nombre_pagina || ''}
-              onChange={(e) => setEditingSite(prev => 
-                prev ? { ...prev, site: { ...prev.site, nombre_pagina: e.target.value }} : null
+    <div className="manage-sites-container">
+      <h2>Gestión de Sitios Bloqueados</h2>
+      <div className="block-section">
+        <h3>Bloqueo de Sitios Personales</h3>
+        <form onSubmit={(e) => handleSubmit(e, false)}>
+          <input
+            type="text"
+            placeholder="Nombre del Sitio"
+            value={newPersonalSite.nombre_pagina}
+            onChange={(e) => setNewPersonalSite({ ...newPersonalSite, nombre_pagina: e.target.value })}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Descripción del Sitio"
+            value={newPersonalSite.descr_pagina}
+            onChange={(e) => setNewPersonalSite({ ...newPersonalSite, descr_pagina: e.target.value })}
+            required
+          />
+          <input
+            type="url"
+            placeholder="URL del Sitio"
+            value={newPersonalSite.url_pagina}
+            onChange={(e) => setNewPersonalSite({ ...newPersonalSite, url_pagina: e.target.value })}
+            required
+          />
+          <button type="submit">Bloquear Sitio</button>
+        </form>
+        <div className="blocked-sites-list">
+          {personalSites.map(site => (
+            <div key={site.id_pagina} className="site-item">
+              <span>{site.nombre_pagina}</span>
+              <button onClick={() => handleUnblockSite(site.url_pagina, false)}>Desbloquear</button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="block-section">
+        <h3>Bloqueo de Sitios por Equipo</h3>
+        {userRole === 'Líder' && (
+          <form onSubmit={(e) => handleSubmit(e, true)}>
+            <input
+              type="text"
+              placeholder="Nombre del Sitio"
+              value={newTeamSite.nombre_pagina}
+              onChange={(e) => setNewTeamSite({ ...newTeamSite, nombre_pagina: e.target.value })}
+              required
+            />
+            <input
+              type="text"
+              placeholder="Descripción del Sitio"
+              value={newTeamSite.descr_pagina}
+              onChange={(e) => setNewTeamSite({ ...newTeamSite, descr_pagina: e.target.value })}
+              required
+            />
+            <input
+              type="url"
+              placeholder="URL del Sitio"
+              value={newTeamSite.url_pagina}
+              onChange={(e) => setNewTeamSite({ ...newTeamSite, url_pagina: e.target.value })}
+              required
+            />
+            <button type="submit">Bloquear Sitio</button>
+          </form>
+        )}
+        <div className="blocked-sites-list">
+          {teamSites.map(site => (
+            <div key={site.id_pagina} className="site-item">
+              <span>{site.nombre_pagina}</span>
+              {userRole === 'Líder' ? (
+                <button onClick={() => handleUnblockSite(site.url_pagina, true)}>Desbloquear</button>
+              ) : (
+                <span>Bloqueado por el líder</span>
               )}
-            />
-            <TextField
-              fullWidth
-              label="Descripción"
-              value={editingSite?.site.descr_pagina || ''}
-              onChange={(e) => setEditingSite(prev => 
-                prev ? { ...prev, site: { ...prev.site, descr_pagina: e.target.value }} : null
-              )}
-            />
-            <TextField
-              fullWidth
-              label="URL"
-              value={editingSite?.site.url_pagina || ''}
-              onChange={(e) => setEditingSite(prev => 
-                prev ? { ...prev, site: { ...prev.site, url_pagina: e.target.value }} : null
-              )}
-            />
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={editingSite?.site.blocked || false}
-                  onChange={(e) => setEditingSite(prev => 
-                    prev ? { ...prev, site: { ...prev.site, blocked: e.target.checked }} : null
-                  )}
-                />
-              }
-              label="Bloqueado"
-            />
-            {editingSite?.isTeamSite && (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={editingSite?.site.teamBlocked || false}
-                    onChange={(e) => setEditingSite(prev => 
-                      prev ? { ...prev, site: { ...prev.site, teamBlocked: e.target.checked }} : null
-                    )}
-                  />
-                }
-                label="Bloqueado para el equipo"
-              />
-            )}
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancelar</Button>
-          <Button onClick={handleEditSave} variant="contained">Guardar</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={3000}
-        onClose={() => setOpenSnackbar(false)}
-        message={snackbarMessage}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      />
-    </Container>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

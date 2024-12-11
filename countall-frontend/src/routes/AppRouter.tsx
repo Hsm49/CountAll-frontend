@@ -119,13 +119,9 @@ const AppRouter: React.FC = () => {
       <Route
         path="/configurar-sitios"
         element={
-          userRole === 'Líder' ? (
             <PrivateRoute>
               <ManageSites />
             </PrivateRoute>
-          ) : (
-            <Navigate to="/tracking" />
-          )
         }
       />
 
